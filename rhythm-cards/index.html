@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4-Beat Rhythm Card Generator</title>
+<style>
+:root{
+  --purple:#6941c6;--purple-dark:#5330a8;--purple-soft:#f2edff;
+  --ink:#111827;--muted:#667085;--line:#d7dce4;--paper:#fff;
+  --bg:#f7f8fb;--shadow:0 12px 34px rgba(16,24,40,.12);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,Helvetica,sans-serif;color:var(--ink);background:var(--bg)}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+.header{height:82px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:center;gap:14px;font-size:clamp(22px,2.2vw,34px);font-weight:800}
+.logo{width:50px;height:50px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(145deg,#7b55dc,#5734b3);color:#fff;font-size:28px;box-shadow:0 7px 16px rgba(105,65,198,.28)}
+.header-actions{display:flex;gap:10px}
+.btn{border:1px solid #d9dde5;background:#fff;color:var(--ink);border-radius:10px;padding:11px 16px;font-weight:700;box-shadow:0 2px 5px rgba(16,24,40,.06);display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:hover{background:#fafafa}
+.btn.primary{background:linear-gradient(180deg,#754bd3,#6440bd);border-color:#6440bd;color:#fff;box-shadow:0 7px 15px rgba(105,65,198,.23)}
+.btn.primary:hover{filter:brightness(.97)}
+.main{display:grid;grid-template-columns:344px minmax(0,1fr);gap:28px;padding:16px 20px 20px}
+.sidebar{background:#fff;border:1px solid #dfe3ea;border-radius:12px;padding:14px;box-shadow:0 3px 10px rgba(16,24,40,.04);height:calc(100vh - 118px);overflow:auto}
+.section-title{margin:4px 0 10px;color:#5835b0;font-size:17px;font-weight:800;letter-spacing:.01em}
+.level-list{display:grid;gap:4px;margin-bottom:22px}
+.level-btn{width:100%;border:1px solid #d7dbe3;background:#fff;border-radius:7px;padding:9px 10px;font-size:16px}
+.level-btn.active{background:linear-gradient(180deg,#754bd3,#6038b6);color:#fff;border-color:#6038b6;font-weight:800}
+.small-note{font-size:13px;color:var(--muted);margin-top:-7px;margin-bottom:9px}
+.rhythm-list{display:grid;gap:4px}
+.rhythm-row{display:grid;grid-template-columns:38px 1fr 24px;align-items:center;gap:8px;border-radius:7px;padding:5px 4px;min-height:32px}
+.rhythm-row:hover{background:#f7f5fc}
+.preview{height:26px;display:grid;place-items:center;color:#111}
+.preview svg{width:38px;height:26px;overflow:visible}
+.rhythm-label{font-size:14px;line-height:1.2}
+.rhythm-row input{width:18px;height:18px;accent-color:var(--purple)}
+.divider{height:1px;background:#e5e7eb;margin:9px 0}
+.select-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.stage{display:flex;flex-direction:column;min-width:0;gap:18px;justify-content:center}
+.card-shell{background:#fff;border:1px solid #dfe3ea;border-radius:12px;box-shadow:var(--shadow);padding:15px 20px 14px;min-height:540px;display:flex;align-items:center;justify-content:center}
+.rhythm-card{width:100%;max-width:1100px;height:min(620px,calc(100vh - 265px));min-height:430px;display:grid;grid-template-rows:92px 1fr 104px;background:#fff}
+.count-row,.notation-row,.syllable-row{display:grid;grid-template-columns:repeat(4,1fr)}
+.count-row{border-bottom:1px solid var(--line);font-size:clamp(34px,4vw,52px);font-weight:700}
+.count-cell,.syllable-cell{display:flex;align-items:center;justify-content:center;border-right:1px solid var(--line)}
+.count-cell:last-child,.syllable-cell:last-child{border-right:none}
+.notation-row{position:relative;border-bottom:1px solid var(--line)}
+.beat-guide{border-right:1px solid var(--line)}
+.beat-guide:last-child{border-right:none}
+.symbols-layer{position:absolute;inset:0}
+.rhythm-symbol{position:absolute;top:50%;height:72%;width:25%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;padding:0 24px}
+.rhythm-symbol svg{width:78%;height:78%;max-width:210px;max-height:220px;overflow:visible;color:#050505;display:block}
+.rhythm-symbol[data-id="fourSixteenths"] svg,.rhythm-symbol[data-id="eighthTwoSixteenths"] svg,.rhythm-symbol[data-id="twoSixteenthsEighth"] svg{width:96%;height:78%}
+.rhythm-symbol[data-id="whole"] svg{width:66%;height:58%}.rhythm-symbol[data-id="wholeRest"] svg,.rhythm-symbol[data-id="halfRest"] svg{width:64%;height:58%}
+.syllable-row{font-size:clamp(26px,3vw,42px)}
+.controls{display:grid;grid-template-columns:1.08fr 1.18fr .85fr .95fr .8fr .95fr;gap:10px;max-width:1120px;width:100%;margin:0 auto}
+.control-btn{min-height:82px;border:1px solid #d8dce4;border-radius:10px;background:#fff;font-weight:800;box-shadow:0 2px 6px rgba(16,24,40,.06);padding:10px}
+.control-btn.primary{background:linear-gradient(180deg,#754bd3,#6240bc);color:#fff;border-color:#6240bc}
+.control-btn .sub{display:block;font-size:13px;font-weight:600;margin-top:5px;opacity:.85}
+.footer-note{text-align:center;color:#242936;font-size:16px}
+.hidden{visibility:hidden}
+.sidebar.hidden-sidebar{display:none}
+.main.sidebar-off{grid-template-columns:1fr}
+@media(max-width:980px){.main{grid-template-columns:1fr}.sidebar{height:auto}.controls{grid-template-columns:repeat(3,1fr)}.rhythm-card{height:500px}.header{height:auto;min-height:76px;gap:12px;flex-wrap:wrap;padding:12px 16px}.brand{font-size:24px}}
+@media(max-width:620px){.main{padding:10px}.header-actions{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}.btn{padding:10px 8px}.controls{grid-template-columns:repeat(2,1fr)}.rhythm-card{min-height:380px;height:430px;grid-template-rows:70px 1fr 78px}.card-shell{padding:8px}.sidebar{padding:10px}}
+
+body.student-mode .header{display:none}
+body.student-mode .sidebar{display:none!important}
+body.student-mode .main{grid-template-columns:1fr;padding:12px;min-height:100vh}
+body.student-mode .stage{gap:12px;justify-content:center}
+body.student-mode .card-shell{min-height:calc(100vh - 122px);padding:10px}
+body.student-mode .rhythm-card{height:calc(100vh - 150px);max-width:1500px;grid-template-rows:clamp(78px,13vh,125px) 1fr clamp(82px,14vh,125px)}
+body.student-mode .controls{grid-template-columns:1fr 1fr 1fr;max-width:880px}
+body.student-mode #countsBtn,body.student-mode #syllablesBtn,body.student-mode #fullscreenBtn{display:none}
+body.student-mode .control-btn{min-height:72px;font-size:18px}
+body.student-mode .footer-note{display:none}
+body.student-mode .rhythm-symbol svg{width:84%;height:84%;max-width:250px;max-height:260px}
+@media print{.header,.sidebar,.controls,.footer-note{display:none!important}.main{display:block;padding:0}.card-shell{box-shadow:none;border:0;border-radius:0;min-height:0;padding:.4in}.rhythm-card{height:7in;max-width:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="brand"><div class="logo">♫</div><div>4-Beat Rhythm Card Generator</div></div>
+    <div class="header-actions">
+      <button class="btn" id="settingsBtn">⚙ Settings</button>
+      <button class="btn" id="fullscreenTopBtn">⛶ Fullscreen</button>
+      <button class="btn" id="printTopBtn">🖨 Print / Save</button>
+    </div>
+  </header>
+
+  <div class="main" id="mainLayout">
+    <aside class="sidebar" id="sidebar">
+      <div class="section-title">1. CHOOSE LEVEL</div>
+      <div class="level-list" id="levelList">
+        <button class="level-btn" data-preset="k1">Kindergarten / Grade 1</button>
+        <button class="level-btn" data-preset="g2">Grade 2</button>
+        <button class="level-btn active" data-preset="g3">Grade 3</button>
+        <button class="level-btn" data-preset="g4">Grade 4</button>
+        <button class="level-btn" data-preset="g5">Grade 5</button>
+        <button class="level-btn" data-preset="custom">Custom ⚙</button>
+      </div>
+
+      <div class="section-title">2. CHOOSE RHYTHMS</div>
+      <div class="small-note">(Used in this activity)</div>
+      <div class="rhythm-list" id="rhythmChecklist"></div>
+      <div class="select-actions">
+        <button class="btn primary" id="selectAllBtn">Select All</button>
+        <button class="btn" id="deselectAllBtn">Deselect All</button>
+      </div>
+    </aside>
+
+    <main class="stage">
+      <div class="card-shell">
+        <section class="rhythm-card" aria-label="Four beat rhythm card">
+          <div class="count-row" id="countRow">
+            <div class="count-cell">1</div><div class="count-cell">2</div><div class="count-cell">3</div><div class="count-cell">4</div>
+          </div>
+          <div class="notation-row">
+            <div class="beat-guide"></div><div class="beat-guide"></div><div class="beat-guide"></div><div class="beat-guide"></div>
+            <div class="symbols-layer" id="symbolsLayer"></div>
+          </div>
+          <div class="syllable-row" id="syllableGrid">
+            <div class="syllable-cell"></div><div class="syllable-cell"></div><div class="syllable-cell"></div><div class="syllable-cell"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="controls">
+        <button class="control-btn primary" id="newBtn">⤨ &nbsp;New Card<span class="sub">(Space)</span></button>
+        <button class="control-btn" id="previousBtn">‹ &nbsp;Previous Card<span class="sub">(←)</span></button>
+        <button class="control-btn" id="countsBtn">1&nbsp; 2&nbsp; 3&nbsp; 4<span class="sub">Counts: Show</span></button>
+        <button class="control-btn" id="syllablesBtn">Ta&nbsp; Ti-Ti&nbsp; a<span class="sub">Syllables: Show</span></button>
+        <button class="control-btn" id="studentModeBtn">▣<span class="sub">Student Mode</span></button>
+        <button class="control-btn" id="fullscreenBtn">⛶<span class="sub">Fullscreen</span></button>
+      </div>
+      <div class="footer-note" id="status">Every card equals exactly 4 beats.</div>
+    </main>
+  </div>
+</div>
+
+<script>
+const SVG={
+quarter:`<svg viewBox="0 0 120 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="42" cy="139" rx="25" ry="17" transform="rotate(-20 42 139)"/><path d="M62 139V31h8v108z"/></g></svg>`,
+half:`<svg viewBox="0 0 120 180" aria-hidden="true"><g stroke="currentColor"><ellipse cx="42" cy="139" rx="25" ry="17" transform="rotate(-20 42 139)" fill="#fff" stroke-width="7"/><path d="M62 139V31" stroke-width="8"/></g></svg>`,
+dottedHalf:`<svg viewBox="0 0 150 180" aria-hidden="true"><g stroke="currentColor"><ellipse cx="42" cy="139" rx="25" ry="17" transform="rotate(-20 42 139)" fill="#fff" stroke-width="7"/><path d="M62 139V31" stroke-width="8"/></g><circle cx="111" cy="137" r="8" fill="currentColor"/></svg>`,
+whole:`<svg viewBox="0 0 150 180" aria-hidden="true"><ellipse cx="75" cy="108" rx="42" ry="25" transform="rotate(-10 75 108)" fill="currentColor"/><ellipse cx="75" cy="108" rx="23" ry="10" transform="rotate(-10 75 108)" fill="#fff"/></svg>`,
+quarterRest:`<svg viewBox="0 0 100 180" aria-hidden="true"><path d="M59 18 39 62l22 27-18 25 17 45-28-31 14-29-19-24 24-57z" fill="currentColor"/></svg>`,
+halfRest:`<svg viewBox="0 0 150 180" aria-hidden="true"><path d="M22 107h106" stroke="currentColor" stroke-width="8"/><rect x="49" y="78" width="52" height="29" rx="1" fill="currentColor"/></svg>`,
+wholeRest:`<svg viewBox="0 0 150 180" aria-hidden="true"><path d="M22 75h106" stroke="currentColor" stroke-width="8"/><rect x="49" y="75" width="52" height="29" rx="1" fill="currentColor"/></svg>`,
+eighthPair:`<svg viewBox="0 0 190 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="42" cy="139" rx="23" ry="16" transform="rotate(-20 42 139)"/><ellipse cx="142" cy="139" rx="23" ry="16" transform="rotate(-20 142 139)"/><path d="M60 139V40h8v99zM160 139V40h8v99zM60 40h108v14H60z"/></g></svg>`,
+fourSixteenths:`<svg viewBox="0 0 320 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="31" cy="139" rx="19" ry="14" transform="rotate(-20 31 139)"/><ellipse cx="112" cy="139" rx="19" ry="14" transform="rotate(-20 112 139)"/><ellipse cx="193" cy="139" rx="19" ry="14" transform="rotate(-20 193 139)"/><ellipse cx="274" cy="139" rx="19" ry="14" transform="rotate(-20 274 139)"/><path d="M46 139V39h7v100zM127 139V39h7v100zM208 139V39h7v100zM289 139V39h7v100zM46 39h250v12H46zM46 58h250v12H46z"/></g></svg>`,
+eighthTwoSixteenths:`<svg viewBox="0 0 260 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="37" cy="139" rx="22" ry="16" transform="rotate(-20 37 139)"/><ellipse cx="151" cy="139" rx="18" ry="14" transform="rotate(-20 151 139)"/><ellipse cx="222" cy="139" rx="18" ry="14" transform="rotate(-20 222 139)"/><path d="M54 139V39h8v100zM165 139V39h7v100zM236 139V39h7v100zM54 39h189v12H54zM165 58h78v12h-78z"/></g></svg>`,
+twoSixteenthsEighth:`<svg viewBox="0 0 260 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="31" cy="139" rx="18" ry="14" transform="rotate(-20 31 139)"/><ellipse cx="102" cy="139" rx="18" ry="14" transform="rotate(-20 102 139)"/><ellipse cx="216" cy="139" rx="22" ry="16" transform="rotate(-20 216 139)"/><path d="M45 139V39h7v100zM116 139V39h7v100zM233 139V39h8v100zM45 39h196v12H45zM45 58h78v12H45z"/></g></svg>`
+}
+const RHYTHMS=[
+{id:'whole',name:'Whole Note',beats:4,syllable:'Ta-a-a-a',svg:SVG.whole},
+{id:'dottedHalf',name:'Dotted Half Note',beats:3,syllable:'Ta-a-a',svg:SVG.dottedHalf},
+{id:'half',name:'Half Note',beats:2,syllable:'Ta-a',svg:SVG.half},
+{id:'quarter',name:'Quarter Note',beats:1,syllable:'Ta',svg:SVG.quarter},
+{id:'eighthPair',name:'Pair of Eighth Notes',beats:1,syllable:'Ti-Ti',svg:SVG.eighthPair},
+{id:'fourSixteenths',name:'Four Sixteenth Notes',beats:1,syllable:'Tika-Tika',svg:SVG.fourSixteenths},
+{id:'eighthTwoSixteenths',name:'Eighth + Two Sixteenths',beats:1,syllable:'Ti-Tika',svg:SVG.eighthTwoSixteenths},
+{id:'twoSixteenthsEighth',name:'Two Sixteenths + Eighth',beats:1,syllable:'Tika-Ti',svg:SVG.twoSixteenthsEighth},
+{id:'wholeRest',name:'Whole Rest',beats:4,syllable:'',svg:SVG.wholeRest,divider:true},
+{id:'halfRest',name:'Half Rest',beats:2,syllable:'',svg:SVG.halfRest},
+{id:'quarterRest',name:'Quarter Rest',beats:1,syllable:'',svg:SVG.quarterRest}
+];
+const PRESETS={
+// Kindergarten and Grade 1: quarter note, paired eighth notes, and quarter rest.
+k1:['quarter','eighthPair','quarterRest'],
+
+// Grade 2 adds half/whole notes and their rests.
+g2:['quarter','eighthPair','quarterRest','half','halfRest','whole','wholeRest'],
+
+// Grade 3 adds dotted half notes and sixteenth-note patterns.
+g3:['quarter','eighthPair','quarterRest','half','halfRest','whole','wholeRest','dottedHalf','fourSixteenths','eighthTwoSixteenths','twoSixteenthsEighth'],
+
+// Grade 4 continues the Grade 3 duration vocabulary shown in the chart.
+g4:['quarter','eighthPair','quarterRest','half','halfRest','whole','wholeRest','dottedHalf','fourSixteenths','eighthTwoSixteenths','twoSixteenthsEighth'],
+
+// Grade 5 continues the complete rhythm vocabulary used in this 4-beat activity.
+g5:['quarter','eighthPair','quarterRest','half','halfRest','whole','wholeRest','dottedHalf','fourSixteenths','eighthTwoSixteenths','twoSixteenthsEighth']
+};
+const els={checklist:document.getElementById('rhythmChecklist'),symbols:document.getElementById('symbolsLayer'),syllables:document.getElementById('syllableGrid'),counts:document.getElementById('countRow'),status:document.getElementById('status'),sidebar:document.getElementById('sidebar'),main:document.getElementById('mainLayout')};
+let history=[],historyIndex=-1,lastSignature='',showCounts=true,showSyllables=true,studentMode=false;
+function buildChecklist(){els.checklist.innerHTML='';RHYTHMS.forEach(r=>{if(r.divider){const d=document.createElement('div');d.className='divider';els.checklist.appendChild(d)}const row=document.createElement('label');row.className='rhythm-row';row.innerHTML=`<span class="preview">${r.svg}</span><span class="rhythm-label">${r.name} (${r.beats})</span><input type="checkbox" value="${r.id}">`;row.querySelector('input').addEventListener('change',()=>{setActivePreset('custom');resetAndGenerate()});els.checklist.appendChild(row)})}
+function setActivePreset(preset){document.querySelectorAll('.level-btn').forEach(b=>b.classList.toggle('active',b.dataset.preset===preset))}
+function applyPreset(preset){if(preset==='custom'){setActivePreset('custom');return}const selected=new Set(PRESETS[preset]||[]);document.querySelectorAll('#rhythmChecklist input').forEach(cb=>cb.checked=selected.has(cb.value));setActivePreset(preset);resetAndGenerate()}
+function selectedRhythms(){const ids=[...document.querySelectorAll('#rhythmChecklist input:checked')].map(cb=>cb.value);return RHYTHMS.filter(r=>ids.includes(r.id))}
+function findCombos(allowed){const out=[];function walk(total,combo){if(Math.abs(total-4)<.001){out.push([...combo]);return}if(total>4)return;for(const r of allowed){if(total+r.beats<=4.001){combo.push(r);walk(total+r.beats,combo);combo.pop()}}}walk(0,[]);return out}
+function sig(c){return c.map(r=>r.id).join('|')}
+function randomCard(){const allowed=selectedRhythms();if(!allowed.length){els.status.textContent='Choose at least one rhythm.';clearCard();return null}const combos=findCombos(allowed);if(!combos.length){els.status.textContent='These choices cannot make exactly four beats.';clearCard();return null}let pool=combos.length>1?combos.filter(c=>sig(c)!==lastSignature):combos;if(!pool.length)pool=combos;const combo=pool[Math.floor(Math.random()*pool.length)];lastSignature=sig(combo);els.status.textContent=`Every card equals exactly 4 beats. ${combos.length.toLocaleString()} possible cards with these choices.`;return combo}
+function render(combo){clearCard();if(!combo)return;let start=0;const syll=Array(4).fill('');combo.forEach(r=>{const beatIndex=Math.floor(start+.001);const el=document.createElement('div');el.className='rhythm-symbol';el.dataset.id=r.id;el.style.left=`${beatIndex*25}%`;el.innerHTML=r.svg;el.setAttribute('aria-label',`${r.name}, ${r.beats} beat${r.beats===1?'':'s'}`);els.symbols.appendChild(el);syll[beatIndex]=r.syllable;start+=r.beats});[...els.syllables.children].forEach((c,i)=>c.textContent=syll[i]);updateDisplay()}
+function clearCard(){els.symbols.innerHTML='';[...els.syllables.children].forEach(c=>c.textContent='')}
+function generate(){const combo=randomCard();if(!combo)return;history=history.slice(0,historyIndex+1);history.push(combo);historyIndex=history.length-1;render(combo)}
+function previous(){if(historyIndex>0){historyIndex--;render(history[historyIndex]);els.status.textContent=`Card ${historyIndex+1} of ${history.length}.`}else els.status.textContent='There is no earlier card yet.'}
+function resetAndGenerate(){history=[];historyIndex=-1;lastSignature='';generate()}
+function updateDisplay(){els.counts.classList.toggle('hidden',!showCounts);els.syllables.classList.toggle('hidden',!showSyllables);document.querySelector('#countsBtn .sub').textContent=`Counts: ${showCounts?'Hide':'Show'}`;document.querySelector('#syllablesBtn .sub').textContent=`Syllables: ${showSyllables?'Hide':'Show'}`;document.querySelector('#studentModeBtn .sub').textContent=studentMode?'Exit Student Mode':'Student Mode'}
+async function fullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch{els.status.textContent='Fullscreen is not available in this browser.'}}
+buildChecklist();applyPreset('g3');updateDisplay();
+document.querySelectorAll('.level-btn').forEach(b=>b.addEventListener('click',()=>applyPreset(b.dataset.preset)));
+document.getElementById('selectAllBtn').onclick=()=>{document.querySelectorAll('#rhythmChecklist input').forEach(cb=>cb.checked=true);setActivePreset('custom');resetAndGenerate()};
+document.getElementById('deselectAllBtn').onclick=()=>{document.querySelectorAll('#rhythmChecklist input').forEach(cb=>cb.checked=false);setActivePreset('custom');clearCard();els.status.textContent='Choose at least one rhythm.'};
+document.getElementById('newBtn').onclick=generate;document.getElementById('previousBtn').onclick=previous;
+document.getElementById('countsBtn').onclick=()=>{showCounts=!showCounts;updateDisplay()};
+document.getElementById('syllablesBtn').onclick=()=>{showSyllables=!showSyllables;updateDisplay()};
+document.getElementById('studentModeBtn').onclick=()=>{studentMode=!studentMode;document.body.classList.toggle('student-mode',studentMode);els.sidebar.classList.toggle('hidden-sidebar',studentMode);els.main.classList.toggle('sidebar-off',studentMode);updateDisplay()};
+document.getElementById('fullscreenBtn').onclick=fullscreen;document.getElementById('fullscreenTopBtn').onclick=fullscreen;
+document.getElementById('printTopBtn').onclick=()=>window.print();
+document.getElementById('settingsBtn').onclick=()=>{if(studentMode){studentMode=false;document.body.classList.remove('student-mode');updateDisplay()}els.sidebar.classList.toggle('hidden-sidebar');els.main.classList.toggle('sidebar-off')};
+document.addEventListener('keydown',e=>{if(e.code==='Space'&&!['INPUT','BUTTON'].includes(document.activeElement.tagName)){e.preventDefault();generate()}if(e.key==='ArrowLeft')previous();if(e.key==='Escape'&&studentMode){studentMode=false;document.body.classList.remove('student-mode');els.sidebar.classList.remove('hidden-sidebar');els.main.classList.remove('sidebar-off');updateDisplay()}});
+</script>
+</body>
+</html>
