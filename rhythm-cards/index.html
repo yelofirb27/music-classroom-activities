@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>4-Beat Rhythm Card Generator</title>
+<title>4-Beat Rhythm Card Generator — Uniform Notes, Correct Quarter Rest</title>
 <style>
 :root{
   --purple:#6941c6;--purple-dark:#5330a8;--purple-soft:#f2edff;
@@ -51,9 +51,11 @@ button{cursor:pointer}
 .beat-guide:last-child{border-right:none}
 .symbols-layer{position:absolute;inset:0}
 .rhythm-symbol{position:absolute;top:50%;height:72%;width:25%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;padding:0 24px}
-.rhythm-symbol svg{width:78%;height:78%;max-width:210px;max-height:220px;overflow:visible;color:#050505;display:block}
-.rhythm-symbol[data-id="fourSixteenths"] svg,.rhythm-symbol[data-id="eighthTwoSixteenths"] svg,.rhythm-symbol[data-id="twoSixteenthsEighth"] svg{width:96%;height:78%}
-.rhythm-symbol[data-id="whole"] svg{width:66%;height:58%}.rhythm-symbol[data-id="wholeRest"] svg,.rhythm-symbol[data-id="halfRest"] svg{width:64%;height:58%}
+.rhythm-symbol svg{height:190px;width:auto;max-width:92%;overflow:visible;color:#0b0d12;display:block;filter:drop-shadow(0 1px 0 rgba(0,0,0,.04))}
+.rhythm-symbol[data-id="whole"] svg{height:112px}
+.rhythm-symbol[data-id="halfRest"] svg,.rhythm-symbol[data-id="wholeRest"] svg{height:96px}
+.rhythm-symbol[data-id="quarterRest"] svg{height:160px}
+.preview svg{height:25px!important;width:auto!important;max-width:38px}
 .syllable-row{font-size:clamp(26px,3vw,42px)}
 .controls{display:grid;grid-template-columns:1.08fr 1.18fr .85fr .95fr .8fr .95fr;gap:10px;max-width:1120px;width:100%;margin:0 auto}
 .control-btn{min-height:82px;border:1px solid #d8dce4;border-radius:10px;background:#fff;font-weight:800;box-shadow:0 2px 6px rgba(16,24,40,.06);padding:10px}
@@ -76,7 +78,7 @@ body.student-mode .controls{grid-template-columns:1fr 1fr 1fr;max-width:880px}
 body.student-mode #countsBtn,body.student-mode #syllablesBtn,body.student-mode #fullscreenBtn{display:none}
 body.student-mode .control-btn{min-height:72px;font-size:18px}
 body.student-mode .footer-note{display:none}
-body.student-mode .rhythm-symbol svg{width:84%;height:84%;max-width:250px;max-height:260px}
+body.student-mode .rhythm-symbol svg{height:230px;width:auto;max-width:94%}body.student-mode .rhythm-symbol[data-id="whole"] svg{height:138px}body.student-mode .rhythm-symbol[data-id="halfRest"] svg,body.student-mode .rhythm-symbol[data-id="wholeRest"] svg{height:118px}body.student-mode .rhythm-symbol[data-id="quarterRest"] svg{height:195px}
 @media print{.header,.sidebar,.controls,.footer-note{display:none!important}.main{display:block;padding:0}.card-shell{box-shadow:none;border:0;border-radius:0;min-height:0;padding:.4in}.rhythm-card{height:7in;max-width:none}}
 </style>
 </head>
@@ -143,17 +145,17 @@ body.student-mode .rhythm-symbol svg{width:84%;height:84%;max-width:250px;max-he
 
 <script>
 const SVG={
-quarter:`<svg viewBox="0 0 120 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="42" cy="139" rx="25" ry="17" transform="rotate(-20 42 139)"/><path d="M62 139V31h8v108z"/></g></svg>`,
-half:`<svg viewBox="0 0 120 180" aria-hidden="true"><g stroke="currentColor"><ellipse cx="42" cy="139" rx="25" ry="17" transform="rotate(-20 42 139)" fill="#fff" stroke-width="7"/><path d="M62 139V31" stroke-width="8"/></g></svg>`,
-dottedHalf:`<svg viewBox="0 0 150 180" aria-hidden="true"><g stroke="currentColor"><ellipse cx="42" cy="139" rx="25" ry="17" transform="rotate(-20 42 139)" fill="#fff" stroke-width="7"/><path d="M62 139V31" stroke-width="8"/></g><circle cx="111" cy="137" r="8" fill="currentColor"/></svg>`,
-whole:`<svg viewBox="0 0 150 180" aria-hidden="true"><ellipse cx="75" cy="108" rx="42" ry="25" transform="rotate(-10 75 108)" fill="currentColor"/><ellipse cx="75" cy="108" rx="23" ry="10" transform="rotate(-10 75 108)" fill="#fff"/></svg>`,
-quarterRest:`<svg viewBox="0 0 100 180" aria-hidden="true"><path d="M59 18 39 62l22 27-18 25 17 45-28-31 14-29-19-24 24-57z" fill="currentColor"/></svg>`,
-halfRest:`<svg viewBox="0 0 150 180" aria-hidden="true"><path d="M22 107h106" stroke="currentColor" stroke-width="8"/><rect x="49" y="78" width="52" height="29" rx="1" fill="currentColor"/></svg>`,
-wholeRest:`<svg viewBox="0 0 150 180" aria-hidden="true"><path d="M22 75h106" stroke="currentColor" stroke-width="8"/><rect x="49" y="75" width="52" height="29" rx="1" fill="currentColor"/></svg>`,
-eighthPair:`<svg viewBox="0 0 190 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="42" cy="139" rx="23" ry="16" transform="rotate(-20 42 139)"/><ellipse cx="142" cy="139" rx="23" ry="16" transform="rotate(-20 142 139)"/><path d="M60 139V40h8v99zM160 139V40h8v99zM60 40h108v14H60z"/></g></svg>`,
-fourSixteenths:`<svg viewBox="0 0 320 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="31" cy="139" rx="19" ry="14" transform="rotate(-20 31 139)"/><ellipse cx="112" cy="139" rx="19" ry="14" transform="rotate(-20 112 139)"/><ellipse cx="193" cy="139" rx="19" ry="14" transform="rotate(-20 193 139)"/><ellipse cx="274" cy="139" rx="19" ry="14" transform="rotate(-20 274 139)"/><path d="M46 139V39h7v100zM127 139V39h7v100zM208 139V39h7v100zM289 139V39h7v100zM46 39h250v12H46zM46 58h250v12H46z"/></g></svg>`,
-eighthTwoSixteenths:`<svg viewBox="0 0 260 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="37" cy="139" rx="22" ry="16" transform="rotate(-20 37 139)"/><ellipse cx="151" cy="139" rx="18" ry="14" transform="rotate(-20 151 139)"/><ellipse cx="222" cy="139" rx="18" ry="14" transform="rotate(-20 222 139)"/><path d="M54 139V39h8v100zM165 139V39h7v100zM236 139V39h7v100zM54 39h189v12H54zM165 58h78v12h-78z"/></g></svg>`,
-twoSixteenthsEighth:`<svg viewBox="0 0 260 180" aria-hidden="true"><g fill="currentColor"><ellipse cx="31" cy="139" rx="18" ry="14" transform="rotate(-20 31 139)"/><ellipse cx="102" cy="139" rx="18" ry="14" transform="rotate(-20 102 139)"/><ellipse cx="216" cy="139" rx="22" ry="16" transform="rotate(-20 216 139)"/><path d="M45 139V39h7v100zM116 139V39h7v100zM233 139V39h8v100zM45 39h196v12H45zM45 58h78v12H45z"/></g></svg>`
+quarter:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><ellipse cx="147" cy="145" rx="29" ry="20" transform="rotate(-18 147 145)"/><rect x="171" y="35" width="8" height="112" rx="3"/></g></svg>`,
+half:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><path fill-rule="evenodd" d="M118 145c0-15 15-28 35-32 20-4 36 4 36 19 0 15-15 29-35 33-20 4-36-5-36-20zm15-2c0 7 8 10 19 8 12-2 22-10 22-17 0-7-8-10-19-8-12 2-22 10-22 17z"/><rect x="181" y="35" width="8" height="112" rx="3"/></g></svg>`,
+dottedHalf:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><path fill-rule="evenodd" d="M105 145c0-15 15-28 35-32 20-4 36 4 36 19 0 15-15 29-35 33-20 4-36-5-36-20zm15-2c0 7 8 10 19 8 12-2 22-10 22-17 0-7-8-10-19-8-12 2-22 10-22 17z"/><rect x="168" y="35" width="8" height="112" rx="3"/><circle cx="212" cy="145" r="8"/></g></svg>`,
+whole:`<svg viewBox="0 0 320 200" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M105 105c0-24 25-42 55-42s55 18 55 42-25 42-55 42-55-18-55-42zm19 0c0 13 16 23 36 23s36-10 36-23-16-23-36-23-36 10-36 23z"/></svg>`,
+quarterRest:`<svg viewBox="0 0 320 200" aria-hidden="true"><path d="M159 17 Q153 14 149 19 Q146 23 150 30 L174 75 L151 99 L179 141 Q184 149 178 154 Q172 160 165 153 Q151 141 137 141 Q123 141 116 151 Q108 163 117 176 Q128 190 146 198 Q153 201 157 195 Q160 191 156 184 Q146 168 142 158 Q139 151 144 147 Q149 143 157 148 L169 156 Q174 160 179 157 Q184 153 181 146 L168 120 L194 96 Q198 92 195 86 L175 53 L180 32 Q182 25 176 21 Z" fill="currentColor"/></svg>`,
+halfRest:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><rect x="104" y="106" width="112" height="8" rx="2"/><rect x="129" y="78" width="62" height="28" rx="2"/></g></svg>`,
+wholeRest:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><rect x="104" y="76" width="112" height="8" rx="2"/><rect x="129" y="84" width="62" height="28" rx="2"/></g></svg>`,
+eighthPair:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><ellipse cx="103" cy="145" rx="29" ry="20" transform="rotate(-18 103 145)"/><ellipse cx="217" cy="145" rx="29" ry="20" transform="rotate(-18 217 145)"/><rect x="127" y="35" width="8" height="112" rx="3"/><rect x="241" y="35" width="8" height="112" rx="3"/><rect x="127" y="35" width="122" height="15" rx="2"/></g></svg>`,
+fourSixteenths:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><ellipse cx="50" cy="145" rx="23" ry="16" transform="rotate(-18 50 145)"/><ellipse cx="123" cy="145" rx="23" ry="16" transform="rotate(-18 123 145)"/><ellipse cx="196" cy="145" rx="23" ry="16" transform="rotate(-18 196 145)"/><ellipse cx="269" cy="145" rx="23" ry="16" transform="rotate(-18 269 145)"/><rect x="69" y="34" width="7" height="113" rx="3"/><rect x="142" y="34" width="7" height="113" rx="3"/><rect x="215" y="34" width="7" height="113" rx="3"/><rect x="288" y="34" width="7" height="113" rx="3"/><rect x="69" y="34" width="226" height="13" rx="2"/><rect x="69" y="55" width="226" height="13" rx="2"/></g></svg>`,
+eighthTwoSixteenths:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><ellipse cx="56" cy="145" rx="27" ry="19" transform="rotate(-18 56 145)"/><ellipse cx="190" cy="145" rx="23" ry="16" transform="rotate(-18 190 145)"/><ellipse cx="265" cy="145" rx="23" ry="16" transform="rotate(-18 265 145)"/><rect x="79" y="34" width="8" height="113" rx="3"/><rect x="209" y="34" width="7" height="113" rx="3"/><rect x="284" y="34" width="7" height="113" rx="3"/><rect x="79" y="34" width="212" height="13" rx="2"/><rect x="209" y="55" width="82" height="13" rx="2"/></g></svg>`,
+twoSixteenthsEighth:`<svg viewBox="0 0 320 200" aria-hidden="true"><g fill="currentColor"><ellipse cx="55" cy="145" rx="23" ry="16" transform="rotate(-18 55 145)"/><ellipse cx="130" cy="145" rx="23" ry="16" transform="rotate(-18 130 145)"/><ellipse cx="264" cy="145" rx="27" ry="19" transform="rotate(-18 264 145)"/><rect x="74" y="34" width="7" height="113" rx="3"/><rect x="149" y="34" width="7" height="113" rx="3"/><rect x="287" y="34" width="8" height="113" rx="3"/><rect x="74" y="34" width="221" height="13" rx="2"/><rect x="74" y="55" width="82" height="13" rx="2"/></g></svg>`
 }
 const RHYTHMS=[
 {id:'whole',name:'Whole Note',beats:4,syllable:'Ta-a-a-a',svg:SVG.whole},
