@@ -6,33 +6,59 @@
 <title>Candy Bar Rondo</title>
 <style>
 :root {
-  --bg:#000;
-  --line:#8e8e8e;
-  --paper:#f7f7f5;
-  --ink:#555;
+  --bg:#080706;
+  --line:#9b8a72;
+  --paper:#fffdf8;
+  --ink:#3f3a34;
   --gold:#f5c451;
+  --cream:#fff2d1;
+  --wood:#5a2711;
 }
 * { box-sizing:border-box; }
-html,body { margin:0; width:100%; height:100%; background:var(--bg); color:#fff; font-family:Arial,Helvetica,sans-serif; overflow:hidden; }
-body { padding:12px 18px; }
-.wrap { width:min(1600px,100%); height:100%; margin:auto; display:flex; flex-direction:column; min-height:0; }
-.header { flex:0 0 auto; display:flex; align-items:center; justify-content:center; position:relative; margin-bottom:8px; }
-h1 { margin:0; font-family:"Comic Sans MS","Bradley Hand",cursive; font-weight:400; font-size:clamp(40px,5vw,72px); }
-.toolbar { position:absolute; right:0; display:flex; gap:8px; }
-.toolbar button { background:#fff; color:#111; border:0; border-radius:9px; padding:10px 14px; font-weight:700; cursor:pointer; }
+html,body { margin:0; min-height:100%; background:var(--bg); color:#fff; font-family:Arial,Helvetica,sans-serif; }
+body {
+  padding:18px;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(196,86,36,.20), transparent 42%),
+    linear-gradient(180deg,#17110e 0,#080706 34%,#030303 100%);
+}
+.wrap { width:min(1600px,100%); margin:auto; }
+.header {
+  display:flex; align-items:center; justify-content:center; position:relative;
+  margin:0 auto 14px; min-height:92px; padding:10px 240px;
+  border-top:3px solid rgba(245,196,81,.55);
+  border-bottom:3px solid rgba(245,196,81,.30);
+  background:linear-gradient(90deg,transparent,rgba(91,35,13,.58),transparent);
+}
+h1 {
+  margin:0; font-family:"Comic Sans MS","Bradley Hand",cursive; font-weight:400;
+  font-size:clamp(40px,5vw,72px); letter-spacing:1px; text-shadow:0 3px 0 #3b170a,0 6px 18px #000;
+}
+.toolbar { position:absolute; right:14px; display:flex; gap:9px; }
+.toolbar button {
+  background:linear-gradient(#fffdf8,#eadfc8); color:#2d241d; border:1px solid #a99270;
+  border-radius:10px; padding:10px 14px; font-weight:800; cursor:pointer;
+  box-shadow:0 3px 0 #76583b,0 6px 13px rgba(0,0,0,.35);
+}
+.toolbar button:hover { transform:translateY(-1px); }
 
 .board {
   display:grid;
   grid-template-columns:110px repeat(4,minmax(0,1fr));
-  grid-template-rows:repeat(5,minmax(0,1fr));
-  flex:1 1 auto;
-  min-height:0;
-  border:2px solid var(--line);
+  grid-template-rows:repeat(5,minmax(118px,1fr));
+  min-height:690px;
+  border:3px solid #b69a70;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 18px 45px rgba(0,0,0,.58),0 0 0 6px rgba(78,34,15,.60);
+  background:#020202;
 }
 .label {
   display:flex; align-items:center; justify-content:center;
   font-size:clamp(56px,7vw,100px); font-weight:800;
   border-right:2px solid var(--line); border-bottom:2px solid var(--line);
+  background:linear-gradient(135deg,#1c1713,#050505 70%);
+  color:#fff8e7; text-shadow:0 4px 0 #321506;
 }
 .cell {
   position:relative; display:flex; align-items:center; justify-content:center;
@@ -42,14 +68,21 @@ h1 { margin:0; font-family:"Comic Sans MS","Bradley Hand",cursive; font-weight:4
 .board > :nth-last-child(-n+5) { border-bottom:0; }
 .a { padding:10px; }
 .a > div {
-  width:100%; height:100%; min-height:0; background:var(--paper); color:var(--ink);
-  border:4px solid #050505; display:flex; align-items:center; justify-content:center; text-align:center;
+  width:100%; height:100%; min-height:96px;
+  background:linear-gradient(180deg,#fffefa,#f3eadb); color:var(--ink);
+  border:3px solid #1b1713; border-radius:5px;
+  display:flex; align-items:center; justify-content:center; text-align:center;
   padding:12px; font-size:clamp(18px,2.1vw,32px); line-height:1.08;
+  box-shadow:inset 0 0 0 1px #fff,0 3px 8px rgba(0,0,0,.28);
 }
-.pick { cursor:pointer; background:#000; }
+.pick { cursor:pointer; background:linear-gradient(180deg,#0d0c0b,#020202); }
 .pick:hover { box-shadow:inset 0 0 0 5px var(--gold); }
-.pick .prompt { color:#d7d7d7; opacity:.75; text-align:center; font-size:18px; }
-.pick img { width:88%; height:78%; max-width:100%; max-height:100%; object-fit:contain; filter:drop-shadow(0 5px 5px rgba(0,0,0,.55)); }
+.pick .prompt {
+  color:#f0dfc7; opacity:.82; text-align:center; font-size:17px; font-weight:700;
+  border:1px dashed rgba(240,223,199,.42); border-radius:10px; padding:13px 18px;
+  background:rgba(255,255,255,.035);
+}
+.pick img { width:86%; height:82%; object-fit:contain; filter:drop-shadow(0 6px 5px rgba(0,0,0,.65)); }
 .pick::after {
   content:"+"; position:absolute; right:10px; bottom:8px; width:30px; height:30px;
   border-radius:50%; display:grid; place-items:center; background:rgba(255,255,255,.18); font-size:22px;
@@ -57,8 +90,18 @@ h1 { margin:0; font-family:"Comic Sans MS","Bradley Hand",cursive; font-weight:4
 .pick.filled::after { content:"↻"; }
 .drop { animation:drop .35s cubic-bezier(.2,.8,.25,1.25); }
 @keyframes drop { from { transform:translateY(-55px) scale(.75); opacity:0; } to { transform:none; opacity:1; } }
-.active { box-shadow:inset 0 0 0 7px var(--gold),0 0 25px rgba(245,196,81,.5); z-index:2; }
-.note { flex:0 0 auto; text-align:center; color:#ddd; margin:6px 0 0; font-size:14px; }
+.repeat-cell { padding-right:42px; }
+.repeat-cell img { width:80%; }
+.repeat-sign {
+  position:absolute; right:10px; top:50%; transform:translateY(-54%);
+  color:#fff8e7; font-family:Georgia,serif; font-size:clamp(56px,5vw,82px);
+  font-weight:900; line-height:.6; text-shadow:0 3px 0 #5f2b12; pointer-events:none; z-index:4;
+}
+.note {
+  width:max-content; max-width:100%; margin:14px auto 0; padding:8px 18px;
+  text-align:center; color:#f0dfc7; font-weight:700; border-radius:999px;
+  background:rgba(87,37,14,.55); border:1px solid rgba(245,196,81,.32);
+}
 
 .drawer {
   position:fixed; left:0; right:0; bottom:0; transform:translateY(105%);
@@ -82,12 +125,10 @@ h1 { margin:0; font-family:"Comic Sans MS","Bradley Hand",cursive; font-weight:4
 .candy span { position:absolute; left:4px; right:4px; bottom:5px; color:#24150c; font-weight:800; text-align:center; font-size:14px; }
 
 @media(max-width:900px){
-  html,body { height:auto; min-height:100%; overflow:auto; }
   body { padding:8px; overflow-x:auto; }
-  .wrap { height:auto; }
-  .header { flex-direction:column; gap:10px; }
+  .header { flex-direction:column; gap:10px; padding:10px; }
   .toolbar { position:static; }
-  .board { min-width:980px; min-height:690px; }
+  .board { min-width:980px; }
   .candies { grid-template-columns:repeat(3,minmax(130px,1fr)); }
 }
 </style>
@@ -97,7 +138,6 @@ h1 { margin:0; font-family:"Comic Sans MS","Bradley Hand",cursive; font-weight:4
   <div class="header">
     <h1>Candy Bar Rondo</h1>
     <div class="toolbar">
-      <button id="play">▶ Visual Play</button>
       <button id="clear">Clear B &amp; C</button>
       <button id="full">⛶ Full Screen</button>
     </div>
@@ -114,7 +154,7 @@ h1 { margin:0; font-family:"Comic Sans MS","Bradley Hand",cursive; font-weight:4
     <div class="cell pick" data-section="B" data-slot="1"><div class="prompt">Click to choose candy</div></div>
     <div class="cell pick" data-section="B" data-slot="2"><div class="prompt">Click to choose candy</div></div>
     <div class="cell pick" data-section="B" data-slot="3"><div class="prompt">Click to choose candy</div></div>
-    <div class="cell pick" data-section="B" data-slot="4"><div class="prompt">Click to choose candy</div></div>
+    <div class="cell pick repeat-cell" data-section="B" data-slot="4"><div class="prompt">Click to choose candy</div><span class="repeat-sign" aria-label="repeat sign">:</span></div>
 
     <div class="label">A</div>
     <div class="cell a"><div>Trick or treat, you’re so sweet.</div></div>
@@ -126,7 +166,7 @@ h1 { margin:0; font-family:"Comic Sans MS","Bradley Hand",cursive; font-weight:4
     <div class="cell pick" data-section="C" data-slot="1"><div class="prompt">Click to choose candy</div></div>
     <div class="cell pick" data-section="C" data-slot="2"><div class="prompt">Click to choose candy</div></div>
     <div class="cell pick" data-section="C" data-slot="3"><div class="prompt">Click to choose candy</div></div>
-    <div class="cell pick" data-section="C" data-slot="4"><div class="prompt">Click to choose candy</div></div>
+    <div class="cell pick repeat-cell" data-section="C" data-slot="4"><div class="prompt">Click to choose candy</div><span class="repeat-sign" aria-label="repeat sign">:</span></div>
 
     <div class="label">A</div>
     <div class="cell a"><div>Trick or treat, you’re so sweet.</div></div>
@@ -150,7 +190,6 @@ const drawer = document.getElementById('drawer');
 const candyGrid = document.getElementById('candies');
 const instruction = document.getElementById('instruction');
 let target = null;
-let playing = false;
 
 for (const c of candyData) {
   const b = document.createElement('button');
@@ -158,7 +197,8 @@ for (const c of candyData) {
   b.innerHTML = `<img src="${c.src}" alt="${c.name}"><span>${c.name}</span>`;
   b.addEventListener('click', () => {
     if (!target) return;
-    target.innerHTML = `<img class="drop" src="${c.src}" alt="${c.name}" title="${c.name}">`;
+    const repeat = target.classList.contains('repeat-cell') ? '<span class="repeat-sign" aria-label="repeat sign">:</span>' : '';
+    target.innerHTML = `<img class="drop" src="${c.src}" alt="${c.name}" title="${c.name}">${repeat}`;
     target.classList.add('filled');
     drawer.classList.remove('open');
     target = null;
@@ -168,7 +208,6 @@ for (const c of candyData) {
 
 document.querySelectorAll('.pick').forEach(cell => {
   cell.addEventListener('click', () => {
-    if (playing) return;
     target = cell;
     instruction.textContent = `Choose candy for section ${cell.dataset.section}, box ${cell.dataset.slot}.`;
     drawer.classList.add('open');
@@ -180,30 +219,11 @@ document.getElementById('close').addEventListener('click', () => {
 });
 
 document.getElementById('clear').addEventListener('click', () => {
-  if (playing) return;
   document.querySelectorAll('.pick').forEach(c => {
     c.classList.remove('filled','active');
-    c.innerHTML = '<div class="prompt">Click to choose candy</div>';
+    const repeat = c.classList.contains('repeat-cell') ? '<span class="repeat-sign" aria-label="repeat sign">:</span>' : '';
+    c.innerHTML = '<div class="prompt">Click to choose candy</div>' + repeat;
   });
-});
-
-const sleep = ms => new Promise(r => setTimeout(r,ms));
-document.getElementById('play').addEventListener('click', async () => {
-  if (playing) return;
-  playing = true;
-  drawer.classList.remove('open');
-  const btn = document.getElementById('play');
-  btn.textContent = 'Playing…';
-  const cells = [...document.querySelectorAll('.board .cell')];
-  const rows = [cells.slice(0,4),cells.slice(4,8),cells.slice(8,12),cells.slice(12,16),cells.slice(16,20)];
-  for (const row of rows) {
-    row.forEach(c=>c.classList.add('active'));
-    await sleep(1800);
-    row.forEach(c=>c.classList.remove('active'));
-    await sleep(250);
-  }
-  btn.textContent = '▶ Visual Play';
-  playing = false;
 });
 
 document.getElementById('full').addEventListener('click', async () => {
