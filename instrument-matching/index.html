@@ -301,6 +301,33 @@
     .game-buttons .primary-button,
     .game-buttons .secondary-button { margin: 0; width: 100%; min-height: 54px; font-size: 1.05rem; }
 
+    .sound-button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: white;
+      color: var(--ink);
+      box-shadow: 0 5px 14px rgba(25, 38, 62, .10);
+      font-weight: 700;
+    }
+
+    .sound-button:hover { background: #f7f9fc; }
+
+    .confetti-piece {
+      position: fixed;
+      top: -20px;
+      z-index: 60;
+      width: 12px;
+      height: 18px;
+      border-radius: 3px;
+      pointer-events: none;
+      animation: confetti-fall 2.8s linear forwards;
+    }
+
+    @keyframes confetti-fall {
+      to { transform: translate3d(var(--drift), 110vh, 720deg); opacity: .9; }
+    }
+
     .win-overlay {
       position: fixed;
       inset: 0;
@@ -391,6 +418,7 @@
           <div class="status-pill"><span id="setName">Common Band Instruments</span></div>
           <div class="status-pill">Matches: <span id="matchesCount">0</span>/8</div>
           <div class="status-pill">Turns: <span id="turnCount">0</span></div>
+          <button id="soundButton" class="sound-button" type="button" aria-pressed="true">🔊 Sound On</button>
         </div>
         <div id="board" class="board" aria-label="Memory matching game board"></div>
       </div>
@@ -425,23 +453,23 @@
       band: {
         title: "Common Band Instruments",
         instruments: [
-          { name: "Bass Clarinet", image: "images/bass clarinet.png" },
-          { name: "Bass Drum", image: "images/bass drum.png" },
-          { name: "Bassoon", image: "images/bassoon.png" },
-          { name: "Clarinet", image: "images/clarinet.png" },
-          { name: "Contrabassoon", image: "images/contrabassoon.png" },
-          { name: "Cymbals", image: "images/cymbals.png" },
-          { name: "English Horn", image: "images/English horn.png" },
-          { name: "Flute", image: "images/flute.png" },
-          { name: "French Horn", image: "images/French horn.png" },
-          { name: "Oboe", image: "images/oboe.png" },
-          { name: "Piccolo", image: "images/piccolo.png" },
-          { name: "Snare Drum", image: "images/snare drum.png" },
-          { name: "Sousaphone", image: "images/sousaphone.png" },
-          { name: "Tenor Saxophone", image: "images/tenor saxophone.png" },
-          { name: "Trombone", image: "images/trombone.png" },
-          { name: "Trumpet", image: "images/trumpet.png" },
-          { name: "Tuba", image: "images/tuba.png" }
+          { name: "Bass Clarinet", image: "bass clarinet.png" },
+          { name: "Bass Drum", image: "bass drum.png" },
+          { name: "Bassoon", image: "bassoon.png" },
+          { name: "Clarinet", image: "clarinet.png" },
+          { name: "Contrabassoon", image: "contrabassoon.png" },
+          { name: "Cymbals", image: "cymbals.png" },
+          { name: "English Horn", image: "English horn.png" },
+          { name: "Flute", image: "flute.png" },
+          { name: "French Horn", image: "French horn.png" },
+          { name: "Oboe", image: "oboe.png" },
+          { name: "Piccolo", image: "piccolo.png" },
+          { name: "Snare Drum", image: "snare drum.png" },
+          { name: "Sousaphone", image: "sousaphone.png" },
+          { name: "Tenor Saxophone", image: "tenor saxophone.png" },
+          { name: "Trombone", image: "trombone.png" },
+          { name: "Trumpet", image: "trumpet.png" },
+          { name: "Tuba", image: "tuba.png" }
         ]
       }
     };
@@ -457,6 +485,9 @@
     const emptyMessage = document.getElementById("emptyMessage");
     const winOverlay = document.getElementById("winOverlay");
     const winMessage = document.getElementById("winMessage");
+    const soundButton = document.getElementById("soundButton");
+    let soundOn = true;
+    let audioContext = null;
 
     let selectedSetKey = "band";
     let firstCard = null;
@@ -464,6 +495,53 @@
     let lockBoard = false;
     let matches = 0;
     let turns = 0;
+
+    function playTone(frequency, duration = 0.16, type = "sine") {
+      if (!soundOn) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      audioContext = audioContext || new AudioCtx();
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = type;
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.18, audioContext.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+      oscillator.connect(gain).connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + duration + 0.03);
+    }
+
+    function playMatchSound() {
+      playTone(523.25, 0.14, "triangle");
+      setTimeout(() => playTone(659.25, 0.18, "triangle"), 110);
+    }
+
+    function playMissSound() {
+      playTone(220, 0.16, "sine");
+    }
+
+    function playWinSound() {
+      [523.25, 659.25, 783.99, 1046.5].forEach((note, index) => {
+        setTimeout(() => playTone(note, 0.24, "triangle"), index * 135);
+      });
+    }
+
+    function launchConfetti() {
+      const colors = ["#ff5d73", "#ffd166", "#06d6a0", "#4c9ae4", "#8b5cf6"];
+      for (let i = 0; i < 70; i++) {
+        const piece = document.createElement("span");
+        piece.className = "confetti-piece";
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.setProperty("--drift", `${(Math.random() - .5) * 220}px`);
+        piece.style.animationDelay = `${Math.random() * .45}s`;
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 3400);
+      }
+    }
 
     function shuffle(items) {
       const array = [...items];
@@ -555,16 +633,20 @@
         matches += 1;
         matchesCount.textContent = String(matches);
         addMatchedName(matchedName);
+        playMatchSound();
         resetTurn();
 
         if (matches === 8) {
           setTimeout(() => {
+            playWinSound();
+            launchConfetti();
             winMessage.textContent = `You matched all eight instruments in ${turns} turn${turns === 1 ? "" : "s"}.`;
             winOverlay.classList.add("show");
             document.getElementById("winPlayAgain").focus();
           }, 550);
         }
       } else {
+        playMissSound();
         lockBoard = true;
         setTimeout(() => {
           firstCard.classList.remove("flipped");
@@ -599,6 +681,12 @@
     document.getElementById("menuButton").addEventListener("click", backToMenu);
     document.getElementById("winPlayAgain").addEventListener("click", startGame);
     document.getElementById("winMenu").addEventListener("click", backToMenu);
+    soundButton.addEventListener("click", () => {
+      soundOn = !soundOn;
+      soundButton.textContent = soundOn ? "🔊 Sound On" : "🔇 Sound Off";
+      soundButton.setAttribute("aria-pressed", String(soundOn));
+      if (soundOn) playTone(660, 0.12, "triangle");
+    });
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && winOverlay.classList.contains("show")) {
