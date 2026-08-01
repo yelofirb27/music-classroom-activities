@@ -270,8 +270,8 @@ h1 {
   height:188%;
   max-width:none;
   max-height:none;
-  object-position:48% center;
-  transform:translate(-5%,9%);
+  object-position:44% center;
+  transform:translate(-13%,9%);
   filter:drop-shadow(0 7px 6px rgba(0,0,0,.72));
 }
 
@@ -280,8 +280,8 @@ h1 {
   height:180%;
   max-width:none;
   max-height:none;
-  object-position:48% center;
-  transform:translate(-4%,7%);
+  object-position:44% center;
+  transform:translate(-11%,7%);
 }
 
 .replace {
@@ -559,6 +559,16 @@ h1 {
 .teacher-actions button { border:1px solid var(--gold); border-radius:8px; padding:9px 14px; font-weight:700; cursor:pointer; }
 .teacher-actions .save { background:#f0dfb9; color:#382610; }
 .teacher-actions .secondary { background:#3d2512; color:#fff; }
+
+.gear-button {
+  width:38px;
+  min-width:38px;
+  padding:7px 0 !important;
+  font-size:19px !important;
+  line-height:1;
+  text-align:center;
+}
+
 @media (max-height:620px) {
   .header { flex-basis:44px; }
   h1 { font-size:29px; }
@@ -574,10 +584,9 @@ h1 {
 <body>
 <div class="app">
   <header class="header">
-    <div class="shop-plaque" aria-hidden="true">Music Rondo<br>Candy Co.<span>♫</span></div>
     <h1><span class="title-candy" aria-hidden="true">🍭</span> <span id="mainTitle">Candy Bar Rondo</span> <span class="title-candy" aria-hidden="true">🍭</span></h1>
     <div class="toolbar">
-      <button id="settingsBtn" title="Teacher settings">⚙ Teacher</button>
+      <button id="settingsBtn" class="gear-button" title="Teacher settings" aria-label="Teacher settings">⚙</button>
       <button id="clearBtn">Clear B &amp; C</button>
       <button id="fullBtn">⛶ Full Screen</button>
     </div>
