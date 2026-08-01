@@ -35,6 +35,41 @@
           { name: "Bass Metallophone", image: "orff-mallet/bass metallophone.png" },
           { name: "Tone Bar", image: "orff-mallet/tone bar.png" }
         ]
+      },
+      general: {
+        title: "General Music Instruments",
+        instruments: [
+          { name: "Jingle Ring", image: "general-music/bells(1).png" },
+          { name: "Hand Bells", image: "general-music/bells.png" },
+          { name: "Cabasa", image: "general-music/cabasa.png" },
+          { name: "Claves", image: "general-music/claves.png" },
+          { name: "Cowbell", image: "general-music/cowbell.png" },
+          { name: "Cymbals", image: "general-music/cymbals.png" },
+          { name: "Egg Shakers", image: "general-music/egg shakers.png" },
+          { name: "Finger Cymbals", image: "general-music/finger cymbals.png" },
+          { name: "Guiro", image: "general-music/guiro.png" },
+          { name: "Keyboard", image: "general-music/keyboard.png" },
+          { name: "Lollipop Drum", image: "general-music/lollipop drum.png" },
+          { name: "Maracas", image: "general-music/maracas.png" },
+          { name: "Ocean Drum", image: "general-music/ocean drum.png" },
+          { name: "Rainstick", image: "general-music/rainstick.png" },
+          { name: "Recorder", image: "general-music/recorder.png" },
+          { name: "Rhythm Sticks", image: "general-music/rhythm sticks.png" },
+          { name: "Sandblocks", image: "general-music/sandblocks.png" },
+          { name: "Slapstick", image: "general-music/slapstick.png" },
+          { name: "Sleigh Bells", image: "general-music/sleigh bells.png" },
+          { name: "Spoons", image: "general-music/spoons.png" },
+          { name: "Hand Drum", image: "general-music/tambour drum.png" },
+          { name: "Tambourine", image: "general-music/tambourine.png" },
+          { name: "Tone Block", image: "general-music/toneblock.png" },
+          { name: "Triangle", image: "general-music/triangle.png" },
+          { name: "Ukulele", image: "general-music/ukulele.png" },
+          { name: "Vibraslap", image: "general-music/vibraslap.png" },
+          { name: "Washboard", image: "general-music/washboard.png" },
+          { name: "Wind Chimes", image: "general-music/wind chimes.png" },
+          { name: "Woodblock", image: "general-music/woodblock.png" },
+          { name: "Wrist Bells", image: "general-music/wrist bells.png" }
+        ]
       }
     };
 
