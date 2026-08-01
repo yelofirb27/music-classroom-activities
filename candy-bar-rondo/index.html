@@ -180,7 +180,7 @@ h1 {
   align-items:center;
   justify-content:center;
   text-align:center;
-  padding:clamp(4px,.65vh,9px);
+  padding:clamp(3px,.48vh,7px);
   background:
     radial-gradient(circle at 18% 22%,rgba(110,82,50,.055) 0 1px,transparent 1.6px),
     radial-gradient(circle at 77% 68%,rgba(110,82,50,.045) 0 1px,transparent 1.5px),
@@ -193,8 +193,8 @@ h1 {
     inset 0 0 0 1px rgba(255,255,255,.7),
     inset 0 0 18px rgba(104,73,34,.08),
     0 3px 7px rgba(0,0,0,.45);
-  font-size:clamp(14px,1.95vh,26px);
-  font-weight:500;
+  font-size:clamp(17px,2.35vh,31px);
+  font-weight:700;
   line-height:1.06;
 }
 
@@ -250,6 +250,27 @@ h1 {
   height:82%;
   object-fit:contain;
   filter:drop-shadow(0 6px 5px rgba(0,0,0,.62));
+}
+
+
+
+/* Rock Candy needs extra visual weight because its package is tall and narrow. */
+.candy-board-img.rock-candy-img {
+  width:112%;
+  height:112%;
+  max-width:none;
+  max-height:none;
+  object-position:58% center;
+  transform:translateX(5%);
+}
+
+.candy-card img.rock-candy-img {
+  width:128%;
+  height:128%;
+  max-width:none;
+  max-height:none;
+  object-position:60% center;
+  transform:translateX(7%);
 }
 
 .replace {
@@ -479,7 +500,7 @@ h1 {
 @media (max-height:560px) {
   h1 { font-size:31px; }
   .header { flex-basis:46px; }
-  .lyric { font-size:13px; }
+  .lyric { font-size:15px; font-weight:700; }
   .label { font-size:34px; }
 }
 
@@ -511,7 +532,7 @@ h1 {
   .app { padding:4px 7px; gap:3px; }
   .board-frame { padding:4px; }
   .footer-note { display:none; }
-  .lyric { font-size:12.5px; }
+  .lyric { font-size:14px; font-weight:700; }
   .label { font-size:32px; }
   .toolbar button { padding:5px 7px; font-size:11px; }
 }
@@ -669,8 +690,9 @@ try {
 candies.forEach(candy => {
   const button = document.createElement("button");
   button.className = "candy-card";
+  const imageClass = candy.name === "Rock Candy" ? "rock-candy-img" : "";
   button.innerHTML = `
-    <img src="${candy.src}" alt="${candy.name}">
+    <img class="${imageClass}" src="${candy.src}" alt="${candy.name}">
     <span class="candy-name">${candy.name}</span>
   `;
   button.addEventListener("click", () => placeCandy(candy));
@@ -693,8 +715,9 @@ function placeCandy(candy) {
   const repeat = targetCell.classList.contains("repeat-cell")
     ? '<div class="repeat-sign">:||</div>'
     : '';
+  const imageClass = candy.name === "Rock Candy" ? " rock-candy-img" : "";
   targetCell.innerHTML = `
-    <img class="candy-board-img drop" src="${candy.src}" alt="${candy.name}" title="${candy.name}">
+    <img class="candy-board-img drop${imageClass}" src="${candy.src}" alt="${candy.name}" title="${candy.name}">
     <span class="replace">↻</span>
     ${repeat}
   `;
