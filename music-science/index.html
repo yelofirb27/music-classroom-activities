@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Pythagoras Monochord – A440 + One Adjustable String</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root { --w: 900px; --pad: 18px; }
+  body{ font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+        margin:0; padding:24px; background:#fff; color:#111; text-align:center; }
+  h1{ margin:0 0 6px 0; font-size:1.8rem; }
+  .sub{ margin:0 12px 18px; color:#444; font-size:0.98rem; }
+  .stage{ width:min(95vw,var(--w)); margin:0 auto 16px auto; border:1px solid #ddd;
+          border-radius:10px; padding:var(--pad); }
+  canvas{ width:100%; height:auto; display:block; background:#fafafa; border-radius:8px; touch-action:none; }
+  .controls{ width:min(95vw,var(--w)); margin:10px auto 0; display:grid; gap:10px; grid-template-columns:1fr; }
+  .row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center;
+        padding:8px 0; border-top:1px dashed #eee; }
+  .row:first-child{ border-top:none; }
+  button, select{ font-size:0.95rem; padding:8px 12px; border-radius:8px; border:1px solid #ccc; background:#fff; }
+  button:hover{ background:#f2f2f2; cursor:pointer; }
+  .badge{ display:inline-block; min-width:12ch; padding:6px 10px; border-radius:999px; background:#f6f6f6;
+          border:1px solid #e9e9e9; font-variant-numeric:tabular-nums; font-size:0.96rem; }
+  .legend{ display:flex; gap:18px; justify-content:center; margin-top:8px; color:#666; font-size:0.95rem; }
+  .dot{ width:12px; height:12px; border-radius:50%; display:inline-block; vertical-align:middle; margin-right:6px; }
+  .red{ background:#d93025; } .gray{ background:#6e6e6e; }
+  .about{ width:min(95vw,var(--w)); margin:22px auto 0; color:#444; font-size:0.98rem; }
+  .about h2{ margin:6px 0 6px; font-size:1.1rem; font-weight:700; }
+  .note{ color:#777; font-size:0.9rem; }
+</style>
+</head>
+<body>
+  <h1>Pythagoras Monochord</h1>
+  <p class="sub">The top string is a fixed open reference at <strong>A4 = 440 Hz</strong>. The red string begins open (far right). Select a preset interval to see Pythagoras’ simple ratios at work.</p>
+
+  <div class="stage">
+    <canvas id="monochord" width="1200" height="280"></canvas>
+  </div>
+
+  <div class="controls">
+    <div class="row">
+      <button id="playRef">Play Open A440</button>
+      <span class="badge">Ref: <span id="refHz">440.00</span> Hz (A4)</span>
+      <span class="legend">
+        <span class="dot red"></span>
+        <span>String 1 (Red): <span class="badge"><span id="hz1">440.00</span> Hz — <span id="note1">A4</span></span></span>
+      </span>
+    </div>
+
+    <div class="row">
+      <button id="play1">Play Red</button>
+      <button id="playBoth">Play A440 + Red</button>
+      <button id="stopAll">Stop All</button>
+      <button id="resetRed">Reset Red to Open</button>
+    </div>
+
+    <div class="row">
+      <label>Choose Interval:</label>
+      <select id="preset">
+        <option value="2/1">Octave — 2:1</option>
+        <option value="3/2">Perfect 5th — 3:2</option>
+        <option value="4/3">Perfect 4th — 4:3</option>
+        <option value="5/4">Major 3rd — 5:4</option>
+        <option value="6/5">Minor 3rd — 6:5</option>
+        <option value="9/8">Major 2nd — 9:8</option>
+        <option value="16/9">Minor 7th — 16:9</option>
+      </select>
+      <button id="applyPreset">Apply & Show Fractions</button>
+    </div>
+
+    <div class="row note" id="fractionNote" style="display:none;"></div>
+  </div>
+
+  <div class="about">
+    <h2>About Pythagoras’ Discovery:</h2>
+    <p>On a monochord, pitch rises as the vibrating length shortens. Pythagoras observed that simple whole-number <em>frequency ratios</em> (like 2:1, 3:2, 4:3, 5:4, 6:5) produce the most consonant intervals. Because frequency is inversely proportional to length, realizing a frequency ratio \(a\!:\!b\) on a string is done by stopping the string at \(b/a\) of its full length.</p>
+  </div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('monochord');
+  const ctx = canvas.getContext('2d');
+  const PADDING = 60;
+  const TOP_Y = 80;
+  const RED_Y = 200;
+  const LINE_X0 = PADDING;
+  const LINE_X1 = canvas.width - PADDING;
+  const FULL_LEN = LINE_X1 - LINE_X0;
+  const MARKER_RADIUS = 9;
+
+  const REF_HZ = 440;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  const actx = new AudioCtx();
+  let playing = new Set();
+
+  function makeOsc(freq){
+    const osc = actx.createOscillator();
+    const gain = actx.createGain();
+    const now = actx.currentTime;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.15, now + 0.01);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    osc.connect(gain).connect(actx.destination);
+    osc.start();
+    return {osc, gain};
+  }
+  function stopAll(){
+    playing.forEach(pair=>{
+      const now = actx.currentTime;
+      pair.gain.gain.cancelScheduledValues(now);
+      pair.gain.gain.setTargetAtTime(0, now, 0.02);
+      pair.osc.stop(now + 0.05);
+    });
+    playing.clear();
+  }
+
+  let redX = LINE_X1;
+  let fracA = null;
+  let fracB = null;
+  let showFractions = false;
+
+  const NOTE_NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+  function freqToNoteName(f){
+    if (!isFinite(f) || f <= 0) return {name:"", cents:0};
+    const n = Math.round(12*Math.log2(f/440)) + 69;
+    const name = NOTE_NAMES[(n % 12 + 12) % 12];
+    const octave = Math.floor(n/12) - 1;
+    const midiFreq = 440*Math.pow(2,(n-69)/12);
+    const cents = Math.round(1200*Math.log2(f/midiFreq));
+    return {name: `${name}${octave}`, cents};
+  }
+
+  function freqFromX(x){
+    const L = Math.max(5, x - LINE_X0);
+    return REF_HZ * (FULL_LEN / L);
+  }
+  function clampX(x){
+    return Math.max(LINE_X0+10, Math.min(LINE_X1, x));
+  }
+  function parseRatio(str){
+    const [a,b] = str.split('/').map(Number);
+    return {a, b, R: a/b};
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.strokeStyle = '#cfcfcf';
+    ctx.lineWidth = 10; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(LINE_X0, TOP_Y-28); ctx.lineTo(LINE_X0, RED_Y+28); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(LINE_X1, TOP_Y-28); ctx.lineTo(LINE_X1, RED_Y+28); ctx.stroke();
+
+    ctx.lineWidth = 3; ctx.strokeStyle = '#6e6e6e';
+    ctx.beginPath(); ctx.moveTo(LINE_X0, TOP_Y); ctx.lineTo(LINE_X1, TOP_Y); ctx.stroke();
+    ctx.fillStyle = '#333'; ctx.font = '14px system-ui, sans-serif';
+    ctx.fillText('Open Reference (A4 = 440 Hz)', LINE_X0, TOP_Y - 18);
+
+    if (showFractions && Number.isInteger(fracA) && fracA > 1){
+      const tooMany = fracA > 12;
+      const fractionNote = document.getElementById('fractionNote');
+
+      if (tooMany){
+        const targetX = LINE_X0 + FULL_LEN * (fracB/fracA);
+        ctx.strokeStyle = '#999'; ctx.setLineDash([6,6]); ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(targetX, RED_Y-28); ctx.lineTo(targetX, RED_Y+28); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#444'; ctx.fillText(`${fracB}/${fracA}`, targetX - 14, RED_Y - 36);
+        fractionNote.style.display = '';
+        fractionNote.textContent = `Stopped fraction b/a = ${fracB}/${fracA}.`;
+      } else {
+        const step = FULL_LEN / fracA;
+        ctx.strokeStyle = '#bdbdbd'; ctx.lineWidth = 2; ctx.setLineDash([4,6]);
+        ctx.fillStyle = '#555';
+        for (let k=1; k<fracA; k++){
+          if (k === fracB) continue;
+          const x = LINE_X0 + step * k;
+          ctx.beginPath(); ctx.moveTo(x, RED_Y-22); ctx.lineTo(x, RED_Y+22); ctx.stroke();
+          ctx.fillText(`${k}/${fracA}`, x - 14, RED_Y - 26);
+        }
+        ctx.setLineDash([]);
+
+        const stopX = LINE_X0 + FULL_LEN * (fracB/fracA);
+        ctx.fillStyle = 'rgba(217,48,37,0.10)';
+        ctx.fillRect(LINE_X0, RED_Y-6, stopX - LINE_X0, 12);
+
+        ctx.strokeStyle = '#d93025'; ctx.lineWidth = 3; ctx.setLineDash([2,4]);
+        ctx.beginPath(); ctx.moveTo(stopX, RED_Y-30); ctx.lineTo(stopX, RED_Y+30); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#d93025'; ctx.fillText(`${fracB}/${fracA}`, stopX - 14, RED_Y - 36);
+
+        fractionNote.style.display = '';
+        fractionNote.textContent = `Dividing the string into ${fracA} parts; stopping at ${fracB}/${fracA} gives the ${fracA}:${fracB} ratio.`;
+      }
+    } else {
+      document.getElementById('fractionNote').style.display = 'none';
+    }
+
+    ctx.strokeStyle = '#d93025'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(LINE_X0, RED_Y); ctx.lineTo(redX, RED_Y); ctx.stroke();
+    drawMarker(redX, RED_Y, '#d93025');
+
+    const f = freqFromX(redX);
+    const {name,cents} = freqToNoteName(f);
+    const centsStr = (cents===0) ? '' : (cents>0?` (+${cents}¢)`:` (${cents}¢)`);
+    ctx.fillStyle = '#333'; ctx.fillText(`String 1 (Red): ${f.toFixed(2)} Hz — ${name}${centsStr}`, LINE_X0, RED_Y - 18);
+  }
+
+  function drawMarker(x, y, color){
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(x, y, MARKER_RADIUS, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = color; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x, y - MARKER_RADIUS - 6); ctx.lineTo(x, y + MARKER_RADIUS + 6); ctx.stroke();
+  }
+
+  function updateHz(){
+    const f = freqFromX(redX);
+    const {name} = freqToNoteName(f);
+    document.getElementById('refHz').textContent = REF_HZ.toFixed(2);
+    document.getElementById('hz1').textContent = f.toFixed(2);
+    document.getElementById('note1').textContent = name;
+  }
+
+  const playRefBtn = document.getElementById('playRef');
+  const play1Btn = document.getElementById('play1');
+  const playBothBtn = document.getElementById('playBoth');
+  const stopAllBtn = document.getElementById('stopAll');
+  const resetRedBtn = document.getElementById('resetRed');
+  const presetSel = document.getElementById('preset');
+  const applyBtn = document.getElementById('applyPreset');
+
+  playRefBtn.addEventListener('click', () => { stopAll(); playing.add(makeOsc(REF_HZ)); });
+  play1Btn.addEventListener('click', () => { stopAll(); playing.add(makeOsc(freqFromX(redX))); });
+  playBothBtn.addEventListener('click', () => { stopAll(); playing.add(makeOsc(REF_HZ)); playing.add(makeOsc(freqFromX(redX))); });
+  stopAllBtn.addEventListener('click', stopAll);
+  resetRedBtn.addEventListener('click', () => { redX = LINE_X1; updateHz(); draw(); stopAll(); });
+
+  applyBtn.addEventListener('click', () => {
+    const {a,b} = parseRatio(presetSel.value);
+    redX = clampX(LINE_X0 + FULL_LEN * (b/a));
+    fracA = a; fracB = b; showFractions = true;
+    updateHz(); draw();
+  });
+
+  function init(){ redX = LINE_X1; updateHz(); draw(); }
+  init();
+})();
+</script>
+</body>
+</html>
