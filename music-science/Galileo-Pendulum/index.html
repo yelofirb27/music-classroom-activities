@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Galileo’s Pendulum Simulator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  :root {
+    --bg: #f0f8ff;
+    --card: #ffffff;
+    --ink: #111;
+    --muted: #666;
+    --border: #d7e3f0;
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.35;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  h1 {
+    margin: 0 0 4px;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+
+  .stage,
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  }
+
+  .stage {
+    padding: 10px;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: #fff;
+    border-radius: 8px;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+  }
+
+  label {
+    font-weight: 600;
+  }
+
+  .value {
+    min-width: 2.5ch;
+    display: inline-block;
+    text-align: right;
+  }
+
+  input[type="range"] {
+    width: 180px;
+  }
+
+  select,
+  button {
+    font: inherit;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  button {
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  #startBtn {
+    background: #e9f2ff;
+    border-color: #cfe3ff;
+  }
+
+  #stopBtn {
+    background: #fff4f4;
+    border-color: #ffd8d8;
+  }
+
+  #resetBtn {
+    background: #f7f7f7;
+  }
+
+  .readout {
+    margin-top: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .readout span {
+    font-weight: 700;
+  }
+
+  .log {
+    max-height: 220px;
+    overflow: auto;
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px dashed var(--border);
+  }
+
+  .log li {
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .footer-blurb {
+    padding-top: 6px;
+    text-align: center;
+  }
+
+  .footer-blurb h2 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+  }
+
+  .footer-blurb p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.93rem;
+  }
+
+  @media (max-width: 420px) {
+    input[type="range"] {
+      width: 140px;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<main class="app">
+
+  <h1>Galileo’s Pendulum Simulator</h1>
+
+  <section class="stage">
+    <canvas
+      id="pendulumCanvas"
+      width="480"
+      height="360"
+      aria-label="Galileo pendulum simulation">
+    </canvas>
+  </section>
+
+  <section class="panel">
+
+    <div class="row" style="justify-content: space-between;">
+
+      <div>
+        <label for="length">String Length</label>
+        &nbsp;<span class="value" id="lenVal">100</span> cm
+        <br>
+        <input
+          type="range"
+          id="length"
+          min="10"
+          max="200"
+          value="100"
+          step="1">
+      </div>
+
+      <div>
+        <label for="mass">Mass</label>
+        <br>
+        <select id="mass">
+          <option value="50">50 g</option>
+          <option value="100" selected>100 g</option>
+          <option value="200">200 g</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <button id="startBtn">Start</button>
+        <button id="stopBtn">Stop</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+
+    </div>
+
+    <div class="readout">
+      Period: <span id="period">--</span> s
+      &nbsp;&nbsp;
+      BPM: <span id="bpm">--</span>
+      &nbsp;&nbsp;
+      🎶 Match: <span id="match">--</span>
+    </div>
+
+    <h3 style="margin: 10px 0 6px;">⏱ Recorded Periods</h3>
+    <ul class="log" id="log"></ul>
+
+  </section>
+
+  <section class="footer-blurb">
+    <h2>About Galileo’s Discovery:</h2>
+    <p>
+      In the 1580s, Galileo noticed that pendulums of the same
+      length keep nearly the same period, even with different
+      swing sizes. This insight led to pendulum timekeepers and
+      inspired the use of pendulums in metronomes to keep a
+      steady musical beat.
+    </p>
+  </section>
+
+</main>
+
+<script>
+const g = 9.81;
+
+const canvas = document.getElementById("pendulumCanvas");
+const ctx = canvas.getContext("2d");
+
+const lenSlider = document.getElementById("length");
+const lenVal = document.getElementById("lenVal");
+const massSelector = document.getElementById("mass");
+
+const periodDisplay = document.getElementById("period");
+const bpmDisplay = document.getElementById("bpm");
+const matchDisplay = document.getElementById("match");
+
+const resetBtn = document.getElementById("resetBtn");
+const startBtn = document.getElementById("startBtn");
+const stopBtn = document.getElementById("stopBtn");
+
+const logList = document.getElementById("log");
+
+const bpmLibrary = [
+  { bpm: 60, song: "Adagio / Ballads" },
+  { bpm: 72, song: "Canon in D — Pachelbel" },
+  { bpm: 90, song: "Perfect — Ed Sheeran" },
+  { bpm: 100, song: "Stayin' Alive — Bee Gees" },
+  { bpm: 120, song: "Billie Jean — Michael Jackson" },
+  { bpm: 140, song: "Uptown Funk — Bruno Mars" },
+  { bpm: 160, song: "Happy — Pharrell" }
+];
+
+/*
+  The pivot remains in the same position as the retrieved version.
+  The length in centimeters is also used as the visible pixel length.
+*/
+const origin = {
+  x: canvas.width / 2,
+  y: 52
+};
+
+let length = Number(lenSlider.value);
+let radius = length;
+let mass = Number(massSelector.value);
+
+let angle = Math.PI / 6;
+let angleVel = 0;
+
+let isRunning = false;
+let isClicking = false;
+let lastClickTime = 0;
+
+/* -------------------------------------------------------
+   ORIGINAL CLICK SOUND
+------------------------------------------------------- */
+
+let audioCtx = null;
+
+function prepareAudio() {
+  if (!audioCtx) {
+    audioCtx = new (
+      window.AudioContext ||
+      window.webkitAudioContext
+    )();
+  }
+
+  if (audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+}
+
+function playClick() {
+  if (!isClicking || !audioCtx) {
+    return;
+  }
+
+  const oscillator = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  oscillator.type = "sine";
+  oscillator.frequency.value = 880;
+
+  oscillator.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  const now = audioCtx.currentTime;
+
+  gain.gain.setValueAtTime(0.12, now);
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    now + 0.10
+  );
+
+  oscillator.start(now);
+  oscillator.stop(now + 0.10);
+}
+
+/* -------------------------------------------------------
+   SONG MATCHING
+------------------------------------------------------- */
+
+function getClosestMatch(bpm) {
+  return bpmLibrary.reduce((closest, current) => {
+    const closestDifference = Math.abs(closest.bpm - bpm);
+    const currentDifference = Math.abs(current.bpm - bpm);
+
+    return currentDifference < closestDifference
+      ? current
+      : closest;
+  });
+}
+
+/* -------------------------------------------------------
+   DRAWING
+------------------------------------------------------- */
+
+function drawStand() {
+  ctx.save();
+
+  /*
+    Top wooden support.
+  */
+  ctx.fillStyle = "#8a6847";
+  ctx.strokeStyle = "#4f3824";
+  ctx.lineWidth = 2;
+
+  ctx.fillRect(origin.x - 82, 18, 164, 18);
+  ctx.strokeRect(origin.x - 82, 18, 164, 18);
+
+  /*
+    Two small support blocks beneath the beam.
+  */
+  ctx.fillStyle = "#745334";
+
+  ctx.fillRect(origin.x - 72, 36, 15, 17);
+  ctx.fillRect(origin.x + 57, 36, 15, 17);
+
+  /*
+    Pivot pin.
+  */
+  ctx.beginPath();
+  ctx.arc(origin.x, origin.y, 5, 0, Math.PI * 2);
+  ctx.fillStyle = "#3b3129";
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(origin.x, origin.y, 2, 0, Math.PI * 2);
+  ctx.fillStyle = "#c3a56b";
+  ctx.fill();
+
+  /*
+    Bottom wooden base.
+  */
+  ctx.fillStyle = "#8a6847";
+  ctx.strokeStyle = "#4f3824";
+
+  ctx.fillRect(65, canvas.height - 25, canvas.width - 130, 14);
+  ctx.strokeRect(65, canvas.height - 25, canvas.width - 130, 14);
+
+  ctx.restore();
+}
+
+function drawTriangularBob(x, y) {
+  /*
+    Bob sizes are still related to mass, but much smaller
+    than the original mass / 3 circle.
+
+    50 g  = approximately 20 pixels high
+    100 g = approximately 24 pixels high
+    200 g = approximately 32 pixels high
+  */
+  const bobHeight = 16 + mass * 0.08;
+  const bobWidth = bobHeight * 0.85;
+
+  ctx.save();
+
+  /*
+    Move the canvas to the exact end of the string.
+    The upper point of the triangle is therefore attached
+    directly to the string.
+  */
+  ctx.translate(x, y);
+
+  /*
+    Rotate the bob with the pendulum so that it remains
+    aligned with the string.
+  */
+  ctx.rotate(-angle);
+
+  /*
+    Small metal loop at the attachment point.
+  */
+  ctx.beginPath();
+  ctx.arc(0, 2, 3, 0, Math.PI * 2);
+  ctx.fillStyle = "#4a4a4a";
+  ctx.fill();
+
+  /*
+    Triangle:
+    point at the string,
+    wider body underneath.
+  */
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-bobWidth / 2, bobHeight);
+  ctx.lineTo(bobWidth / 2, bobHeight);
+  ctx.closePath();
+
+  const gradient = ctx.createLinearGradient(
+    -bobWidth / 2,
+    0,
+    bobWidth / 2,
+    bobHeight
+  );
+
+  gradient.addColorStop(0, "#5c6268");
+  gradient.addColorStop(0.5, "#a4a7aa");
+  gradient.addColorStop(1, "#494e53");
+
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  ctx.strokeStyle = "#303438";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  /*
+    Short bottom ridge to give the weight a visible base.
+  */
+  ctx.beginPath();
+  ctx.moveTo(-bobWidth / 2, bobHeight);
+  ctx.lineTo(bobWidth / 2, bobHeight);
+  ctx.strokeStyle = "#25282b";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+function drawPendulum() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  drawStand();
+
+  const x = origin.x + radius * Math.sin(angle);
+  const y = origin.y + radius * Math.cos(angle);
+
+  /*
+    String.
+  */
+  ctx.beginPath();
+  ctx.moveTo(origin.x, origin.y);
+  ctx.lineTo(x, y);
+
+  ctx.strokeStyle = "#2b2926";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  /*
+    Triangular bob.
+  */
+  drawTriangularBob(x, y);
+}
+
+/* -------------------------------------------------------
+   CONTROLS AND DISPLAY
+------------------------------------------------------- */
+
+function updateUI() {
+  length = Number(lenSlider.value);
+  radius = length;
+  mass = Number(massSelector.value);
+
+  lenVal.textContent = length;
+}
+
+function recordPeriod(swingDuration) {
+  const bpm = Math.round(60 / swingDuration);
+  const match = getClosestMatch(bpm);
+
+  bpmDisplay.textContent = bpm;
+  periodDisplay.textContent = swingDuration.toFixed(2);
+  matchDisplay.textContent =
+    `${match.song} (${match.bpm} BPM)`;
+
+  const item = document.createElement("li");
+
+  item.textContent =
+    `Length: ${length} cm | ` +
+    `Mass: ${mass}g | ` +
+    `Period: ${swingDuration.toFixed(2)}s | ` +
+    `BPM: ${bpm} | ` +
+    `Match: ${match.song}`;
+
+  logList.appendChild(item);
+  logList.scrollTop = logList.scrollHeight;
+}
+
+/* -------------------------------------------------------
+   ANIMATION
+------------------------------------------------------- */
+
+function updatePendulum() {
+  if (!isRunning) {
+    drawPendulum();
+    requestAnimationFrame(updatePendulum);
+    return;
+  }
+
+  const acceleration =
+    (-g / (length / 100)) * Math.sin(angle);
+
+  angleVel += acceleration * 0.02;
+  angleVel *= 0.995;
+  angle += angleVel * 0.02;
+
+  if (Math.abs(angleVel) < 0.0005) {
+    isRunning = false;
+    isClicking = false;
+    drawPendulum();
+    requestAnimationFrame(updatePendulum);
+    return;
+  }
+
+  drawPendulum();
+
+  /*
+    The original sound and timing method:
+    click whenever the bob passes near the center.
+  */
+  if (
+    Math.abs(angle) < 0.01 &&
+    Date.now() - lastClickTime > 250
+  ) {
+    playClick();
+
+    const now = Date.now();
+
+    if (lastClickTime > 0) {
+      const swingDuration =
+        (now - lastClickTime) / 1000;
+
+      recordPeriod(swingDuration);
+    }
+
+    lastClickTime = now;
+  }
+
+  requestAnimationFrame(updatePendulum);
+}
+
+/* -------------------------------------------------------
+   EVENT LISTENERS
+------------------------------------------------------- */
+
+lenSlider.addEventListener("input", () => {
+  if (!isRunning) {
+    updateUI();
+    drawPendulum();
+  }
+});
+
+massSelector.addEventListener("change", () => {
+  updateUI();
+
+  if (!isRunning) {
+    drawPendulum();
+  }
+});
+
+startBtn.addEventListener("click", async () => {
+  prepareAudio();
+
+  if (audioCtx && audioCtx.state === "suspended") {
+    try {
+      await audioCtx.resume();
+    } catch (error) {
+      console.warn("Audio could not be resumed.", error);
+    }
+  }
+
+  isRunning = true;
+  isClicking = true;
+});
+
+stopBtn.addEventListener("click", () => {
+  isRunning = false;
+  isClicking = false;
+});
+
+resetBtn.addEventListener("click", () => {
+  angle = Math.PI / 6;
+  angleVel = 0;
+
+  isRunning = false;
+  isClicking = false;
+  lastClickTime = 0;
+
+  bpmDisplay.textContent = "--";
+  periodDisplay.textContent = "--";
+  matchDisplay.textContent = "--";
+
+  logList.innerHTML = "";
+
+  lenSlider.value = 100;
+  massSelector.value = "100";
+
+  updateUI();
+  drawPendulum();
+});
+
+/* -------------------------------------------------------
+   INITIAL DISPLAY
+------------------------------------------------------- */
+
+updateUI();
+updatePendulum();
+</script>
+
+</body>
+</html>
