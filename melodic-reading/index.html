@@ -73,7 +73,7 @@ main{
   box-shadow:0 5px 0 rgba(0,0,0,.08);
 }
 .hand-row{
-  margin-left:92px;
+  margin-left:76px;
   display:grid;
   grid-template-columns:repeat(4,1fr);
   min-height:175px;
@@ -104,7 +104,7 @@ main{
 }
 .staff-area{
   display:grid;
-  grid-template-columns:92px 1fr;
+  grid-template-columns:76px 1fr;
   align-items:stretch;
   margin-top:4px;
 }
@@ -114,9 +114,9 @@ main{
 }
 .pitch-label{
   position:absolute;
-  right:12px;
+  right:10px;
   transform:translateY(-50%);
-  font-size:clamp(25px,2.5vw,40px);
+  font-size:clamp(18px,1.8vw,28px);
   font-weight:900;
   white-space:nowrap;
 }
@@ -137,7 +137,7 @@ main{
 }
 .note{
   position:absolute;
-  width:clamp(46px,5vw,74px);
+  width:clamp(56px,6vw,84px);
   aspect-ratio:1/1;
   border:7px solid #111;
   border-radius:50%;
@@ -271,12 +271,12 @@ input[type=checkbox],input[type=radio]{
   header{padding:76px 18px 16px}
   #settingsButton{top:12px;right:12px}
   .card{padding:14px 10px 20px}
-  .hand-row{margin-left:60px;min-height:140px}
+  .hand-row{margin-left:54px;min-height:140px}
   .hand-wrap{height:90px}
   .hand-img{max-width:95px;max-height:80px}
-  .staff-area{grid-template-columns:60px 1fr}
+  .staff-area{grid-template-columns:54px 1fr}
   .staff,.labels{height:250px}
-  .pitch-label{right:7px}
+  .pitch-label{right:6px;font-size:clamp(16px,4vw,22px)}
 }
 </style>
 </head>
