@@ -1,6 +1,271 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Music & Science</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at top left, rgba(57, 189, 248, 0.24), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(151, 71, 255, 0.25), transparent 38%),
+        linear-gradient(135deg, #071a33, #102e55 55%, #17143f);
+    }
+
+    header {
+      padding: 28px 20px 20px;
+      text-align: center;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 22px;
+      padding: 10px 16px;
+      color: #ffffff;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 999px;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .back-link:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 6vw, 4.5rem);
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 16px auto 0;
+      color: #d7e9ff;
+      font-size: 1.08rem;
+      line-height: 1.6;
+    }
+
+    main {
+      width: min(1120px, 92%);
+      margin: 18px auto 60px;
+    }
+
+    .section-title {
+      margin: 28px 0 18px;
+      text-align: center;
+      font-size: 1.45rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      position: relative;
+      min-height: 215px;
+      padding: 25px;
+      overflow: hidden;
+      color: #12213b;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid rgba(255, 255, 255, 0.68);
+      border-radius: 22px;
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.23);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .card.active:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 20px 38px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-icon {
+      margin-bottom: 14px;
+      font-size: 3rem;
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 1.35rem;
+    }
+
+    .card p {
+      margin: 0;
+      color: #40516b;
+      line-height: 1.5;
+    }
+
+    .open-label,
+    .soon-label {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      font-size: 0.83rem;
+      font-weight: bold;
+    }
+
+    .open-label {
+      color: #ffffff;
+      background: #1769d2;
+    }
+
+    .soon-label {
+      color: #58657a;
+      background: #e7ebf1;
+    }
+
+    .card.coming-soon {
+      cursor: default;
+      opacity: 0.8;
+    }
+
+    .featured {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.98), rgba(218,239,255,0.97));
+      border-color: #77d5ff;
+    }
+
+    footer {
+      padding: 24px 20px 34px;
+      color: #c9dcf7;
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding-top: 20px;
+      }
+
+      .card {
+        min-height: 190px;
+      }
+    }
+  </style>
+</head>
+
 <body>
-Loading Music & Science...
+
+  <header>
+    <a class="back-link" href="../">← Back to Music Classroom Games</a>
+
+    <h1>🔬 Music & Science</h1>
+
+    <p class="subtitle">
+      Explore the science behind sound, vibration, pitch, resonance, motion
+      and musical instruments through interactive demonstrations and classroom experiments.
+    </p>
+  </header>
+
+  <main>
+    <h2 class="section-title">Interactive Activities</h2>
+
+    <div class="card-grid">
+
+      <a class="card active featured" href="pythagoras-monochord/">
+        <div class="card-icon">🎵</div>
+        <h2>Pythagoras Monochord</h2>
+        <p>
+          Explore how changing string length creates musical intervals
+          and simple whole-number ratios.
+        </p>
+        <span class="open-label">Open Activity</span>
+      </a>
+
+      <div class="card coming-soon">
+        <div class="card-icon">🌊</div>
+        <h2>Chladni Patterns</h2>
+        <p>
+          Investigate how vibrations create geometric patterns in sand.
+        </p>
+        <span class="soon-label">Coming Soon</span>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-icon">🔔</div>
+        <h2>Tuning Fork Lab</h2>
+        <p>
+          Explore vibration, frequency, pitch and the movement of sound waves.
+        </p>
+        <span class="soon-label">Coming Soon</span>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-icon">🎼</div>
+        <h2>Singing Rod</h2>
+        <p>
+          Discover how friction and vibration can make a metal rod produce sound.
+        </p>
+        <span class="soon-label">Coming Soon</span>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-icon">📞</div>
+        <h2>String Telephone</h2>
+        <p>
+          See how sound vibrations travel through a stretched string.
+        </p>
+        <span class="soon-label">Coming Soon</span>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-icon">🎶</div>
+        <h2>Music Box Resonance</h2>
+        <p>
+          Compare how different surfaces amplify the sound of a music box.
+        </p>
+        <span class="soon-label">Coming Soon</span>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-icon">🌀</div>
+        <h2>Newton Color Wheel</h2>
+        <p>
+          Explore how spinning colors can appear to combine into white light.
+        </p>
+        <span class="soon-label">Coming Soon</span>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-icon">⏱️</div>
+        <h2>Pendulum Experiment</h2>
+        <p>
+          Investigate how pendulum length affects movement and timing.
+        </p>
+        <span class="soon-label">Coming Soon</span>
+      </div>
+
+      <div class="card coming-soon">
+        <div class="card-icon">🫙</div>
+        <h2>Bell Jar Experiment</h2>
+        <p>
+          Explore why sound needs matter such as air in order to travel.
+        </p>
+        <span class="soon-label">Coming Soon</span>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>
+    Music Classroom Games · Music & Science
+  </footer>
+
 </body>
 </html>
