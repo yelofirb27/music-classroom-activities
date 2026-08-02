@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" >
+<meta name="viewport" content="width=device-width, initial-scale=1" >
+<title>Boyle’s Bell-in-a-Jar Demonstration</title>
+<style>
+  :root{ --accent:#0a0a0a; }
+  html,body{margin:0;padding:0;background:#fff;color:#111;font-family:system-ui,Segoe UI,Arial,sans-serif}
+  .wrap{max-width:900px;margin:0 auto;padding:16px;text-align:center}
+  h1{margin:10px 0 6px 0;font-size:clamp(1.2rem,3.5vw,2rem);letter-spacing:.4px}
+  .sub{margin:0 0 14px 0;opacity:.75}
+  .panel{display:grid;gap:14px;grid-template-columns:1fr}
+  @media(min-width:800px){ .panel{grid-template-columns:1.2fr .9fr} }
+  .stage{background:#f7f7f7;border:2px solid #e6e6e6;border-radius:12px;position:relative;padding:12px}
+  canvas{display:block;width:100%;height:auto;border-radius:10px;background:#fcfcfc}
+
+  .controls{background:#fafafa;border:2px solid #eee;border-radius:12px;padding:12px;text-align:left}
+  .controls h2{margin:0 0 8px 0;font-size:1rem;text-align:center}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;justify-content:center}
+  button{appearance:none;border:0;border-radius:8px;padding:10px 12px;font-weight:600;background:#111;color:#fff;cursor:pointer}
+  button.secondary{background:#e9e9e9;color:#111}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  input[type=range]{width:260px}
+
+  .meter{display:grid;grid-template-columns:98px 1fr auto;gap:8px;align-items:center;font-size:.95rem}
+  .bar{height:12px;background:#e5e5e5;border-radius:8px;overflow:hidden;position:relative}
+  .fill{height:100%;width:100%;background:#111;transition:width .2s}
+  .tick{position:absolute;top:-2px;width:2px;height:16px;background:#d10;transform:translateX(-1px)}
+
+  .readouts{display:grid;gap:6px;margin-top:8px}
+  .readouts div{display:flex;justify-content:space-between}
+
+  /* Ringing status LED */
+  .led-wrap{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:4px}
+  .led{width:14px;height:14px;border-radius:50%;background:#9aa0a6;box-shadow:0 0 0 2px #ddd inset;}
+  .led.on{background:#18c364;box-shadow:0 0 8px 2px rgba(24,195,100,.6);}
+
+  .about{margin:16px auto 8px auto;max-width:800px}
+  .about h3{margin:.6em 0 .2em 0}
+  .about p{margin:.2em 0}
+  .tips{font-size:.92rem;opacity:.85;margin-top:8px}
+  .footer{margin-top:10px;padding-top:8px;border-top:1px solid #eee}
+</style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Boyle’s Bell-in-a-Jar Demonstration</h1>
+    <div class="sub">Ring the bell, pump out the air, and notice what changes…and what doesn’t.</div>
+
+    <div class="panel">
+      <!-- VISUALS -->
+      <div class="stage">
+        <canvas id="jar" width="820" height="520"></canvas>
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="controls">
+        <h2>Controls</h2>
+
+        <div class="row">
+          <button id="startBell">Start Bell</button>
+          <button id="stopBell" class="secondary">Stop Bell</button>
+          <button id="strikeOnce" class="secondary">Strike Once</button>
+        </div>
+
+        <div class="row">
+          <button id="pumpToggle">Start Vacuum Pump</button>
+          <button id="ventAir" class="secondary">Vent Air</button>
+          <button id="reset" class="secondary">Reset</button>
+        </div>
+
+        <!-- Vacuum Stop: keep 10% minimum air (max 90% vacuum) -->
+        <div class="row" style="gap:12px">
+          <strong>Vacuum Stop:</strong>
+          <input id="vacStop" type="range" min="0" max="90" step="5" value="70" >
+          <span id="vacLbl">70% vacuum</span>
+          <span style="opacity:.8">(Air left: <span id="airLeftLbl">30%</span>, Vacuumed: <span id="vacOutLbl">70%</span>)</span>
+        </div>
+
+        <div class="meter">
+          <div><strong style="font-size:1rem">Pressure</strong></div>
+          <div class="bar">
+            <div id="pFill" class="fill" style="width:100%"></div>
+            <div id="pTick" class="tick" style="left:100%"></div>
+          </div>
+          <div><span id="pPct">100%</span></div>
+        </div>
+
+        <div class="readouts">
+          <div><span>Approx. loudness (relative dB):</span><span id="dbLbl">0 dB</span></div>
+          <div><span>Bell pitch (Hz):</span><span id="freqLbl">880</span></div>
+          <div><span>Pump status:</span><span id="pumpLbl">Off</span></div>
+        </div>
+
+        <!-- Ringing status light -->
+        <div class="led-wrap">
+          <div id="ringLED" class="led"></div>
+          <div>Bell status: <span id="ringStatusTxt">Stopped</span></div>
+        </div>
+
+        <div class="tips">
+          Try this: let the bell ring, then turn on the pump and watch the air “disappear.” The pitch stays the same, but the loudness drops.
+        </div>
+
+        <div class="footer">
+          <strong>Teacher toggles</strong>
+          <div class="row" style="justify-content:flex-start">
+            <label><input type="checkbox" id="lockPitch" checked> Lock pitch vs. pressure</label>
+            <label><input type="checkbox" id="showWaves" checked> Show sound waves</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about">
+      <h3>About Boyle’s Discovery:</h3>
+      <p>
+        In the 1660s, Robert Boyle placed a ringing bell under a glass jar and pumped the air out. As the air thinned, the bell grew quieter even though it kept ringing.
+        Boyle showed that <em>sound needs a medium</em> (air) to travel. With fewer air molecules, there’s less “stuff” to vibrate your eardrum—so loudness drops—while
+        the <em>pitch</em> of the bell (its vibration rate) stays essentially the same.
+      </p>
+    </div>
+  </div>
+
+<script>
+function log10(x){ return Math.log(x)/Math.LN10; }
+
+/* ====== AUDIO ENGINE ====== */
+let audioCtx, masterGain, strikeIntervalId=null, ringing=false;
+const AUDIO = {
+  context(){
+    if(!audioCtx){
+      audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+      masterGain=audioCtx.createGain();
+      masterGain.gain.value=0.0;
+      masterGain.connect(audioCtx.destination);
+    }
+    return audioCtx;
+  },
+  strikeBell(freq=880, amplitude=0.5, duration=1.2){
+    const ctx=AUDIO.context();
+    const now=ctx.currentTime;
+
+    const car=ctx.createOscillator(); car.type="sine"; car.frequency.value=freq;
+    const mod=ctx.createOscillator(); mod.type="sine"; mod.frequency.value=freq*1.99;
+    const modGain=ctx.createGain(); modGain.gain.value=freq*0.015;
+    mod.connect(modGain).connect(car.frequency);
+
+    const partial=ctx.createOscillator(); partial.type="triangle"; partial.frequency.value=freq*2.01;
+
+    const env=ctx.createGain();
+    env.gain.setValueAtTime(0,now);
+    env.gain.linearRampToValueAtTime(amplitude, now+0.01);
+    env.gain.exponentialRampToValueAtTime(0.0008, now+duration);
+
+    car.connect(env); partial.connect(env); env.connect(masterGain);
+    car.start(now); partial.start(now); mod.start(now);
+    car.stop(now+duration+0.05); partial.stop(now+duration+0.05); mod.stop(now+duration+0.05);
+  },
+  setMaster(level){ if(masterGain){ masterGain.gain.setTargetAtTime(level, audioCtx.currentTime, 0.02); } }
+};
+
+/* ====== STATE ====== */
+const state = {
+  pressure: 1.0,
+  pTarget:  1.0,
+  pumpOn:   false,
+  freq:     880,
+  showWaves:true,
+  lockPitch:true,
+  vacStopPct: 70, // % vacuum (max evacuation) -> minAirFrac = 1 - 0.70 = 0.30
+};
+
+const ui = {
+  pFill: document.getElementById('pFill'),
+  pTick: document.getElementById('pTick'),
+  pPct: document.getElementById('pPct'),
+  dbLbl: document.getElementById('dbLbl'),
+  freqLbl: document.getElementById('freqLbl'),
+  pumpLbl: document.getElementById('pumpLbl'),
+  startBell: document.getElementById('startBell'),
+  stopBell: document.getElementById('stopBell'),
+  strikeOnce: document.getElementById('strikeOnce'),
+  pumpToggle: document.getElementById('pumpToggle'),
+  ventAir: document.getElementById('ventAir'),
+  reset: document.getElementById('reset'),
+  lockPitch: document.getElementById('lockPitch'),
+  showWaves: document.getElementById('showWaves'),
+  vacStop: document.getElementById('vacStop'),
+  vacLbl: document.getElementById('vacLbl'),
+  airLeftLbl: document.getElementById('airLeftLbl'),
+  vacOutLbl: document.getElementById('vacOutLbl'),
+  ringLED: document.getElementById('ringLED'),
+  ringStatusTxt: document.getElementById('ringStatusTxt'),
+};
+
+function minAirFrac(){ return 1 - state.vacStopPct/100; }
+
+/* ====== UI & INDICATORS ====== */
+let flashT = 0; // visual shake timer (decays), also used for LED blink on single strike
+
+function updateLabels(){
+  const pct = Math.round(state.pressure*100);
+  ui.pFill.style.width = pct + '%';
+  ui.pPct.textContent = pct + '%';
+
+  // vacuum stop tick (min air)
+  ui.pTick.style.left = (minAirFrac()*100) + '%';
+
+  // loudness (relative)
+  const rel = Math.max(0.0001, state.pressure);
+  const db = 20 * log10(rel);
+  ui.dbLbl.textContent = (db>=0? '+' : '') + db.toFixed(1) + ' dB';
+
+  ui.freqLbl.textContent = state.freq.toFixed(0);
+  ui.pumpLbl.textContent = state.pumpOn ? 'On' : 'Off';
+
+  // vacuum stop labels
+  ui.vacLbl.textContent = state.vacStopPct + '% vacuum';
+  const airLeft = Math.round(minAirFrac()*100);
+  ui.airLeftLbl.textContent = airLeft + '%';
+  ui.vacOutLbl.textContent = (100-airLeft) + '%';
+
+  // ringing status LED: on if looping OR within recent strike flash
+  const lightOn = ringing || flashT > 0;
+  ui.ringLED.className = 'led' + (lightOn ? ' on' : '');
+  ui.ringStatusTxt.textContent = lightOn ? 'Ringing' : 'Stopped';
+}
+
+function visualFlash(){ flashT = 1; }
+
+/* ====== CONTROLS ====== */
+function startRinging(){
+  if (ringing) return;
+  AUDIO.context().resume();
+  ringing = true;
+  strikeIntervalId = setInterval(()=>{
+    const amp = state.pressure;
+    if (amp>0.0005){ AUDIO.strikeBell(state.freq, 0.48 * amp, 1.2); }
+    visualFlash();
+  }, 500);
+}
+function stopRinging(){
+  ringing=false;
+  if (strikeIntervalId) clearInterval(strikeIntervalId);
+  strikeIntervalId=null;
+  // stop visuals immediately
+  flashT = 0;
+}
+
+ui.startBell.onclick = ()=> startRinging();
+ui.stopBell.onclick  = ()=> stopRinging();
+ui.strikeOnce.onclick = ()=>{
+  AUDIO.context().resume();
+  AUDIO.strikeBell(state.freq, 0.55 * state.pressure, 1.2);
+  visualFlash();
+};
+
+ui.pumpToggle.onclick = ()=>{
+  AUDIO.context().resume();
+  state.pumpOn = !state.pumpOn;
+  ui.pumpToggle.textContent = state.pumpOn ? 'Stop Vacuum Pump' : 'Start Vacuum Pump';
+  // never set target below the vacuum stop floor (min 10% air if slider = 90%)
+  state.pTarget = state.pumpOn ? Math.max(minAirFrac(), state.pressure) : state.pressure;
+};
+
+ui.ventAir.onclick = ()=>{
+  AUDIO.context().resume();
+  state.pumpOn = false;
+  ui.pumpToggle.textContent = 'Start Vacuum Pump';
+  state.pTarget = 1.0;
+};
+
+ui.reset.onclick = ()=>{
+  state.pumpOn=false; state.pTarget=1.0; state.pressure=1.0; state.freq=880;
+  ui.pumpToggle.textContent='Start Vacuum Pump';
+  stopRinging();
+  updateLabels();
+};
+
+ui.lockPitch.onchange = (e)=>{ state.lockPitch = e.target.checked; };
+ui.showWaves.onchange = (e)=>{ state.showWaves = e.target.checked; };
+ui.vacStop.oninput = (e)=>{
+  state.vacStopPct = parseInt(e.target.value,10); // 0..90
+  if(state.pumpOn && state.pTarget < minAirFrac()) state.pTarget = minAirFrac();
+  updateLabels();
+};
+
+/* ====== CANVAS / BELL‑JAR VISUAL ====== */
+const canvas = document.getElementById('jar');
+const ctx = canvas.getContext('2d');
+
+// Bell-jar geometry
+const J = {
+  cx: canvas.width*0.45,
+  baseY: canvas.height*0.58,
+  domeR: Math.min(canvas.width,canvas.height)*0.28,
+  baseW: Math.min(canvas.width,canvas.height)*0.46,
+  baseH: 24
+};
+// Air domain (clip to dome)
+const AIR = { cx:J.cx, cy:J.baseY - J.domeR + 6, r:J.domeR*0.90 };
+
+// Larger pump & bigger “Pressure” label
+function drawBellJarBody(){
+  // floor
+  ctx.fillStyle = '#efefef';
+  ctx.fillRect(0, J.baseY + J.domeR*0.55, canvas.width, canvas.height);
+
+  // side hose (visual)
+  ctx.strokeStyle = '#222';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(AIR.cx + J.domeR*0.6, AIR.cy - J.domeR*0.75);
+  ctx.quadraticCurveTo(canvas.width*0.9, canvas.height*0.15, canvas.width*0.9, canvas.height*0.4);
+  ctx.stroke();
+
+  // BIGGER pump block (same place)
+  const pumpW = 34, pumpH = 84;
+  ctx.fillStyle = state.pumpOn ? '#111' : '#888';
+  ctx.fillRect(canvas.width*0.88, canvas.height*0.35 - (pumpH-60)/2, pumpW, pumpH);
+
+  // gauge + larger “Pressure”
+  const gx = canvas.width*0.86, gy = canvas.height*0.17;
+  ctx.strokeStyle='#444'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(gx,gy,32,0,Math.PI*2); ctx.stroke();
+  const ang = Math.PI*0.75 + state.pressure*(Math.PI*1.5);
+  ctx.beginPath(); ctx.moveTo(gx,gy); ctx.lineTo(gx+Math.cos(ang)*27, gy+Math.sin(ang)*27); ctx.stroke();
+  // red tick for vacuum stop
+  const stopAng = Math.PI*0.75 + (minAirFrac())*(Math.PI*1.5);
+  ctx.strokeStyle='#d10'; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(gx+Math.cos(stopAng)*25, gy+Math.sin(stopAng)*25);
+  ctx.lineTo(gx+Math.cos(stopAng)*19, gy+Math.sin(stopAng)*19);
+  ctx.stroke();
+  ctx.fillStyle='#111';
+  ctx.font='bold 16px system-ui';
+  ctx.fillText('Pressure', gx-32, gy+56);
+
+  // base ellipse (glass)
+  const gb = ctx.createLinearGradient(J.cx, J.baseY, J.cx, J.baseY+J.baseH+14);
+  gb.addColorStop(0,'rgba(200,215,240,0.25)');
+  gb.addColorStop(1,'rgba(230,240,255,0.10)');
+  ctx.save();
+  ctx.translate(J.cx, J.baseY + J.baseH/2);
+  ctx.scale(1, 0.55);
+  ctx.beginPath(); ctx.arc(0, 0, J.baseW/2, 0, Math.PI*2);
+  ctx.fillStyle = gb; ctx.fill();
+  ctx.lineWidth=6; ctx.strokeStyle='#c9d1e0'; ctx.stroke();
+  ctx.restore();
+
+  // dome
+  const g = ctx.createRadialGradient(AIR.cx - J.domeR*0.35, AIR.cy - J.domeR*0.45, J.domeR*0.25, AIR.cx, AIR.cy, J.domeR*1.05);
+  g.addColorStop(0,'rgba(180,200,255,0.18)');
+  g.addColorStop(1,'rgba(220,235,255,0.05)');
+  ctx.beginPath();
+  ctx.arc(AIR.cx, AIR.cy, J.domeR, Math.PI, 0, false);
+  ctx.lineTo(AIR.cx + J.baseW/2 - 8, J.baseY);
+  ctx.lineTo(AIR.cx - J.baseW/2 + 8, J.baseY);
+  ctx.closePath();
+  ctx.fillStyle=g; ctx.fill();
+  ctx.lineWidth=6; ctx.strokeStyle='#c9d1e0'; ctx.stroke();
+
+  // top knob
+  ctx.fillStyle='rgba(210,225,255,0.6)';
+  ctx.beginPath(); ctx.arc(AIR.cx, AIR.cy - J.domeR + 18, 10, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle='#bcd0ea'; ctx.lineWidth=2; ctx.stroke();
+}
+
+/* Air dots inside the dome */
+let airDots = [];
+function resetAirDots(){
+  airDots = [];
+  const baseCount = 240;
+  const count = Math.round(baseCount * state.pressure);
+  for (let i=0;i<count;i++){
+    const r = (Math.random()**0.5) * (AIR.r*0.95);
+    const a = Math.random()*Math.PI*2;
+    airDots.push({x: AIR.cx + Math.cos(a)*r, y: AIR.cy + Math.sin(a)*r, a: Math.random()*Math.PI*2, s: 0.4+Math.random()*0.8});
+  }
+}
+resetAirDots();
+
+function drawAir(){
+  const desired = Math.round(240 * state.pressure);
+  if (airDots.length > desired){ airDots.splice(desired, airDots.length-desired); }
+  else if (airDots.length < desired){
+    for (let i=airDots.length;i<desired;i++){
+      const r = (Math.random()**0.5) * (AIR.r*0.95);
+      const a = Math.random()*Math.PI*2;
+      airDots.push({x: AIR.cx + Math.cos(a)*r, y: AIR.cy + Math.sin(a)*r, a: Math.random()*Math.PI*2, s: 0.4+Math.random()*0.8});
+    }
+  }
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(AIR.cx, AIR.cy, AIR.r, 0, Math.PI*2); ctx.clip();
+
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  for (let d of airDots){
+    d.a += 0.01 + d.s*0.005;
+    d.x += Math.cos(d.a)*0.2*d.s;
+    d.y += Math.sin(d.a)*0.2*d.s;
+    const dx=d.x-AIR.cx, dy=d.y-AIR.cy, rr=Math.hypot(dx,dy);
+    if(rr > AIR.r){
+      const k = AIR.r/rr; d.x = AIR.cx + dx*k; d.y = AIR.cy + dy*k;
+    }
+    ctx.fillRect(d.x, d.y, 1.8, 1.8);
+  }
+  ctx.restore();
+}
+
+function drawBell(){
+  const baseX = AIR.cx;
+  const baseY = J.baseY - 10;
+
+  // shake ONLY while ringing (or right after a strike), never after Stop
+  const allowShake = ringing || (flashT > 0);
+  const shake = allowShake ? (Math.random()-0.5)*4 : 0;
+
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(baseX-70, baseY); ctx.lineTo(baseX+70, baseY); ctx.stroke();
+
+  ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(baseX, baseY-120); ctx.lineTo(baseX, baseY); ctx.stroke();
+
+  const bellX = baseX + shake, bellY = baseY-35;
+  ctx.fillStyle = '#d6b76c';
+  ctx.beginPath();
+  ctx.moveTo(bellX-40, bellY-55);
+  ctx.quadraticCurveTo(bellX, bellY-88, bellX+40, bellY-55);
+  ctx.quadraticCurveTo(bellX+55, bellY-8, bellX, bellY+6);
+  ctx.quadraticCurveTo(bellX-55, bellY-8, bellX-40, bellY-55);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#c3a050'; ctx.lineWidth = 2; ctx.stroke();
+
+  ctx.fillStyle = '#7f6b3d';
+  ctx.beginPath(); ctx.arc(bellX, bellY+2, 6.5, 0, Math.PI*2); ctx.fill();
+}
+
+function drawWaves(){
+  // show waves only while ringing (Stop freezes visuals)
+  if (!state.showWaves || !ringing) return;
+  const now = performance.now()/1000;
+  const centerX = AIR.cx, centerY = AIR.cy + J.domeR*0.75;
+  const maxR = J.domeR*0.9;
+  const speed = 140, spacing = 38;
+  const amp = Math.min(1, state.pressure)*0.8;
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(AIR.cx, AIR.cy, AIR.r, 0, Math.PI*2); ctx.clip();
+  for (let i=0;i<6;i++){
+    const t = (now*speed + i*spacing) % maxR;
+    const alpha = Math.max(0, 0.22 - t/maxR*0.22) * amp;
+    ctx.strokeStyle = 'rgba(0,0,0,'+alpha.toFixed(3)+')';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, t, 0, Math.PI*2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* ====== MAIN LOOP ====== */
+function tick(){
+  // ease toward target
+  if (Math.abs(state.pressure - state.pTarget) > 0.0001){
+    state.pressure += (state.pTarget - state.pressure)*0.02;
+    if (Math.abs(state.pressure - state.pTarget) < 0.0005) state.pressure = state.pTarget;
+  }
+  // pump nudges target down but NOT below vacuum stop (10% min air if slider=90)
+  if (state.pumpOn){
+    state.pTarget = Math.max(minAirFrac(), state.pTarget - 0.0006);
+  }
+  // optional tiny pitch drift
+  if (!state.lockPitch){ state.freq = 880 + (1 - state.pressure)*10; }
+
+  if (audioCtx){ AUDIO.setMaster(Math.max(0, Math.min(1, state.pressure))); }
+
+  // draw
+  const ctx2 = ctx;
+  ctx2.clearRect(0,0,canvas.width,canvas.height);
+  drawBellJarBody();
+  drawAir();
+  drawBell();
+  drawWaves();
+
+  // decay strike flash (for LED blink on single strike)
+  if (flashT>0) flashT *= 0.90;
+
+  updateLabels();
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+
+</body>
+</html>
