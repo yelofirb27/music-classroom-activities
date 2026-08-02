@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Music Classroom Games | Brian Foley</title>
+
   <style>
     :root {
       --navy: #16324f;
@@ -19,7 +20,9 @@
       --shadow: 0 10px 28px rgba(22, 50, 79, 0.14);
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -116,7 +119,10 @@
       text-decoration: none;
       color: var(--text);
       border: 3px solid transparent;
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease;
     }
 
     .card:hover,
@@ -135,11 +141,33 @@
       color: white;
     }
 
-    .card:nth-child(1) .card-top { background: linear-gradient(135deg, #ef6f6c, #d8495b); }
-    .card:nth-child(2) .card-top { background: linear-gradient(135deg, #f6b73c, #ed8f24); }
-    .card:nth-child(3) .card-top { background: linear-gradient(135deg, #2878b5, #18598d); }
-    .card:nth-child(4) .card-top { background: linear-gradient(135deg, #4caf78, #268c59); }
-    .card:nth-child(5) .card-top { background: linear-gradient(135deg, #7559b7, #573a99); }
+    .card:nth-child(1) .card-top {
+      background: linear-gradient(135deg, #ef6f6c, #d8495b);
+    }
+
+    .card:nth-child(2) .card-top {
+      background: linear-gradient(135deg, #f6b73c, #ed8f24);
+    }
+
+    .card:nth-child(3) .card-top {
+      background: linear-gradient(135deg, #2878b5, #18598d);
+    }
+
+    .card:nth-child(4) .card-top {
+      background: linear-gradient(135deg, #4caf78, #268c59);
+    }
+
+    .card:nth-child(5) .card-top {
+      background: linear-gradient(135deg, #7559b7, #573a99);
+    }
+
+    .card:nth-child(6) .card-top {
+      background: linear-gradient(135deg, #dc63a5, #a83f80);
+    }
+
+    .card:nth-child(7) .card-top {
+      background: linear-gradient(135deg, #25a9a2, #14746f);
+    }
 
     .card-body {
       display: flex;
@@ -193,32 +221,62 @@
     }
 
     @media (max-width: 550px) {
-      header { padding-top: 28px; }
-      main { width: min(100% - 20px, 1180px); margin-top: 24px; }
-      .grid { grid-template-columns: 1fr; gap: 16px; }
-      .card { min-height: 245px; }
-      .card-top { min-height: 105px; font-size: 58px; }
+      header {
+        padding-top: 28px;
+      }
+
+      main {
+        width: min(100% - 20px, 1180px);
+        margin-top: 24px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .card {
+        min-height: 245px;
+      }
+
+      .card-top {
+        min-height: 105px;
+        font-size: 58px;
+      }
     }
   </style>
 </head>
+
 <body>
+
   <header>
     <h1>Music Classroom Games</h1>
-    <p class="subtitle">Interactive music activities created by Brian Foley</p>
+    <p class="subtitle">
+      Interactive music activities created by Brian Foley
+    </p>
   </header>
 
   <main>
+
     <section class="intro">
       <h2>Choose an Activity</h2>
-      <p>Open any game below for whole-class instruction, student practice, movement, rhythm, or instrument recognition.</p>
+      <p>
+        Open any collection below for whole-class instruction,
+        student practice, movement, rhythm, instrument recognition,
+        or music and science exploration.
+      </p>
     </section>
 
     <section class="grid" aria-label="Music classroom projects">
+
       <a class="card" href="./body-percussion/">
         <div class="card-top" aria-hidden="true">👏</div>
         <div class="card-body">
           <h3>Body Percussion Staff</h3>
-          <p>Create and display four-beat body percussion patterns using snap, clap, pat, and stamp.</p>
+          <p>
+            Create and display four-beat body percussion patterns
+            using snap, clap, pat, and stamp.
+          </p>
           <span class="launch">Open Activity →</span>
         </div>
       </a>
@@ -227,7 +285,10 @@
         <div class="card-top" aria-hidden="true">🍫</div>
         <div class="card-body">
           <h3>Candy Bar Rondo</h3>
-          <p>Arrange candy-bar rhythm sections while keeping the complete rondo form visible on screen.</p>
+          <p>
+            Arrange candy-bar rhythm sections while keeping the
+            complete rondo form visible on screen.
+          </p>
           <span class="launch">Open Activity →</span>
         </div>
       </a>
@@ -236,7 +297,10 @@
         <div class="card-top" aria-hidden="true">🎺</div>
         <div class="card-body">
           <h3>Instrument Matching Games</h3>
-          <p>Choose from Common Band Instruments, Orff Mallet Instruments, and General Music Instruments.</p>
+          <p>
+            Choose from Common Band Instruments, Orff Mallet
+            Instruments, and General Music Instruments.
+          </p>
           <span class="launch">Choose a Set →</span>
         </div>
       </a>
@@ -245,7 +309,10 @@
         <div class="card-top" aria-hidden="true">🚦</div>
         <div class="card-body">
           <h3>Movement Signals</h3>
-          <p>Use large color signals for classroom movement activities, controlled quickly from the keyboard.</p>
+          <p>
+            Use large color signals for classroom movement activities,
+            controlled quickly from the keyboard.
+          </p>
           <span class="launch">Open Activity →</span>
         </div>
       </a>
@@ -254,29 +321,50 @@
         <div class="card-top" aria-hidden="true">🥁</div>
         <div class="card-body">
           <h3>Rhythm Cards</h3>
-          <p>Display and use interactive rhythm materials for reading, practice, and classroom games.</p>
+          <p>
+            Display and use interactive rhythm materials for reading,
+            practice, and classroom games.
+          </p>
           <span class="launch">Open Activity →</span>
         </div>
       </a>
-      
+
       <a class="card" href="./melodic-reading/">
-  <div class="card-top" aria-hidden="true">🎵</div>
-  <div class="card-body">
-    <h3>Melodic Reading</h3>
-    <p>Practice solfège reading with hand signs, three-line and five-line staffs, and teacher-selected pitches.</p>
-    <span class="launch">Open Activity →</span>
-  </div>
-</a>
-      
+        <div class="card-top" aria-hidden="true">🎵</div>
+        <div class="card-body">
+          <h3>Melodic Reading</h3>
+          <p>
+            Practice solfège reading with hand signs, three-line and
+            five-line staffs, and teacher-selected pitches.
+          </p>
+          <span class="launch">Open Activity →</span>
+        </div>
+      </a>
+
+      <a class="card" href="./music-science/">
+        <div class="card-top" aria-hidden="true">🔬</div>
+        <div class="card-body">
+          <h3>Music &amp; Science</h3>
+          <p>
+            Explore sound, vibration, pitch, frequency, resonance,
+            musical ratios, and other music-science experiments.
+          </p>
+          <span class="launch">View Experiments →</span>
+        </div>
+      </a>
+
     </section>
 
     <div class="note">
-      This page is your permanent project library. Whenever a new activity is added to the repository, a new card can be added here.
+      This page is your permanent project library. Whenever a new
+      activity or collection is added, a new card can be added here.
     </div>
+
   </main>
 
   <footer>
     © 2026 Brian Foley · Music Classroom Games
   </footer>
+
 </body>
 </html>
