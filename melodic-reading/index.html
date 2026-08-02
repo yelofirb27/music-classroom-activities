@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi–So–La Melodic Reading Cards</title>
+<style>
+  :root {
+    --ink: #111;
+    --paper: #fff;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    text-align: center;
+    padding: 16px 16px 4px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(30px, 4vw, 58px);
+    font-weight: 600;
+  }
+
+  .subtitle {
+    margin-top: 5px;
+    font-size: clamp(15px, 1.5vw, 22px);
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 24px 14px;
+  }
+
+  .card {
+    width: min(1120px, 96vw);
+    border: 5px solid var(--ink);
+    border-radius: 20px;
+    padding: 28px 36px 38px;
+    background: white;
+  }
+
+  .beat-numbers {
+    margin-left: 92px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    text-align: center;
+    font-size: clamp(22px, 2.5vw, 36px);
+    margin-bottom: 12px;
+  }
+
+  .staff-wrap {
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    align-items: stretch;
+  }
+
+  .labels {
+    height: 250px;
+    position: relative;
+    font-size: clamp(21px, 2.3vw, 34px);
+    font-weight: 600;
+  }
+
+  .label {
+    position: absolute;
+    right: 12px;
+    transform: translateY(-50%);
+  }
+
+  /* La is in the space between the top and So lines. */
+  .label.la { top: 33%; }
+  .label.so { top: 55%; }
+  .label.mi { top: 88%; }
+
+  .staff {
+    height: 250px;
+    position: relative;
+    border-left: 5px solid var(--ink);
+    border-right: 5px solid var(--ink);
+  }
+
+  .line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--ink);
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  /* Three-line first-grade staff:
+     top line is unlabeled, So is middle, Mi is bottom. */
+  .line.top { top: 12%; }
+  .line.so { top: 55%; }
+  .line.mi { top: 88%; }
+
+  .beat-guide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(0,0,0,0.07);
+    z-index: 0;
+  }
+
+  .guide-1 { left: 25%; }
+  .guide-2 { left: 50%; }
+  .guide-3 { left: 75%; }
+
+  .note {
+    position: absolute;
+    width: clamp(38px, 5vw, 66px);
+    aspect-ratio: 1 / 1;
+    border: clamp(4px, .45vw, 7px) solid var(--ink);
+    border-radius: 50%;
+    background: transparent;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+  }
+
+  .controls {
+    padding: 6px 16px 16px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  button {
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    background: white;
+    color: var(--ink);
+    padding: 11px 20px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  button:hover, button:focus-visible {
+    background: var(--ink);
+    color: white;
+  }
+
+  .counter {
+    min-width: 140px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .hint {
+    text-align: center;
+    font-size: 14px;
+    padding-bottom: 8px;
+  }
+
+  @media (max-height: 700px) {
+    header { padding-top: 8px; }
+    .card { padding-top: 16px; padding-bottom: 22px; }
+    .staff, .labels { height: 190px; }
+    .controls { padding-bottom: 7px; }
+    .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Melodic Reading</h1>
+    <div class="subtitle">Mi · So · La — four beats</div>
+  </header>
+
+  <main>
+    <section class="card" aria-label="Four-beat melodic reading card">
+      <div class="beat-numbers">
+        <div>1</div><div>2</div><div>3</div><div>4</div>
+      </div>
+
+      <div class="staff-wrap">
+        <div class="labels">
+          <div class="label la">La</div>
+          <div class="label so">So</div>
+          <div class="label mi">Mi</div>
+        </div>
+
+        <div class="staff" id="staff">
+          <div class="line top"></div>
+          <div class="line so"></div>
+          <div class="line mi"></div>
+
+          <div class="beat-guide guide-1"></div>
+          <div class="beat-guide guide-2"></div>
+          <div class="beat-guide guide-3"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="controls">
+    <button id="backButton" type="button">◀ Back</button>
+    <div class="counter" id="counter">Card 1 of 81</div>
+    <button id="nextButton" type="button">Next ▶</button>
+    <button id="shuffleButton" type="button">Shuffle All 81</button>
+  </div>
+
+  <div class="hint">Press the space bar or right arrow for the next card.</div>
+
+<script>
+(() => {
+  const pitchNames = ["mi", "so", "la"];
+
+  /* Mi and So sit directly on lines.
+     La sits in the space between the top and So lines. */
+  const pitchY = {
+    la: 33,
+    so: 55,
+    mi: 88
+  };
+
+  const beatX = [12.5, 37.5, 62.5, 87.5];
+
+  const staff = document.getElementById("staff");
+  const counter = document.getElementById("counter");
+  const nextButton = document.getElementById("nextButton");
+  const backButton = document.getElementById("backButton");
+  const shuffleButton = document.getElementById("shuffleButton");
+
+  let deck = [];
+  let currentIndex = 0;
+
+  function makeAllCards() {
+    const cards = [];
+    for (const a of pitchNames) {
+      for (const b of pitchNames) {
+        for (const c of pitchNames) {
+          for (const d of pitchNames) {
+            cards.push([a, b, c, d]);
+          }
+        }
+      }
+    }
+    return cards;
+  }
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function drawCard() {
+    staff.querySelectorAll(".note").forEach(note => note.remove());
+
+    const melody = deck[currentIndex];
+
+    melody.forEach((pitch, beat) => {
+      const note = document.createElement("div");
+      note.className = "note";
+      note.style.left = `${beatX[beat]}%`;
+      note.style.top = `${pitchY[pitch]}%`;
+      note.setAttribute("aria-label", `Beat ${beat + 1}: ${pitch}`);
+      staff.appendChild(note);
+    });
+
+    counter.textContent = `Card ${currentIndex + 1} of ${deck.length}`;
+  }
+
+  function nextCard() {
+    currentIndex = (currentIndex + 1) % deck.length;
+    drawCard();
+  }
+
+  function previousCard() {
+    currentIndex = (currentIndex - 1 + deck.length) % deck.length;
+    drawCard();
+  }
+
+  function reshuffle() {
+    deck = shuffle(makeAllCards());
+    currentIndex = 0;
+    drawCard();
+  }
+
+  nextButton.addEventListener("click", nextCard);
+  backButton.addEventListener("click", previousCard);
+  shuffleButton.addEventListener("click", reshuffle);
+
+  document.addEventListener("keydown", event => {
+    if (event.code === "Space" || event.code === "ArrowRight") {
+      event.preventDefault();
+      nextCard();
+    } else if (event.code === "ArrowLeft") {
+      event.preventDefault();
+      previousCard();
+    }
+  });
+
+  reshuffle();
+})();
+</script>
+</body>
+</html>
