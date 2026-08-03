@@ -35,13 +35,11 @@
   .good{background:#1a222b;border-color:#465360}
   .warn{background:#1a222b;border-color:#465360}
   input[type=range]{width:100%;accent-color:#55b8ff}
-  .status{margin-top:12px;padding:10px;border-radius:6px;background:#111820;border:1px solid #34414d;line-height:1.35;font-size:.82rem}
-  .status.match{border-color:#3d7650;color:#dbf7df}.status.nomatch{border-color:#765e38;color:#ffe6bd}
-  .aboutSide{margin-top:14px;padding:10px;border:1px solid #3b4650;border-radius:6px;color:#e5ebf0;font-size:.78rem;line-height:1.42;background:#0d141c}
-  .aboutSide b{display:block;color:#62c1ff;margin-bottom:4px}
   .sceneBox{position:relative;min-width:0;min-height:760px;padding:0;overflow:hidden;border-radius:0;border-top:0;border-right:0;border-bottom:0;background:#020914}
   canvas{display:block;width:100%;height:100%;min-height:760px;background:#020914}
-  footer{display:none}
+  footer{display:block;max-width:1560px;margin:14px auto 24px;padding:16px 20px;text-align:center;background:#0b1119;border:1px solid var(--edge);border-radius:12px}
+  footer h3{margin:0 0 8px;color:#69c3ff;font-size:1.05rem}
+  footer p{margin:0 auto;max-width:1040px;color:#d9e0e7;line-height:1.55}
   body.fullscreen-mode{overflow:hidden}
   body.fullscreen-mode .wrap{max-width:none;width:100vw;height:100vh;min-height:0;grid-template-columns:292px minmax(0,1fr)}
   body.fullscreen-mode .controls{height:100vh;padding:12px 16px;overflow:hidden}
@@ -52,8 +50,6 @@
   body.fullscreen-mode .row{margin-bottom:7px}
   body.fullscreen-mode button{padding:6px 3px;font-size:.78rem}
   body.fullscreen-mode .bigbtns{gap:5px;margin-top:5px}
-  body.fullscreen-mode .status{margin-top:6px;padding:6px;font-size:.7rem}
-  body.fullscreen-mode .aboutSide{margin-top:6px;padding:6px;font-size:.67rem;line-height:1.25}
   body.fullscreen-mode .sceneBox,body.fullscreen-mode canvas{height:100vh;min-height:0}
   @media(max-width:900px){.wrap{grid-template-columns:1fr;min-height:0}.controls{border-right:0}.sceneBox,canvas{min-height:560px}}
 </style>
@@ -100,10 +96,6 @@
       <button id="fullscreen" class="good" style="grid-column:1 / -1">Full Screen</button>
     </div>
 
-    <div class="sectionRule"></div>
-    <h2>3. Options</h2>
-    <div id="status" class="status"></div>
-    <div class="aboutSide"><b>ABOUT</b>When two tuning forks share the same natural frequency, energy from one can cause the other to vibrate through sympathetic resonance.</div>
   </section>
 
   <section class="panel sceneBox">
@@ -112,8 +104,8 @@
 </main>
 
 <footer class="panel">
-  <h3>About Helmholtz’s Demonstration</h3>
-  <p>Hermann von Helmholtz discussed sympathetic vibration in <i>On the Sensations of Tone</i> (1863). A tuning fork responds most strongly to vibrations at its own natural frequency. When two forks match, striking one can make the other vibrate even though it was never touched. The light ping-pong ball makes that otherwise-small motion easier to see.</p>
+  <h3>About Helmholtz’s Discovery</h3>
+  <p>Hermann von Helmholtz described this experiment in his book <i>On the Sensations of Tone</i> (1863). When two tuning forks are tuned to the same pitch, striking one will cause the other to resonate and even move a light object like a ping-pong ball. This demonstrates <b>sympathetic resonance</b>: vibrations in one object can set another into motion when they share the same natural frequency.</p>
 </footer>
 
 <script>
@@ -137,7 +129,6 @@
   const muteBtn = document.getElementById('mute');
   const fullscreenBtn = document.getElementById('fullscreen');
   const sceneBox = document.querySelector('.sceneBox');
-  const status = document.getElementById('status');
 
   let noteA = 'A';
   let noteB = 'A';
@@ -237,11 +228,6 @@
     infoB.textContent = `${noteB} · ${fB.toFixed(1)} Hz`;
     [...btnsA.children].forEach(b => b.className = b.dataset.note === noteA ? 'activeA' : '');
     [...btnsB.children].forEach(b => b.className = b.dataset.note === noteB ? 'activeB' : '');
-    const match = noteA === noteB;
-    status.className = `status ${match ? 'match' : 'nomatch'}`;
-    status.innerHTML = match
-      ? `<b>Matching frequencies:</b> Fork B can resonate sympathetically when Fork A is struck.`
-      : `<b>Different frequencies:</b> Fork B will not build a strong sympathetic vibration.`;
   }
 
   function strikeA(){
@@ -467,23 +453,19 @@
     const forkA=drawFork(cxA,baseY,ampA,phaseA,scaleA,'','#76c7ff');
     const forkB=drawFork(cxB,baseY,ampB,phaseB,scaleB,'','#f5c96a');
 
-    const labelTop = 18 * baseScale;
+    // Keep each note display close above its fork, regardless of fork size.
+    const labelTopA = Math.max(8*baseScale, forkA.prongTop - 132*baseScale);
+    const labelTopB = Math.max(8*baseScale, forkB.prongTop - 132*baseScale);
     const labelMaxW = Math.max(155, W*.20);
-    drawForkLabel(cxA,labelTop,'FORK A',noteA,frequency(noteA),'#76c7ff',baseScale,labelMaxW);
-    drawForkLabel(cxB,labelTop,'FORK B',noteB,frequency(noteB),'#f5c96a',baseScale,labelMaxW);
+    drawForkLabel(cxA,labelTopA,'FORK A',noteA,frequency(noteA),'#76c7ff',baseScale,labelMaxW);
+    drawForkLabel(cxB,labelTopB,'FORK B',noteB,frequency(noteB),'#f5c96a',baseScale,labelMaxW);
 
     drawMallet(cxA,baseY,strikeFlashA,'left',scaleA);
     drawMallet(cxB,baseY,strikeFlashB,'right',scaleB);
     drawEnergyTransfer(forkA.rightX+22*baseScale,forkB.leftX-22*baseScale,(forkA.midY+forkB.midY)/2,transfer,now);
     drawBall(forkB);
 
-    // Museum-style match panel and bottom energy display.
-    if(noteA===noteB){
-      const mw=250*baseScale,mh=78*baseScale,mx=W/2-mw/2,my=22*baseScale;
-      roundRect(mx,my,mw,mh,8*baseScale);ctx.fillStyle='rgba(8,14,20,.88)';ctx.fill();ctx.strokeStyle='#384651';ctx.lineWidth=1;ctx.stroke();
-      ctx.textAlign='center';ctx.fillStyle='#79e36f';ctx.font=`900 ${Math.round(24*baseScale)}px system-ui`;ctx.fillText('MATCH!',W/2,my+29*baseScale);
-      ctx.fillStyle='#eef3f7';ctx.font=`${Math.round(14*baseScale)}px system-ui`;ctx.fillText('The forks are the same pitch.',W/2,my+52*baseScale);ctx.fillText('Fork B resonates sympathetically.',W/2,my+70*baseScale);
-    }
+    // Bottom energy display.
     const barX=70*baseScale,barW=W-140*baseScale,barH=92*baseScale,barY=H-barH-18*baseScale;
     roundRect(barX,barY,barW,barH,8*baseScale);ctx.fillStyle='rgba(8,13,19,.93)';ctx.fill();ctx.strokeStyle='#39444e';ctx.stroke();
     ctx.textAlign='left';ctx.fillStyle='#55b8ff';ctx.font=`800 ${Math.round(14*baseScale)}px system-ui`;ctx.fillText('Fork A (Source)',barX+58*baseScale,barY+31*baseScale);
