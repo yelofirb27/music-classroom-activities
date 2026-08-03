@@ -46,8 +46,10 @@
   .status{margin-top:12px;padding:10px 11px;border-radius:11px;background:#111820;border:1px solid #29313a;line-height:1.35;font-size:.92rem}
   .status.match{border-color:#4f9b5f;background:#112118;color:#d9f7df}
   .status.nomatch{border-color:#7d5d30;background:#21190f;color:#ffe4bc}
-  .sceneBox{min-height:500px;padding:10px;overflow:hidden}
+  .sceneBox{min-height:500px;padding:10px;overflow:hidden;position:relative}
   canvas{display:block;width:100%;height:100%;min-height:480px;background:linear-gradient(#0b1118 0 72%,#12171e 72% 100%);border:1px solid var(--edge);border-radius:12px}
+  .sceneBox:fullscreen{width:100vw;height:100vh;min-height:100vh;padding:12px;background:#090d12;border:0;border-radius:0}
+  .sceneBox:fullscreen canvas{width:100%;height:100%;min-height:0;border-radius:8px}
   footer{max-width:1422px;margin:0 auto 22px;padding:14px 18px;text-align:center}
   footer h3{margin:0 0 7px;color:var(--blue)}
   footer p{margin:0 auto;max-width:980px;color:#c9d1d9;line-height:1.55}
@@ -87,6 +89,7 @@
     <div class="bigbtns">
       <button id="reset" class="warn">Reset Motion</button>
       <button id="mute" class="good">Sound: On</button>
+      <button id="fullscreen" class="good" style="grid-column:1 / -1">Full Screen</button>
     </div>
 
     <div id="status" class="status"></div>
@@ -121,6 +124,8 @@
   const hitB = document.getElementById('hitB');
   const resetBtn = document.getElementById('reset');
   const muteBtn = document.getElementById('mute');
+  const fullscreenBtn = document.getElementById('fullscreen');
+  const sceneBox = document.querySelector('.sceneBox');
   const status = document.getElementById('status');
 
   let noteA = 'A';
@@ -137,6 +142,7 @@
   let ballAngle = 0;
   let ballVelocity = 0;
   let ballContactCooldown = 0;
+  let ballWasDriven = false;
 
   function ensureAudio(){
     if(!audioCtx){
@@ -192,6 +198,7 @@
         if(which === 'A') noteA = note; else noteB = note;
         ampA = ampB = transfer = 0;
         ballAngle = ballVelocity = ballContactCooldown = 0;
+        ballWasDriven = false;
         refreshUI();
       };
       holder.appendChild(b);
@@ -222,6 +229,7 @@
       setTimeout(() => {
         ampB = Math.max(ampB, 0.72);
         transfer = 1;
+        ballWasDriven = true;
         createForkTone(frequency(noteB), 0.17, 4.8);
       }, 280);
     }
@@ -231,6 +239,7 @@
     createForkTone(frequency(noteB), 0.5, 5.2);
     ampB = 1;
     strikeFlashB = 1;
+    ballWasDriven = true;
   }
 
   function roundRect(x,y,w,h,r){
@@ -303,10 +312,19 @@
       ctx.globalAlpha=1;
     }
 
-    ctx.fillStyle='#dfe7ef'; ctx.font=`600 ${13*scale}px system-ui`; ctx.textAlign='center';
-    ctx.fillText(label,cx,prongTop-24*scale);
-
     return {rightX:cx+gap/2+wiggle, leftX:cx-gap/2-wiggle, prongTop, yokeY, midY:(prongTop+yokeY)/2, scale};
+  }
+
+  function drawForkLabel(cx, y, line1, line2, accent, baseScale){
+    ctx.save();
+    ctx.textAlign='center';
+    ctx.fillStyle=accent;
+    ctx.font=`800 ${Math.round(27*baseScale)}px system-ui`;
+    ctx.fillText(line1,cx,y);
+    ctx.fillStyle='#eef5fb';
+    ctx.font=`700 ${Math.round(22*baseScale)}px system-ui`;
+    ctx.fillText(line2,cx,y+30*baseScale);
+    ctx.restore();
   }
 
   function drawMallet(cx, baseY, flash, side, scale){
@@ -366,9 +384,16 @@
       ballAngle = maxAngle;
       ballVelocity *= -0.18;
     }
-    if(ampB < .012 && Math.abs(ballAngle) < .002 && Math.abs(ballVelocity) < .02){
-      ballAngle = 0;
-      ballVelocity = 0;
+    // Once the visible sound-wave transfer and Fork B vibration have faded,
+    // quickly settle the ball so its motion does not outlast the sound.
+    if(ballWasDriven && ampB < .035 && transfer < .025){
+      ballVelocity *= Math.exp(-dt * 10);
+      ballAngle *= Math.exp(-dt * 8);
+      if(Math.abs(ballAngle) < .004 && Math.abs(ballVelocity) < .035){
+        ballAngle = 0;
+        ballVelocity = 0;
+        ballWasDriven = false;
+      }
     }
   }
 
@@ -426,8 +451,12 @@
 
     const phaseA=now*.025*Math.sqrt(frequency(noteA)/256);
     const phaseB=now*.025*Math.sqrt(frequency(noteB)/256)+.8;
-    const forkA=drawFork(cxA,baseY,ampA,phaseA,scaleA,`Fork A: ${noteA}  ${frequency(noteA).toFixed(1)} Hz`,'#76c7ff');
-    const forkB=drawFork(cxB,baseY,ampB,phaseB,scaleB,`Fork B: ${noteB}  ${frequency(noteB).toFixed(1)} Hz`,'#f5c96a');
+    const forkA=drawFork(cxA,baseY,ampA,phaseA,scaleA,'','#76c7ff');
+    const forkB=drawFork(cxB,baseY,ampB,phaseB,scaleB,'','#f5c96a');
+
+    const labelY = 92 * baseScale;
+    drawForkLabel(cxA,labelY,`Fork A — ${noteA}`,`${frequency(noteA).toFixed(1)} Hz`,'#76c7ff',baseScale);
+    drawForkLabel(cxB,labelY,`Fork B — ${noteB}`,`${frequency(noteB).toFixed(1)} Hz`,'#f5c96a',baseScale);
 
     drawMallet(cxA,baseY,strikeFlashA,'left',scaleA);
     drawMallet(cxB,baseY,strikeFlashB,'right',scaleB);
@@ -445,8 +474,17 @@
 
   hitA.onclick=strikeA;
   hitB.onclick=strikeB;
-  resetBtn.onclick=()=>{ampA=ampB=transfer=strikeFlashA=strikeFlashB=0;ballAngle=ballVelocity=ballContactCooldown=0;};
+  resetBtn.onclick=()=>{ampA=ampB=transfer=strikeFlashA=strikeFlashB=0;ballAngle=ballVelocity=ballContactCooldown=0;ballWasDriven=false;};
   muteBtn.onclick=()=>setMute(!muted);
+  fullscreenBtn.onclick=async()=>{
+    try{
+      if(!document.fullscreenElement) await sceneBox.requestFullscreen();
+      else await document.exitFullscreen();
+    }catch(err){ console.warn('Full-screen mode was unavailable.',err); }
+  };
+  document.addEventListener('fullscreenchange',()=>{
+    fullscreenBtn.textContent=document.fullscreenElement?'Exit Full Screen':'Full Screen';
+  });
   vol.oninput=()=>{volLbl.textContent=Number(vol.value).toFixed(2);if(master&&!muted)master.gain.value=Number(vol.value);};
 
   makeButtons(btnsA,'A');
