@@ -85,7 +85,7 @@
     .statusbar{
       margin-top:12px;
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(5,1fr);
       gap:8px;
     }
 
@@ -214,6 +214,45 @@
       margin:8px 0 0;
     }
 
+
+
+    select{
+      width:100%;
+      min-height:40px;
+      padding:7px 9px;
+      border:1px solid #af9c7e;
+      border-radius:8px;
+      background:white;
+      color:var(--ink);
+      font:inherit;
+    }
+
+    .resonance-meter{
+      height:16px;
+      overflow:hidden;
+      border-radius:999px;
+      background:#d9d2c7;
+      border:1px solid rgba(65,48,27,.22);
+      margin-top:8px;
+    }
+
+    .resonance-fill{
+      width:0%;
+      height:100%;
+      border-radius:inherit;
+      background:linear-gradient(90deg,#7b858a,#d3a238,#3f9a58);
+      transition:width .12s linear;
+    }
+
+    .resonance-caption{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:5px;
+      font:700 .76rem Arial,sans-serif;
+      color:#625642;
+    }
+
     .about{
       width:min(920px,94vw);
       margin:0 auto 38px;
@@ -272,6 +311,7 @@
         <div class="status"><small>Frequency</small><strong><span id="frequencyStatus">440</span> Hz</strong></div>
         <div class="status"><small>Mode</small><strong id="modeStatus">(2, 2)</strong></div>
         <div class="status"><small>Salt grains</small><strong id="grainStatus">0</strong></div>
+        <div class="status"><small>Resonance</small><strong id="resonanceStatus">Searching</strong></div>
       </div>
     </section>
 
@@ -283,6 +323,8 @@
           <button id="stopButton" class="red">Stop</button>
           <button id="addSaltButton" class="gold">Sprinkle More Salt</button>
           <button id="resetButton" class="secondary">Reset Plate</button>
+          <button id="sweepButton">Start Frequency Sweep</button>
+          <button id="stopSweepButton" class="secondary">Stop Sweep</button>
         </div>
       </div>
 
@@ -292,6 +334,27 @@
           <button id="squareButton" class="active">Square Plate</button>
           <button id="circleButton" class="secondary">Circular Plate</button>
         </div>
+      </div>
+
+
+
+      <div class="section">
+        <h2>Plate properties</h2>
+        <div class="row">
+          <div>
+            <label for="materialSelect">Material</label>
+            <select id="materialSelect">
+              <option value="steel">Steel</option>
+              <option value="brass">Brass</option>
+              <option value="aluminum">Aluminum</option>
+            </select>
+          </div>
+          <div>
+            <label for="sizeSlider">Plate size: <span id="sizeReadout">100</span>%</label>
+            <input id="sizeSlider" type="range" min="70" max="130" value="100" step="1">
+          </div>
+        </div>
+        <p class="note">Larger plates and softer materials resonate at lower frequencies.</p>
       </div>
 
       <div class="section">
@@ -313,8 +376,16 @@
           </div>
         </div>
 
+        <div class="resonance-meter" aria-label="Resonance strength">
+          <div class="resonance-fill" id="resonanceFill"></div>
+        </div>
+        <div class="resonance-caption">
+          <span>Weak response</span>
+          <span id="nearestResonanceLabel">Nearest resonance: 440 Hz</span>
+          <span>Locked in</span>
+        </div>
         <p class="note">
-          Changing frequency disturbs the old figure. The grains then reorganize toward the nearest simulated resonance.
+          Changing frequency disturbs the old figure. Near a resonant frequency, the meter rises and the salt locks into place more quickly.
         </p>
       </div>
 
@@ -355,6 +426,12 @@
     const volumeSlider = document.getElementById("volumeSlider");
     const guidesCheckbox = document.getElementById("guidesCheckbox");
     const labelsCheckbox = document.getElementById("labelsCheckbox");
+    const materialSelect = document.getElementById("materialSelect");
+    const sizeSlider = document.getElementById("sizeSlider");
+    const sizeReadout = document.getElementById("sizeReadout");
+    const resonanceFill = document.getElementById("resonanceFill");
+    const resonanceStatus = document.getElementById("resonanceStatus");
+    const nearestResonanceLabel = document.getElementById("nearestResonanceLabel");
 
     const W = canvas.width;
     const H = canvas.height;
@@ -375,6 +452,23 @@
     let lastTime = performance.now();
     let pourQueue = 0;
     let disturbance = 0;
+    let plateMaterial = "steel";
+    let plateSizePercent = 100;
+    let sweepActive = false;
+    let sweepDirection = 1;
+    let lastSweepTime = performance.now();
+    let sweepPauseUntil = 0;
+    let lastPausedResonance = null;
+    let avalancheClock = 0;
+    let lockTransition = 1;
+    let lockDelay = 0;
+    let lastModeTarget = 440;
+
+    const materialFactors = {
+      steel: 1.00,
+      brass: 0.86,
+      aluminum: 1.12
+    };
 
     const MAX_GRAINS = 14000;
     const INITIAL_GRAINS = 7200;
@@ -443,19 +537,38 @@
       return sum;
     }
 
+    function resonanceScale(){
+      const materialFactor = materialFactors[plateMaterial] || 1;
+      const sizeFactor = 100 / plateSizePercent;
+      return materialFactor * sizeFactor;
+    }
+
+    function adjustedModeFrequency(mode){
+      return Math.round(mode.f * resonanceScale());
+    }
+
     function nearestMode(){
       const list = plateShape === "square" ? squareModes : circleModes;
       let best = list[0];
       let bestDistance = Infinity;
 
       for(const mode of list){
-        const distance = Math.abs(mode.f - frequency);
+        const distance = Math.abs(adjustedModeFrequency(mode) - frequency);
         if(distance < bestDistance){
           best = mode;
           bestDistance = distance;
         }
       }
       return best;
+    }
+
+    function resonanceInformation(){
+      const mode = nearestMode();
+      const target = adjustedModeFrequency(mode);
+      const distance = Math.abs(frequency - target);
+      const windowSize = Math.max(20, target * .055);
+      const strength = Math.max(0, 1 - distance / windowSize);
+      return { mode, target, distance, strength };
     }
 
     function squareWave(x,y,mode){
@@ -524,7 +637,9 @@
         vy:pouring ? .5 + Math.random() * 1.8 : 0,
         size:.8 + Math.random() * 1.35,
         shade:208 + Math.random() * 45,
-        settled:0
+        settled:0,
+        falling:false,
+        pile:0
       };
     }
 
@@ -551,9 +666,9 @@
       if(pourQueue <= 0) return;
 
       /*
-        Release only a small handful each animation frame.
-        Every grain receives a completely independent random position,
-        so no rectangular pouring region can appear.
+        Release a small number of grains each frame.
+        Each grain receives an independent random position anywhere
+        on the current plate, avoiding visible rows, bands, or rectangles.
       */
       const amount = Math.min(10, pourQueue);
 
@@ -561,11 +676,12 @@
         const p = randomPointOnPlate();
         const g = createGrain(p.x, p.y, true);
 
-        // Give each grain its own tiny random hop in a random direction.
         const angle = Math.random() * Math.PI * 2;
         const speed = .35 + Math.random() * 1.9;
+
         g.vx = Math.cos(angle) * speed;
         g.vy = Math.sin(angle) * speed;
+        g.falling = false;
 
         grains.push(g);
       }
@@ -588,16 +704,38 @@
       if(!vibrating || frequency <= 0) return;
 
       const eps = 2.2;
-      const mode = nearestMode();
-      const resonanceDistance = Math.abs(frequency - mode.f);
-      const resonanceStrength = Math.max(.18,1 - resonanceDistance / 520);
+      const info = resonanceInformation();
+      const mode = info.mode;
+      const resonanceStrength = .14 + info.strength * 1.46;
       const frequencyStrength = .48 + Math.sqrt(frequency / 3520) * 1.35;
-      const forceScale = 5.6 * resonanceStrength * frequencyStrength;
-      const baseJitter = .045 + frequencyStrength * .06;
+      const lockBoost = info.strength > .82 ? 1.75 : 1;
+      const transitionBoost = .22 + lockTransition * .78;
+      const forceScale = 4.7 * resonanceStrength * frequencyStrength * lockBoost * transitionBoost;
+
+      const chaosBoost = 1 + (1 - lockTransition) * 2.8;
+      const baseJitter = (.065 + frequencyStrength * .07) *
+        (1.15 - info.strength * .68) *
+        chaosBoost;
 
       disturbance *= Math.pow(.965,dt);
 
       for(const g of grains){
+        if(g.falling){
+          g.vy += .12 * dt;
+          g.x += g.vx * dt * 2.4;
+          g.y += g.vy * dt * 2.4;
+
+          if(!insidePlate(g.x, g.y) || g.y > plateMargin + squareSize * .46){
+            const p = randomPointOnPlate();
+            g.x = p.x;
+            g.y = p.y;
+            g.vx = (Math.random() - .5) * 1.5;
+            g.vy = (Math.random() - .5) * 1.5;
+            g.falling = false;
+          }
+          continue;
+        }
+
         const eL = energy(g.x - eps,g.y);
         const eR = energy(g.x + eps,g.y);
         const eU = energy(g.x,g.y - eps);
@@ -644,12 +782,16 @@
 
         g.x = nx;
         g.y = ny;
+        const snapBonus = (info.strength > .84 && lockTransition > .72) ? .035 : 0;
+
         g.settled = localEnergy < .0035
-          ? Math.min(1,g.settled + .022 * dt)
-          : Math.max(0,g.settled - .035 * dt);
+          ? Math.min(1,g.settled + (.018 + info.strength * .035 + snapBonus) * dt)
+          : Math.max(0,g.settled - .04 * dt);
+        g.pile = Math.max(0, Math.min(1, g.pile + (g.settled > .75 ? .012 : -.018) * dt));
       }
 
       resolveNearbyCollisions();
+      updateSaltAvalanches(dt);
     }
 
     function resolveNearbyCollisions(){
@@ -710,6 +852,34 @@
               }
             }
           }
+        }
+      }
+    }
+
+
+
+    function updateSaltAvalanches(dt){
+      avalancheClock += dt;
+      if(avalancheClock < 34 || grains.length < 200) return;
+      avalancheClock = 0;
+
+      const sampleCount = Math.min(30, Math.floor(grains.length / 180));
+      for(let s = 0; s < sampleCount; s++){
+        const g = grains[Math.floor(Math.random() * grains.length)];
+        if(!g || g.settled < .72) continue;
+
+        let neighbors = 0;
+        for(let k = 0; k < 22; k++){
+          const other = grains[Math.floor(Math.random() * grains.length)];
+          if(other && Math.hypot(other.x - g.x, other.y - g.y) < 10) neighbors++;
+        }
+
+        if(neighbors >= 3 && Math.random() < .35){
+          const angle = Math.random() * Math.PI * 2;
+          g.vx += Math.cos(angle) * (.5 + Math.random());
+          g.vy += Math.sin(angle) * (.5 + Math.random());
+          g.settled *= .55;
+          g.pile *= .5;
         }
       }
     }
@@ -790,7 +960,8 @@
         const alpha = .68 + g.settled * .32;
         ctx.fillStyle = `rgba(${g.shade},${g.shade - 8},${Math.max(150,g.shade - 35)},${alpha})`;
         ctx.beginPath();
-        ctx.arc(g.x,g.y,g.size,0,Math.PI * 2);
+        const displaySize = g.size * (1 + g.pile * .34);
+        ctx.arc(g.x,g.y,displaySize,0,Math.PI * 2);
         ctx.fill();
       }
 
@@ -868,6 +1039,14 @@
       const elapsed = Math.min(2.2,(now - lastTime) / 16.667);
       lastTime = now;
 
+      updateFrequencySweep(now);
+
+      if(lockDelay > 0){
+        lockDelay = Math.max(0, lockDelay - elapsed / 60);
+      } else {
+        lockTransition = Math.min(1, lockTransition + elapsed * .028);
+      }
+
       emitPouredSalt();
       updateGrains(elapsed);
       render();
@@ -921,19 +1100,105 @@
       document.getElementById("startButton").classList.remove("active");
     }
 
-    function setFrequency(value){
+
+
+    function updateResonanceDisplay(){
+      const info = resonanceInformation();
+      const percent = Math.round(info.strength * 100);
+      resonanceFill.style.width = `${percent}%`;
+      nearestResonanceLabel.textContent = `Nearest resonance: ${info.target} Hz`;
+
+      if(info.strength > .82){
+        resonanceStatus.textContent = "Locked In";
+      } else if(info.strength > .48){
+        resonanceStatus.textContent = "Approaching";
+      } else {
+        resonanceStatus.textContent = "Searching";
+      }
+    }
+
+    function startFrequencySweep(){
+      sweepActive = true;
+      sweepDirection = frequency >= 3500 ? -1 : 1;
+      lastSweepTime = performance.now();
+      if(!vibrating) startVibration();
+      document.getElementById("sweepButton").classList.add("active");
+    }
+
+    function stopFrequencySweep(){
+      sweepActive = false;
+      document.getElementById("sweepButton").classList.remove("active");
+    }
+
+    function updateFrequencySweep(now){
+      if(!sweepActive) return;
+
+      if(now < sweepPauseUntil){
+        lastSweepTime = now;
+        return;
+      }
+
+      const seconds = Math.min(.08, (now - lastSweepTime) / 1000);
+      lastSweepTime = now;
+
+      let next = frequency + sweepDirection * 95 * seconds;
+
+      if(next >= 3520){
+        next = 3520;
+        sweepDirection = -1;
+      } else if(next <= 0){
+        next = 0;
+        sweepDirection = 1;
+      }
+
+      setFrequency(next, true);
+
+      const info = resonanceInformation();
+      const closeEnough = Math.abs(frequency - info.target) <= 2.2;
+
+      if(closeEnough && lastPausedResonance !== info.target){
+        frequency = info.target;
+        frequencySlider.value = info.target;
+        frequencyInput.value = info.target;
+        frequencyReadout.textContent = info.target;
+        frequencyStatus.textContent = info.target;
+
+        sweepPauseUntil = now + 1400;
+        lastPausedResonance = info.target;
+
+        disturbGrains(.9);
+        lockDelay = .45;
+        lockTransition = 0;
+        updateModeStatus();
+        updateResonanceDisplay();
+      }
+
+      if(Math.abs(frequency - info.target) > 18){
+        lastPausedResonance = null;
+      }
+    }
+
+    function setFrequency(value, fromSweep = false){
       const previous = frequency;
-      frequency = Math.max(0,Math.min(3520,Math.round(Number(value) || 0)));
+      frequency = Math.max(0,Math.min(3520, fromSweep ? Number(value) : Math.round(Number(value) || 0)));
 
       frequencySlider.value = frequency;
       frequencyInput.value = frequency;
-      frequencyReadout.textContent = frequency;
-      frequencyStatus.textContent = frequency;
+      const shownFrequency = Math.round(frequency);
+      frequencyReadout.textContent = shownFrequency;
+      frequencyStatus.textContent = shownFrequency;
 
       if(Math.abs(previous - frequency) >= 3){
-        disturbGrains(
-          Math.min(4.5,.8 + Math.abs(previous - frequency) / 260)
-        );
+        const changeAmount = Math.abs(previous - frequency);
+
+        if(!fromSweep){
+          disturbGrains(
+            Math.min(4.5,.8 + changeAmount / 260)
+          );
+        }
+
+        lockDelay = fromSweep ? .12 : .42;
+        lockTransition = 0;
       }
 
       if(vibrating){
@@ -951,6 +1216,7 @@
       }
 
       updateModeStatus();
+      updateResonanceDisplay();
     }
 
     function setShape(shape){
@@ -991,10 +1257,15 @@
     }
 
     function resetPlate(){
+      stopFrequencySweep();
       stopVibration();
       grains = [];
       pourQueue = 0;
       disturbance = 0;
+      lockTransition = 1;
+      lockDelay = 0;
+      sweepPauseUntil = 0;
+      lastPausedResonance = null;
       scatterSalt(INITIAL_GRAINS);
       render();
     }
@@ -1022,7 +1293,7 @@
 
         ex.font = "17px Arial";
         ex.fillText(
-          `Simulated mode ${modeStatus.textContent}`,
+          `${plateMaterial[0].toUpperCase() + plateMaterial.slice(1)} · ${plateSizePercent}% size · Mode ${modeStatus.textContent}`,
           W / 2,
           H + 56
         );
@@ -1056,6 +1327,8 @@
     document.getElementById("stopButton").addEventListener("click",stopVibration);
     document.getElementById("addSaltButton").addEventListener("click",() => queueSalt(ADD_GRAINS));
     document.getElementById("resetButton").addEventListener("click",resetPlate);
+    document.getElementById("sweepButton").addEventListener("click",startFrequencySweep);
+    document.getElementById("stopSweepButton").addEventListener("click",stopFrequencySweep);
     document.getElementById("squareButton").addEventListener("click",() => setShape("square"));
     document.getElementById("circleButton").addEventListener("click",() => setShape("circle"));
     document.getElementById("exportButton").addEventListener("click",exportImage);
@@ -1070,11 +1343,29 @@
       }
     });
 
+
+
+    materialSelect.addEventListener("change",() => {
+      plateMaterial = materialSelect.value;
+      disturbGrains(3.1);
+      updateModeStatus();
+      updateResonanceDisplay();
+    });
+
+    sizeSlider.addEventListener("input",() => {
+      plateSizePercent = Number(sizeSlider.value);
+      sizeReadout.textContent = plateSizePercent;
+      disturbGrains(2.2);
+      updateModeStatus();
+      updateResonanceDisplay();
+    });
+
     guidesCheckbox.addEventListener("change",render);
 
     scatterSalt(INITIAL_GRAINS);
     setFrequency(440);
     setShape("square");
+    updateResonanceDisplay();
     render();
     animationId = requestAnimationFrame(loop);
   })();
