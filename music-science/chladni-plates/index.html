@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chladni Plate Laboratory</title>
+  <style>
+    :root{
+      --ink:#18212b;
+      --paper:#f5efe3;
+      --panel:#fffaf0;
+      --gold:#b87922;
+      --gold-dark:#865314;
+      --blue:#245b78;
+      --red:#9f3b32;
+      --shadow:0 12px 30px rgba(36,28,17,.18);
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
+      font-family:Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,.7), transparent 32%),
+        repeating-linear-gradient(90deg, rgba(110,75,36,.035) 0 2px, transparent 2px 7px),
+        var(--paper);
+    }
+
+    header{
+      text-align:center;
+      padding:18px 16px 10px;
+    }
+
+    h1{
+      margin:0;
+      font-size:clamp(2rem,4vw,3.35rem);
+      letter-spacing:.03em;
+    }
+
+    .subtitle{
+      margin:7px auto 0;
+      max-width:850px;
+      font-size:1rem;
+      line-height:1.45;
+    }
+
+    .app{
+      width:min(1180px,96vw);
+      margin:12px auto 34px;
+      display:grid;
+      grid-template-columns:minmax(330px, 1fr) minmax(310px, 390px);
+      gap:20px;
+      align-items:start;
+    }
+
+    .stage, .panel{
+      background:rgba(255,250,240,.94);
+      border:1px solid rgba(95,66,30,.24);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+    }
+
+    .stage{
+      padding:16px;
+    }
+
+    .canvas-wrap{
+      position:relative;
+      width:min(100%,720px);
+      aspect-ratio:1;
+      margin:auto;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      border-radius:14px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.8), rgba(217,199,168,.5)),
+        #d7c7aa;
+      border:1px solid rgba(76,53,27,.25);
+    }
+
+    canvas{
+      display:block;
+      width:100%;
+      height:100%;
+      touch-action:none;
+    }
+
+    .statusbar{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+    }
+
+    .status{
+      background:#eee4d2;
+      border:1px solid rgba(87,58,25,.18);
+      border-radius:10px;
+      padding:8px 7px;
+      text-align:center;
+      min-height:58px;
+    }
+
+    .status small{
+      display:block;
+      color:#6d604e;
+      margin-bottom:3px;
+      font-family:Arial,sans-serif;
+      font-size:.72rem;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .status strong{
+      font-size:1rem;
+    }
+
+    .panel{
+      padding:17px;
+      position:sticky;
+      top:12px;
+    }
+
+    .section{
+      padding:13px 0;
+      border-bottom:1px solid rgba(77,54,26,.17);
+    }
+
+    .section:first-child{padding-top:0}
+    .section:last-child{border-bottom:0;padding-bottom:0}
+
+    .section h2{
+      font-size:1.03rem;
+      margin:0 0 9px;
+    }
+
+    .button-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:8px;
+    }
+
+    button, select, input{
+      font:inherit;
+    }
+
+    button{
+      border:0;
+      border-radius:9px;
+      min-height:42px;
+      padding:9px 11px;
+      cursor:pointer;
+      color:white;
+      background:var(--blue);
+      box-shadow:0 3px 0 rgba(0,0,0,.18);
+      transition:transform .08s ease, filter .15s ease;
+    }
+
+    button:hover{filter:brightness(1.08)}
+    button:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+    button.secondary{background:#5d625f}
+    button.gold{background:var(--gold-dark)}
+    button.red{background:var(--red)}
+    button.active{outline:3px solid rgba(184,121,34,.35)}
+
+    .shape-picker{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+
+    label{
+      display:block;
+      font-family:Arial,sans-serif;
+      font-size:.83rem;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .freq-readout{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:12px;
+      margin-bottom:5px;
+    }
+
+    .freq-number{
+      font-size:1.55rem;
+      font-weight:bold;
+      color:var(--gold-dark);
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color:var(--gold-dark);
+    }
+
+    input[type="number"], select{
+      width:100%;
+      min-height:40px;
+      padding:7px 9px;
+      border:1px solid #af9c7e;
+      border-radius:8px;
+      background:white;
+      color:var(--ink);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .preset-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:7px;
+    }
+
+    .preset-grid button{
+      min-height:48px;
+      padding:7px 5px;
+      font-size:.82rem;
+      line-height:1.15;
+      background:#6f4e2f;
+    }
+
+    .preset-grid button span{
+      display:block;
+      opacity:.8;
+      font-size:.71rem;
+      margin-top:3px;
+    }
+
+    .checkrow{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      font-family:Arial,sans-serif;
+      font-size:.86rem;
+      margin-top:7px;
+    }
+
+    .checkrow input{width:18px;height:18px}
+
+    .note{
+      font-family:Arial,sans-serif;
+      font-size:.8rem;
+      line-height:1.4;
+      color:#625642;
+      margin:8px 0 0;
+    }
+
+    .about{
+      width:min(920px,94vw);
+      margin:0 auto 38px;
+      padding:17px 20px;
+      background:rgba(255,250,240,.9);
+      border:1px solid rgba(95,66,30,.22);
+      border-radius:14px;
+    }
+
+    .about h2{margin:0 0 7px}
+    .about p{margin:0;line-height:1.55}
+
+    @media (max-width:900px){
+      .app{grid-template-columns:1fr}
+      .panel{position:static}
+      .statusbar{grid-template-columns:repeat(2,1fr)}
+    }
+
+    @media (max-width:520px){
+      .stage{padding:8px}
+      .panel{padding:14px}
+      .button-grid,.shape-picker,.preset-grid,.row{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Chladni Plate Laboratory</h1>
+    <p class="subtitle">
+      Sprinkle salt on a vibrating plate, change the frequency, and observe the grains gradually collect along nodal lines where the plate moves least.
+    </p>
+  </header>
+
+  <main class="app">
+    <section class="stage">
+      <div class="canvas-wrap">
+        <canvas id="plateCanvas" width="760" height="760" aria-label="Interactive Chladni plate"></canvas>
+      </div>
+
+      <div class="statusbar">
+        <div class="status"><small>Plate</small><strong id="shapeStatus">Square</strong></div>
+        <div class="status"><small>Frequency</small><strong><span id="frequencyStatus">440</span> Hz</strong></div>
+        <div class="status"><small>Mode</small><strong id="modeStatus">(2, 2)</strong></div>
+        <div class="status"><small>Salt grains</small><strong id="grainStatus">0</strong></div>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="section">
+        <h2>Experiment controls</h2>
+        <div class="button-grid">
+          <button id="startButton">Start Vibration</button>
+          <button id="stopButton" class="red">Stop</button>
+          <button id="addSaltButton" class="gold">Pour More Salt</button>
+          <button id="resetButton" class="secondary">Reset Plate</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Plate shape</h2>
+        <div class="shape-picker">
+          <button id="squareButton" class="active">Square Plate</button>
+          <button id="circleButton" class="secondary">Circular Plate</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="freq-readout">
+          <h2>Frequency</h2>
+          <div class="freq-number"><span id="frequencyReadout">440</span> Hz</div>
+        </div>
+        <input id="frequencySlider" type="range" min="0" max="3520" step="1" value="440">
+        <div class="row">
+          <div>
+            <label for="frequencyInput">Enter frequency</label>
+            <input id="frequencyInput" type="number" min="0" max="3520" step="1" value="440">
+          </div>
+          <div>
+            <label for="volumeSlider">Tone volume</label>
+            <input id="volumeSlider" type="range" min="0" max="0.16" value="0.045" step="0.005">
+          </div>
+        </div>
+        <p class="note">At 0 Hz the plate is still and no tone is produced.</p>
+      </div>
+
+      <div class="section">
+        <h2>Pythagorean monochord presets</h2>
+        <div class="preset-grid" id="presetGrid"></div>
+        <p class="note">These ratios control the audible pitch. The plate pattern changes to the nearest simulated resonance.</p>
+      </div>
+
+      <div class="section">
+        <h2>Display</h2>
+        <label class="checkrow"><input id="guidesCheckbox" type="checkbox"> Show faint nodal guides</label>
+        <label class="checkrow"><input id="labelsCheckbox" type="checkbox" checked> Include label when exporting</label>
+        <div class="button-grid" style="margin-top:10px">
+          <button id="exportButton" class="gold">Save Pattern Image</button>
+          <button id="fullscreenButton" class="secondary">Full Screen</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <section class="about">
+    <h2>About Chladni’s Discovery</h2>
+    <p>
+      In the late eighteenth century, Ernst Chladni sprinkled sand on metal plates and set them vibrating with a violin bow. At resonant frequencies, the grains bounced away from strongly moving regions and collected along nearly motionless nodal lines. The symmetrical patterns became known as Chladni figures and helped make sound vibration visible.
+    </p>
+  </section>
+
+  <script>
+  (() => {
+    "use strict";
+
+    const canvas = document.getElementById("plateCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const frequencySlider = document.getElementById("frequencySlider");
+    const frequencyInput = document.getElementById("frequencyInput");
+    const frequencyReadout = document.getElementById("frequencyReadout");
+    const frequencyStatus = document.getElementById("frequencyStatus");
+    const shapeStatus = document.getElementById("shapeStatus");
+    const modeStatus = document.getElementById("modeStatus");
+    const grainStatus = document.getElementById("grainStatus");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const guidesCheckbox = document.getElementById("guidesCheckbox");
+    const labelsCheckbox = document.getElementById("labelsCheckbox");
+
+    const W = canvas.width;
+    const H = canvas.height;
+    const cx = W / 2;
+    const cy = H / 2;
+    const plateMargin = 58;
+    const squareSize = W - plateMargin * 2;
+    const circleRadius = squareSize / 2;
+
+    let plateShape = "square";
+    let frequency = 440;
+    let vibrating = false;
+    let grains = [];
+    let animationId = null;
+    let audioContext = null;
+    let oscillator = null;
+    let gainNode = null;
+    let lastTime = performance.now();
+    let pourQueue = 0;
+
+    const MAX_GRAINS = 12000;
+    const INITIAL_GRAINS = 6500;
+    const ADD_GRAINS = 1600;
+
+    const squareModes = [
+      { f: 80,   m:1, n:1, mix:.00 },
+      { f: 120,  m:2, n:1, mix:.55 },
+      { f: 180,  m:2, n:2, mix:.00 },
+      { f: 240,  m:3, n:1, mix:.45 },
+      { f: 320,  m:3, n:2, mix:.60 },
+      { f: 440,  m:2, n:2, mix:.75 },
+      { f: 540,  m:4, n:2, mix:.48 },
+      { f: 660,  m:4, n:3, mix:.66 },
+      { f: 800,  m:5, n:2, mix:.50 },
+      { f: 990,  m:5, n:3, mix:.68 },
+      { f: 1200, m:6, n:3, mix:.57 },
+      { f: 1450, m:6, n:4, mix:.70 },
+      { f: 1760, m:7, n:4, mix:.62 },
+      { f: 2100, m:8, n:5, mix:.72 },
+      { f: 2640, m:9, n:6, mix:.66 },
+      { f: 3200, m:10,n:7, mix:.72 },
+      { f: 3520, m:11,n:8, mix:.74 }
+    ];
+
+    const circleModes = [
+      { f: 80,   m:0, n:1, zero:2.4048 },
+      { f: 130,  m:1, n:1, zero:3.8317 },
+      { f: 190,  m:2, n:1, zero:5.1356 },
+      { f: 260,  m:0, n:2, zero:5.5201 },
+      { f: 360,  m:3, n:1, zero:6.3802 },
+      { f: 440,  m:2, n:2, zero:8.4172 },
+      { f: 560,  m:4, n:1, zero:7.5883 },
+      { f: 700,  m:3, n:2, zero:9.7610 },
+      { f: 880,  m:5, n:1, zero:8.7715 },
+      { f: 1050, m:4, n:2, zero:11.0647 },
+      { f: 1320, m:6, n:1, zero:9.9361 },
+      { f: 1580, m:5, n:2, zero:12.3386 },
+      { f: 1900, m:6, n:2, zero:13.5893 },
+      { f: 2300, m:7, n:2, zero:14.8213 },
+      { f: 2760, m:8, n:2, zero:16.0378 },
+      { f: 3200, m:9, n:2, zero:17.2412 },
+      { f: 3520, m:10,n:2, zero:18.4335 }
+    ];
+
+    const presets = [
+      { name:"Unison", ratio:"1:1", hz:440 },
+      { name:"Whole Tone", ratio:"9:8", hz:495 },
+      { name:"Major Third", ratio:"81:64", hz:557 },
+      { name:"Perfect Fourth", ratio:"4:3", hz:587 },
+      { name:"Perfect Fifth", ratio:"3:2", hz:660 },
+      { name:"Major Sixth", ratio:"27:16", hz:743 },
+      { name:"Octave", ratio:"2:1", hz:880 },
+      { name:"Two Octaves", ratio:"4:1", hz:1760 },
+      { name:"Three Octaves", ratio:"8:1", hz:3520 }
+    ];
+
+    function buildPresets(){
+      const grid = document.getElementById("presetGrid");
+      presets.forEach(p => {
+        const b = document.createElement("button");
+        b.innerHTML = `${p.name}<span>${p.ratio} · ${p.hz} Hz</span>`;
+        b.addEventListener("click", () => setFrequency(p.hz));
+        grid.appendChild(b);
+      });
+    }
+
+    function nearestMode(){
+      const list = plateShape === "square" ? squareModes : circleModes;
+      let best = list[0];
+      let bestDistance = Infinity;
+      for(const mode of list){
+        const distance = Math.abs(mode.f - frequency);
+        if(distance < bestDistance){
+          best = mode;
+          bestDistance = distance;
+        }
+      }
+      return best;
+    }
+
+    function besselJ(order, x){
+      let sum = 0;
+      for(let k = 0; k < 18; k++){
+        const sign = k % 2 ? -1 : 1;
+        const numerator = Math.pow(x / 2, 2 * k + order);
+        const denominator = factorial(k) * factorial(k + order);
+        sum += sign * numerator / denominator;
+      }
+      return sum;
+    }
+
+    const factorialCache = [1];
+    function factorial(n){
+      if(factorialCache[n] != null) return factorialCache[n];
+      let value = factorialCache[factorialCache.length - 1];
+      for(let i = factorialCache.length; i <= n; i++){
+        value *= i;
+        factorialCache[i] = value;
+      }
+      return factorialCache[n];
+    }
+
+    function squareWave(x, y, mode){
+      const u = (x - plateMargin) / squareSize;
+      const v = (y - plateMargin) / squareSize;
+      if(u < 0 || u > 1 || v < 0 || v > 1) return 0;
+
+      const a = Math.sin(mode.m * Math.PI * u) * Math.sin(mode.n * Math.PI * v);
+      const b = Math.sin(mode.n * Math.PI * u) * Math.sin(mode.m * Math.PI * v);
+      return a + mode.mix * b;
+    }
+
+    function circleWave(x, y, mode){
+      const dx = x - cx;
+      const dy = y - cy;
+      const r = Math.hypot(dx, dy) / circleRadius;
+      if(r > 1) return 0;
+      const theta = Math.atan2(dy, dx);
+      const radial = besselJ(mode.m, mode.zero * r);
+      const angular = mode.m === 0 ? 1 : Math.cos(mode.m * theta);
+      return radial * angular;
+    }
+
+    function waveValue(x, y){
+      const mode = nearestMode();
+      return plateShape === "square"
+        ? squareWave(x, y, mode)
+        : circleWave(x, y, mode);
+    }
+
+    function energy(x, y){
+      const z = waveValue(x, y);
+      return z * z;
+    }
+
+    function insidePlate(x, y){
+      if(plateShape === "square"){
+        return x >= plateMargin && x <= W - plateMargin &&
+               y >= plateMargin && y <= H - plateMargin;
+      }
+      return Math.hypot(x - cx, y - cy) <= circleRadius;
+    }
+
+    function randomPointOnPlate(){
+      if(plateShape === "square"){
+        return {
+          x: plateMargin + Math.random() * squareSize,
+          y: plateMargin + Math.random() * squareSize
+        };
+      }
+
+      const angle = Math.random() * Math.PI * 2;
+      const radius = Math.sqrt(Math.random()) * circleRadius;
+      return {
+        x: cx + Math.cos(angle) * radius,
+        y: cy + Math.sin(angle) * radius
+      };
+    }
+
+    function createGrain(x, y, pouring = false){
+      return {
+        x, y,
+        vx: pouring ? (Math.random() - .5) * 1.6 : 0,
+        vy: pouring ? Math.random() * 1.2 : 0,
+        size: .85 + Math.random() * 1.25,
+        shade: 205 + Math.random() * 50,
+        settled: 0
+      };
+    }
+
+    function scatterSalt(count){
+      const available = Math.max(0, MAX_GRAINS - grains.length);
+      count = Math.min(count, available);
+      for(let i = 0; i < count; i++){
+        const p = randomPointOnPlate();
+        grains.push(createGrain(p.x, p.y));
+      }
+      updateGrainCount();
+    }
+
+    function queueSalt(count){
+      pourQueue = Math.min(pourQueue + count, MAX_GRAINS - grains.length);
+    }
+
+    function emitPouredSalt(){
+      if(pourQueue <= 0) return;
+      const amount = Math.min(42, pourQueue);
+      for(let i = 0; i < amount; i++){
+        let x = cx + (Math.random() - .5) * squareSize * .22;
+        let y = plateMargin + 18 + Math.random() * 18;
+        if(plateShape === "circle"){
+          x = cx + (Math.random() - .5) * circleRadius * .45;
+          y = cy - circleRadius * .72 + Math.random() * 18;
+        }
+        grains.push(createGrain(x, y, true));
+      }
+      pourQueue -= amount;
+      updateGrainCount();
+    }
+
+    function updateGrains(dt){
+      if(!vibrating || frequency <= 0) return;
+
+      const eps = 2.2;
+      const mode = nearestMode();
+      const resonanceDistance = Math.abs(frequency - mode.f);
+      const resonanceStrength = Math.max(.18, 1 - resonanceDistance / 520);
+      const frequencyStrength = .48 + Math.sqrt(frequency / 3520) * 1.25;
+      const forceScale = 5.5 * resonanceStrength * frequencyStrength;
+      const jitter = .035 + frequencyStrength * .055;
+
+      for(const g of grains){
+        const eL = energy(g.x - eps, g.y);
+        const eR = energy(g.x + eps, g.y);
+        const eU = energy(g.x, g.y - eps);
+        const eD = energy(g.x, g.y + eps);
+
+        const gradX = (eR - eL) / (2 * eps);
+        const gradY = (eD - eU) / (2 * eps);
+        const localEnergy = energy(g.x, g.y);
+
+        g.vx += (-gradX * forceScale + (Math.random() - .5) * jitter * (0.25 + localEnergy)) * dt;
+        g.vy += (-gradY * forceScale + (Math.random() - .5) * jitter * (0.25 + localEnergy)) * dt;
+
+        const damping = localEnergy < .008 ? .82 : .91;
+        g.vx *= Math.pow(damping, dt);
+        g.vy *= Math.pow(damping, dt);
+
+        let nx = g.x + g.vx * dt * 3.2;
+        let ny = g.y + g.vy * dt * 3.2;
+
+        if(!insidePlate(nx, ny)){
+          if(plateShape === "square"){
+            if(nx < plateMargin || nx > W - plateMargin) g.vx *= -.42;
+            if(ny < plateMargin || ny > H - plateMargin) g.vy *= -.42;
+            nx = Math.max(plateMargin + 1, Math.min(W - plateMargin - 1, nx));
+            ny = Math.max(plateMargin + 1, Math.min(H - plateMargin - 1, ny));
+          } else {
+            const angle = Math.atan2(ny - cy, nx - cx);
+            nx = cx + Math.cos(angle) * (circleRadius - 2);
+            ny = cy + Math.sin(angle) * (circleRadius - 2);
+            const radialV = g.vx * Math.cos(angle) + g.vy * Math.sin(angle);
+            g.vx -= 1.45 * radialV * Math.cos(angle);
+            g.vy -= 1.45 * radialV * Math.sin(angle);
+          }
+        }
+
+        g.x = nx;
+        g.y = ny;
+        g.settled = localEnergy < .004 ? Math.min(1, g.settled + .02 * dt) : Math.max(0, g.settled - .03 * dt);
+      }
+    }
+
+    function drawBackground(){
+      ctx.clearRect(0, 0, W, H);
+
+      const wood = ctx.createLinearGradient(0, 0, W, H);
+      wood.addColorStop(0, "#dfcfb1");
+      wood.addColorStop(.52, "#cbb58f");
+      wood.addColorStop(1, "#eadcc3");
+      ctx.fillStyle = wood;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.save();
+      ctx.globalAlpha = .1;
+      ctx.strokeStyle = "#68451f";
+      for(let i = 0; i < 28; i++){
+        const y = (i / 28) * H + Math.sin(i * 2.1) * 7;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.bezierCurveTo(W * .25, y + 14, W * .7, y - 12, W, y + 5);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function platePath(){
+      ctx.beginPath();
+      if(plateShape === "square"){
+        ctx.roundRect(plateMargin, plateMargin, squareSize, squareSize, 9);
+      } else {
+        ctx.arc(cx, cy, circleRadius, 0, Math.PI * 2);
+      }
+    }
+
+    function drawPlate(){
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,.35)";
+      ctx.shadowBlur = 24;
+      ctx.shadowOffsetY = 12;
+      platePath();
+      const metal = ctx.createRadialGradient(cx - 90, cy - 130, 30, cx, cy, circleRadius * 1.25);
+      metal.addColorStop(0, "#31363b");
+      metal.addColorStop(.38, "#12171b");
+      metal.addColorStop(1, "#020405");
+      ctx.fillStyle = metal;
+      ctx.fill();
+      ctx.restore();
+
+      ctx.save();
+      platePath();
+      ctx.clip();
+
+      const sheen = ctx.createLinearGradient(plateMargin, plateMargin, W - plateMargin, H - plateMargin);
+      sheen.addColorStop(0, "rgba(255,255,255,.10)");
+      sheen.addColorStop(.4, "rgba(255,255,255,.015)");
+      sheen.addColorStop(.75, "rgba(255,255,255,.055)");
+      sheen.addColorStop(1, "rgba(255,255,255,.01)");
+      ctx.fillStyle = sheen;
+      ctx.fillRect(plateMargin, plateMargin, squareSize, squareSize);
+
+      if(guidesCheckbox.checked) drawGuides();
+
+      for(const g of grains){
+        const alpha = .72 + g.settled * .28;
+        ctx.fillStyle = `rgba(${g.shade},${g.shade - 8},${Math.max(150,g.shade - 35)},${alpha})`;
+        ctx.beginPath();
+        ctx.arc(g.x, g.y, g.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+
+      ctx.save();
+      platePath();
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = "#6d7478";
+      ctx.stroke();
+      platePath();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "rgba(255,255,255,.38)";
+      ctx.stroke();
+      ctx.restore();
+
+      drawDriver();
+    }
+
+    function drawDriver(){
+      ctx.save();
+      ctx.translate(cx, cy);
+      const pulse = vibrating && frequency > 0 ? 1 + Math.sin(performance.now() * .018) * .08 : 1;
+      ctx.scale(pulse, pulse);
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.fillStyle = "#b48b45";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#ead7a6";
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawGuides(){
+      const mode = nearestMode();
+      const resolution = 170;
+      const cell = W / resolution;
+      ctx.save();
+      ctx.globalAlpha = .18;
+      ctx.fillStyle = "#8bd3ff";
+
+      for(let gy = 0; gy < resolution; gy++){
+        for(let gx = 0; gx < resolution; gx++){
+          const x = (gx + .5) * cell;
+          const y = (gy + .5) * cell;
+          if(!insidePlate(x, y)) continue;
+          const value = plateShape === "square" ? squareWave(x,y,mode) : circleWave(x,y,mode);
+          if(Math.abs(value) < .035){
+            ctx.fillRect(gx * cell, gy * cell, cell + .6, cell + .6);
+          }
+        }
+      }
+      ctx.restore();
+    }
+
+    function render(){
+      drawBackground();
+      drawPlate();
+    }
+
+    function loop(now){
+      const elapsed = Math.min(2.2, (now - lastTime) / 16.667);
+      lastTime = now;
+      emitPouredSalt();
+      updateGrains(elapsed);
+      render();
+      animationId = requestAnimationFrame(loop);
+    }
+
+    function ensureAudio(){
+      if(!audioContext){
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioContext.createGain();
+        gainNode.gain.value = Number(volumeSlider.value);
+        gainNode.connect(audioContext.destination);
+      }
+      if(audioContext.state === "suspended") audioContext.resume();
+    }
+
+    function startAudio(){
+      ensureAudio();
+      stopOscillator();
+
+      if(frequency <= 0) return;
+
+      oscillator = audioContext.createOscillator();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.connect(gainNode);
+      oscillator.start();
+    }
+
+    function stopOscillator(){
+      if(oscillator){
+        try{ oscillator.stop(); }catch(e){}
+        oscillator.disconnect();
+        oscillator = null;
+      }
+    }
+
+    function startVibration(){
+      vibrating = true;
+      startAudio();
+      document.getElementById("startButton").classList.add("active");
+    }
+
+    function stopVibration(){
+      vibrating = false;
+      stopOscillator();
+      document.getElementById("startButton").classList.remove("active");
+    }
+
+    function setFrequency(value){
+      frequency = Math.max(0, Math.min(3520, Math.round(Number(value) || 0)));
+      frequencySlider.value = frequency;
+      frequencyInput.value = frequency;
+      frequencyReadout.textContent = frequency;
+      frequencyStatus.textContent = frequency;
+
+      if(vibrating){
+        if(frequency === 0){
+          stopOscillator();
+        } else if(oscillator){
+          oscillator.frequency.setTargetAtTime(frequency, audioContext.currentTime, .015);
+        } else {
+          startAudio();
+        }
+      }
+      updateModeStatus();
+    }
+
+    function setShape(shape){
+      plateShape = shape;
+      shapeStatus.textContent = shape === "square" ? "Square" : "Circular";
+      document.getElementById("squareButton").className = shape === "square" ? "active" : "secondary";
+      document.getElementById("circleButton").className = shape === "circle" ? "active" : "secondary";
+
+      for(const g of grains){
+        if(!insidePlate(g.x, g.y)){
+          const p = randomPointOnPlate();
+          g.x = p.x;
+          g.y = p.y;
+          g.vx = 0;
+          g.vy = 0;
+        }
+      }
+      updateModeStatus();
+      render();
+    }
+
+    function updateModeStatus(){
+      const mode = nearestMode();
+      if(plateShape === "square"){
+        modeStatus.textContent = `(${mode.m}, ${mode.n})`;
+      } else {
+        modeStatus.textContent = `(${mode.m}, ${mode.n}) radial`;
+      }
+    }
+
+    function updateGrainCount(){
+      grainStatus.textContent = grains.length.toLocaleString();
+    }
+
+    function resetPlate(){
+      stopVibration();
+      grains = [];
+      pourQueue = 0;
+      scatterSalt(INITIAL_GRAINS);
+      render();
+    }
+
+    function exportImage(){
+      const exportCanvas = document.createElement("canvas");
+      exportCanvas.width = W;
+      exportCanvas.height = labelsCheckbox.checked ? H + 72 : H;
+      const ex = exportCanvas.getContext("2d");
+
+      ex.drawImage(canvas, 0, 0);
+
+      if(labelsCheckbox.checked){
+        ex.fillStyle = "#f4ead8";
+        ex.fillRect(0, H, W, 72);
+        ex.fillStyle = "#1d2730";
+        ex.font = "bold 25px Georgia";
+        ex.textAlign = "center";
+        ex.fillText(
+          `Chladni ${plateShape === "square" ? "Square" : "Circular"} Plate — ${frequency} Hz`,
+          W / 2,
+          H + 31
+        );
+        ex.font = "17px Arial";
+        ex.fillText(`Simulated mode ${modeStatus.textContent}`, W / 2, H + 56);
+      }
+
+      const link = document.createElement("a");
+      link.download = `chladni-${plateShape}-${frequency}Hz.png`;
+      link.href = exportCanvas.toDataURL("image/png");
+      link.click();
+    }
+
+    frequencySlider.addEventListener("input", e => setFrequency(e.target.value));
+    frequencyInput.addEventListener("change", e => setFrequency(e.target.value));
+    volumeSlider.addEventListener("input", () => {
+      if(gainNode && audioContext){
+        gainNode.gain.setTargetAtTime(Number(volumeSlider.value), audioContext.currentTime, .02);
+      }
+    });
+
+    document.getElementById("startButton").addEventListener("click", startVibration);
+    document.getElementById("stopButton").addEventListener("click", stopVibration);
+    document.getElementById("addSaltButton").addEventListener("click", () => queueSalt(ADD_GRAINS));
+    document.getElementById("resetButton").addEventListener("click", resetPlate);
+    document.getElementById("squareButton").addEventListener("click", () => setShape("square"));
+    document.getElementById("circleButton").addEventListener("click", () => setShape("circle"));
+    document.getElementById("exportButton").addEventListener("click", exportImage);
+    document.getElementById("fullscreenButton").addEventListener("click", () => {
+      const target = document.querySelector(".stage");
+      if(!document.fullscreenElement){
+        target.requestFullscreen?.();
+      } else {
+        document.exitFullscreen?.();
+      }
+    });
+
+    guidesCheckbox.addEventListener("change", render);
+
+    buildPresets();
+    scatterSalt(INITIAL_GRAINS);
+    setFrequency(440);
+    setShape("square");
+    render();
+    animationId = requestAnimationFrame(loop);
+  })();
+  </script>
+</body>
+</html>
