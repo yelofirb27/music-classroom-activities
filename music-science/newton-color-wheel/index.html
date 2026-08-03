@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Newton's Color Wheel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .page-title {
+      margin: 14px 16px 6px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 8px 16px 10px;
+    }
+
+    .wheel-wrap {
+      width: min(420px, 88vw, 52vh);
+      aspect-ratio: 1;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+
+    .controls {
+      width: min(520px, 88vw);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tabbar {
+      display: flex;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .tabbar button,
+    #muteBtn,
+    #applyBpm {
+      border: 0;
+      border-radius: 7px;
+      color: #fff;
+      background: #3b3b3b;
+      cursor: pointer;
+    }
+
+    .tabbar button {
+      padding: 7px 13px;
+      font-size: 14px;
+      opacity: 0.78;
+    }
+
+    .tabbar button.active {
+      background: #626262;
+      opacity: 1;
+    }
+
+    .panel {
+      display: none;
+      width: 100%;
+      text-align: center;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .panel-label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 15px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      min-height: 32px;
+      accent-color: #fff;
+      touch-action: pan-y;
+    }
+
+    .bpm-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 7px;
+    }
+
+    #bpmInput {
+      width: 125px;
+      padding: 8px 10px;
+      border: 1px solid #555;
+      border-radius: 7px;
+      background: #111;
+      color: #fff;
+      text-align: center;
+    }
+
+    #applyBpm {
+      padding: 8px 14px;
+    }
+
+    #muteBtn {
+      padding: 9px 16px;
+      font-size: 15px;
+    }
+
+    .metrics {
+      display: flex;
+      justify-content: center;
+      gap: 22px;
+      flex-wrap: wrap;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .song {
+      min-height: 20px;
+      text-align: center;
+      font-size: 14px;
+      opacity: 0.92;
+    }
+
+    .explain {
+      width: min(1034px, calc(100% - 28px));
+      margin: 0 auto 12px;
+      padding: 12px 18px 16px;
+      border-top: 1px solid #222;
+      color: #e8e8e8;
+      font-size: 14px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .explain-heading {
+      display: block;
+      margin-bottom: 4px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .connection {
+      margin-top: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .page-title {
+        font-size: 20px;
+      }
+
+      .main {
+        justify-content: flex-start;
+      }
+
+      .wheel-wrap {
+        width: min(390px, 90vw, 45vh);
+      }
+
+      .metrics {
+        gap: 14px;
+        font-size: 15px;
+      }
+
+      .explain {
+        width: calc(100% - 24px);
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1 class="page-title">Newton's Color Wheel</h1>
+
+  <main class="main">
+    <div class="wheel-wrap">
+      <canvas id="wheelCanvas" width="840" height="840"></canvas>
+    </div>
+
+    <section class="controls" aria-label="Color wheel controls">
+      <div class="tabbar" role="tablist" aria-label="Speed controls">
+        <button
+          id="tabSlider"
+          class="active"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="sliderPane"
+        >
+          Slider
+        </button>
+
+        <button
+          id="tabBpm"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="bpmPane"
+        >
+          Manual BPM
+        </button>
+      </div>
+
+      <div id="sliderPane" class="panel active" role="tabpanel">
+        <label class="panel-label" for="speed">
+          Spin Speed (0-1000 RPM)
+        </label>
+        <input
+          type="range"
+          id="speed"
+          min="0"
+          max="1000"
+          step="1"
+          value="0"
+        />
+      </div>
+
+      <div id="bpmPane" class="panel" role="tabpanel">
+        <label class="panel-label" for="bpmInput">
+          Enter an exact BPM
+        </label>
+
+        <div class="bpm-inputs">
+          <input
+            type="number"
+            id="bpmInput"
+            min="0"
+            max="1000"
+            step="1"
+            value="120"
+            inputmode="numeric"
+          />
+          <button id="applyBpm" type="button">Apply BPM</button>
+        </div>
+      </div>
+
+      <button id="muteBtn" type="button" aria-pressed="false">
+        Mute Click: OFF
+      </button>
+
+      <div class="metrics" aria-live="polite">
+        <div>Speed: <strong><span id="speedDisplay">0</span> RPM</strong></div>
+        <div>Tempo: <strong><span id="bpmDisplay">0</span> BPM</strong></div>
+      </div>
+
+      <div class="song">
+        Song match: <span id="songDisplay">—</span>
+      </div>
+    </section>
+  </main>
+
+  <section class="explain">
+    <span class="explain-heading">About Newton's Discovery:</span>
+    Newton discovered that white light is a combination of all the colors of the spectrum.
+    When the colors on this disk spin quickly, they blend together in our vision through an effect
+    called <em>persistence of vision</em>. At high speeds, the rainbow appears nearly white.
+    The soft click occurs once per revolution, when the red section returns to the top, so the
+    wheel's RPM also represents the click tempo in BPM.
+
+    <div class="connection">
+      <span class="explain-heading">Music &amp; Science Connection:</span>
+      In <em>Opticks</em>, Newton suggested that the seven colors of the rainbow might correspond
+      to the seven notes of the musical scale. Although this idea was never widely accepted,
+      it reflected his belief that both light and music could be understood through patterns
+      and mathematics.
+    </div>
+  </section>
+
+  <script>
+    "use strict";
+
+    const TWO_PI = Math.PI * 2;
+    const MAX_RPM = 1000;
+    const SEGMENTS = 360;
+
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d", { alpha: false });
+
+    const tabSliderBtn = document.getElementById("tabSlider");
+    const tabBpmBtn = document.getElementById("tabBpm");
+    const sliderPane = document.getElementById("sliderPane");
+    const bpmPane = document.getElementById("bpmPane");
+
+    const speedSlider = document.getElementById("speed");
+    const bpmInput = document.getElementById("bpmInput");
+    const applyBpmBtn = document.getElementById("applyBpm");
+    const muteBtn = document.getElementById("muteBtn");
+
+    const speedDisplay = document.getElementById("speedDisplay");
+    const bpmDisplay = document.getElementById("bpmDisplay");
+    const songDisplay = document.getElementById("songDisplay");
+
+    const center = canvas.width / 2;
+    const radius = center;
+
+    let rpm = 0;
+    let angle = 0;
+    let totalRevolutions = 0;
+    let completedRevolutions = 0;
+    let lastFrameTime = performance.now();
+    let muted = false;
+    let audioContext = null;
+
+    const SONGS = [
+      { name: "Queen – We Will Rock You", bpm: 81 },
+      { name: "Bee Gees – Stayin' Alive", bpm: 104 },
+      { name: "Survivor – Eye of the Tiger", bpm: 109 },
+      { name: "Bruno Mars – Uptown Funk", bpm: 115 },
+      { name: "Michael Jackson – Billie Jean", bpm: 117 },
+      { name: "Metallica – Enter Sandman", bpm: 123 },
+      { name: "The White Stripes – Seven Nation Army", bpm: 124 },
+      { name: "AC/DC – Thunderstruck", bpm: 134 },
+      { name: "Rossini – William Tell Overture Finale", bpm: 144 },
+      { name: "OutKast – Hey Ya!", bpm: 160 },
+      { name: "a-ha – Take On Me", bpm: 169 }
+    ];
+
+    function getAudioContext() {
+      if (!audioContext) {
+        const AudioContextClass =
+          window.AudioContext || window.webkitAudioContext;
+
+        if (!AudioContextClass) {
+          return null;
+        }
+
+        audioContext = new AudioContextClass();
+      }
+
+      if (audioContext.state === "suspended") {
+        audioContext.resume().catch(() => {});
+      }
+
+      return audioContext;
+    }
+
+    function playClick() {
+      if (muted || rpm <= 0) {
+        return;
+      }
+
+      const audio = getAudioContext();
+
+      if (!audio) {
+        return;
+      }
+
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      const now = audio.currentTime;
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(620, now);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.045, now + 0.002);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+
+      oscillator.start(now);
+      oscillator.stop(now + 0.03);
+    }
+
+    function hsvToRgb(h, s, v) {
+      const f = (n, k = (n + h * 6) % 6) =>
+        v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
+
+      const red = Math.round(f(5) * 255);
+      const green = Math.round(f(3) * 255);
+      const blue = Math.round(f(1) * 255);
+
+      return `rgb(${red}, ${green}, ${blue})`;
+    }
+
+    function drawWheel(rotation) {
+      const slice = TWO_PI / SEGMENTS;
+      const topOffset = -Math.PI / 2;
+
+      ctx.fillStyle = "#000";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < SEGMENTS; i += 1) {
+        const startAngle = rotation + i * slice + topOffset;
+        const endAngle = startAngle + slice + 0.002;
+
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = hsvToRgb(i / SEGMENTS, 1, 1);
+        ctx.fill();
+      }
+    }
+
+    function nearestSong(tempo) {
+      if (!Number.isFinite(tempo) || tempo <= 0) {
+        return null;
+      }
+
+      return SONGS.reduce((closest, song) => {
+        if (!closest) {
+          return song;
+        }
+
+        return Math.abs(song.bpm - tempo) <
+          Math.abs(closest.bpm - tempo)
+          ? song
+          : closest;
+      }, null);
+    }
+
+    function updateSongMatch() {
+      const match = nearestSong(rpm);
+
+      songDisplay.textContent = match
+        ? `${match.name} (about ${match.bpm} BPM)`
+        : "—";
+    }
+
+    function updateDisplays() {
+      const rounded = Math.round(rpm);
+
+      speedDisplay.textContent = rounded;
+      bpmDisplay.textContent = rounded;
+      updateSongMatch();
+    }
+
+    function setSpeed(newRpm, syncSlider = true) {
+      const numericValue = Number(newRpm);
+
+      if (!Number.isFinite(numericValue)) {
+        return;
+      }
+
+      rpm = Math.min(MAX_RPM, Math.max(0, numericValue));
+
+      if (syncSlider) {
+        speedSlider.value = String(Math.round(rpm));
+      }
+
+      bpmInput.value = String(Math.round(rpm));
+
+      totalRevolutions = 0;
+      completedRevolutions = 0;
+
+      updateDisplays();
+
+      if (rpm === 0) {
+        angle = 0;
+        drawWheel(angle);
+      }
+    }
+
+    function selectTab(tabName) {
+      const sliderSelected = tabName === "slider";
+
+      tabSliderBtn.classList.toggle("active", sliderSelected);
+      tabBpmBtn.classList.toggle("active", !sliderSelected);
+      sliderPane.classList.toggle("active", sliderSelected);
+      bpmPane.classList.toggle("active", !sliderSelected);
+
+      tabSliderBtn.setAttribute("aria-selected", String(sliderSelected));
+      tabBpmBtn.setAttribute("aria-selected", String(!sliderSelected));
+    }
+
+    function animate(currentTime) {
+      const deltaSeconds = Math.min(
+        (currentTime - lastFrameTime) / 1000,
+        0.1
+      );
+
+      lastFrameTime = currentTime;
+
+      if (rpm > 0) {
+        const revolutionsThisFrame = (rpm / 60) * deltaSeconds;
+
+        totalRevolutions += revolutionsThisFrame;
+        angle = (totalRevolutions % 1) * TWO_PI;
+
+        const newCompletedRevolutions = Math.floor(totalRevolutions);
+
+        if (newCompletedRevolutions > completedRevolutions) {
+          const revolutionsCrossed =
+            newCompletedRevolutions - completedRevolutions;
+
+          completedRevolutions = newCompletedRevolutions;
+
+          /*
+            Browsers cannot reliably produce a separate audible click for every
+            revolution at extremely high tempos. We play one click for the most
+            recent revolution crossed in this animation frame.
+          */
+          if (revolutionsCrossed > 0) {
+            playClick();
+          }
+        }
+      }
+
+      drawWheel(angle);
+      requestAnimationFrame(animate);
+    }
+
+    tabSliderBtn.addEventListener("click", () => {
+      selectTab("slider");
+    });
+
+    tabBpmBtn.addEventListener("click", () => {
+      selectTab("bpm");
+      bpmInput.focus();
+      bpmInput.select();
+    });
+
+    speedSlider.addEventListener("input", () => {
+      getAudioContext();
+      setSpeed(speedSlider.value, false);
+    });
+
+    applyBpmBtn.addEventListener("click", () => {
+      getAudioContext();
+      setSpeed(bpmInput.value);
+    });
+
+    bpmInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        getAudioContext();
+        setSpeed(bpmInput.value);
+      }
+    });
+
+    muteBtn.addEventListener("click", () => {
+      muted = !muted;
+      muteBtn.textContent = muted
+        ? "Mute Click: ON"
+        : "Mute Click: OFF";
+      muteBtn.setAttribute("aria-pressed", String(muted));
+
+      if (!muted) {
+        getAudioContext();
+      }
+    });
+
+    drawWheel(0);
+    updateDisplays();
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
