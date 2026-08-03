@@ -9,10 +9,10 @@
       --ink:#18212b;
       --paper:#f5efe3;
       --panel:#fffaf0;
-      --gold:#b87922;
-      --gold-dark:#865314;
+      --gold:#9b681d;
       --blue:#245b78;
       --red:#9f3b32;
+      --gray:#5d625f;
       --shadow:0 12px 30px rgba(36,28,17,.18);
     }
 
@@ -24,7 +24,7 @@
       color:var(--ink);
       font-family:Georgia, "Times New Roman", serif;
       background:
-        radial-gradient(circle at 20% 10%, rgba(255,255,255,.7), transparent 32%),
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,.72), transparent 32%),
         repeating-linear-gradient(90deg, rgba(110,75,36,.035) 0 2px, transparent 2px 7px),
         var(--paper);
     }
@@ -36,13 +36,13 @@
 
     h1{
       margin:0;
-      font-size:clamp(2rem,4vw,3.35rem);
+      font-size:clamp(2rem,4vw,3.2rem);
       letter-spacing:.03em;
     }
 
     .subtitle{
       margin:7px auto 0;
-      max-width:850px;
+      max-width:860px;
       font-size:1rem;
       line-height:1.45;
     }
@@ -51,35 +51,28 @@
       width:min(1180px,96vw);
       margin:12px auto 34px;
       display:grid;
-      grid-template-columns:minmax(330px, 1fr) minmax(310px, 390px);
+      grid-template-columns:minmax(340px,1fr) minmax(310px,390px);
       gap:20px;
       align-items:start;
     }
 
-    .stage, .panel{
-      background:rgba(255,250,240,.94);
+    .stage,.panel{
+      background:rgba(255,250,240,.95);
       border:1px solid rgba(95,66,30,.24);
       border-radius:18px;
       box-shadow:var(--shadow);
     }
 
-    .stage{
-      padding:16px;
-    }
+    .stage{padding:16px}
 
     .canvas-wrap{
-      position:relative;
-      width:min(100%,720px);
+      width:min(100%,740px);
       aspect-ratio:1;
       margin:auto;
-      display:grid;
-      place-items:center;
       overflow:hidden;
       border-radius:14px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.8), rgba(217,199,168,.5)),
-        #d7c7aa;
       border:1px solid rgba(76,53,27,.25);
+      background:#d7c7aa;
     }
 
     canvas{
@@ -115,9 +108,7 @@
       letter-spacing:.08em;
     }
 
-    .status strong{
-      font-size:1rem;
-    }
+    .status strong{font-size:1rem}
 
     .panel{
       padding:17px;
@@ -138,15 +129,13 @@
       margin:0 0 9px;
     }
 
-    .button-grid{
+    .button-grid,.shape-picker,.row{
       display:grid;
       grid-template-columns:repeat(2,1fr);
       gap:8px;
     }
 
-    button, select, input{
-      font:inherit;
-    }
+    button,input{font:inherit}
 
     button{
       border:0;
@@ -157,21 +146,15 @@
       color:white;
       background:var(--blue);
       box-shadow:0 3px 0 rgba(0,0,0,.18);
-      transition:transform .08s ease, filter .15s ease;
+      transition:transform .08s ease,filter .15s ease;
     }
 
     button:hover{filter:brightness(1.08)}
     button:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
-    button.secondary{background:#5d625f}
-    button.gold{background:var(--gold-dark)}
+    button.secondary{background:var(--gray)}
+    button.gold{background:var(--gold)}
     button.red{background:var(--red)}
-    button.active{outline:3px solid rgba(184,121,34,.35)}
-
-    .shape-picker{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-    }
+    button.active{outline:3px solid rgba(155,104,29,.34)}
 
     label{
       display:block;
@@ -192,15 +175,15 @@
     .freq-number{
       font-size:1.55rem;
       font-weight:bold;
-      color:var(--gold-dark);
+      color:var(--gold);
     }
 
     input[type="range"]{
       width:100%;
-      accent-color:var(--gold-dark);
+      accent-color:var(--gold);
     }
 
-    input[type="number"], select{
+    input[type="number"]{
       width:100%;
       min-height:40px;
       padding:7px 9px;
@@ -210,33 +193,7 @@
       color:var(--ink);
     }
 
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-      margin-top:8px;
-    }
-
-    .preset-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:7px;
-    }
-
-    .preset-grid button{
-      min-height:48px;
-      padding:7px 5px;
-      font-size:.82rem;
-      line-height:1.15;
-      background:#6f4e2f;
-    }
-
-    .preset-grid button span{
-      display:block;
-      opacity:.8;
-      font-size:.71rem;
-      margin-top:3px;
-    }
+    .row{margin-top:8px}
 
     .checkrow{
       display:flex;
@@ -269,8 +226,22 @@
     .about h2{margin:0 0 7px}
     .about p{margin:0;line-height:1.55}
 
+    .app:fullscreen{
+      width:100vw;
+      height:100vh;
+      margin:0;
+      padding:14px;
+      max-width:none;
+      background:var(--paper);
+      grid-template-columns:minmax(0,1fr) minmax(300px,390px);
+      overflow:auto;
+    }
+
+    .app:fullscreen .stage,
+    .app:fullscreen .panel{box-shadow:none}
+
     @media (max-width:900px){
-      .app{grid-template-columns:1fr}
+      .app,.app:fullscreen{grid-template-columns:1fr}
       .panel{position:static}
       .statusbar{grid-template-columns:repeat(2,1fr)}
     }
@@ -278,7 +249,7 @@
     @media (max-width:520px){
       .stage{padding:8px}
       .panel{padding:14px}
-      .button-grid,.shape-picker,.preset-grid,.row{grid-template-columns:1fr}
+      .button-grid,.shape-picker,.row{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -286,14 +257,14 @@
   <header>
     <h1>Chladni Plate Laboratory</h1>
     <p class="subtitle">
-      Sprinkle salt on a vibrating plate, change the frequency, and observe the grains gradually collect along nodal lines where the plate moves least.
+      Pour salt onto a vibrating plate, change the frequency, and watch the grains bounce away from strongly moving regions and collect along nodal lines.
     </p>
   </header>
 
-  <main class="app">
+  <main class="app" id="app">
     <section class="stage">
       <div class="canvas-wrap">
-        <canvas id="plateCanvas" width="760" height="760" aria-label="Interactive Chladni plate"></canvas>
+        <canvas id="plateCanvas" width="760" height="760"></canvas>
       </div>
 
       <div class="statusbar">
@@ -310,7 +281,7 @@
         <div class="button-grid">
           <button id="startButton">Start Vibration</button>
           <button id="stopButton" class="red">Stop</button>
-          <button id="addSaltButton" class="gold">Pour More Salt</button>
+          <button id="addSaltButton" class="gold">Sprinkle More Salt</button>
           <button id="resetButton" class="secondary">Reset Plate</button>
         </div>
       </div>
@@ -328,7 +299,9 @@
           <h2>Frequency</h2>
           <div class="freq-number"><span id="frequencyReadout">440</span> Hz</div>
         </div>
+
         <input id="frequencySlider" type="range" min="0" max="3520" step="1" value="440">
+
         <div class="row">
           <div>
             <label for="frequencyInput">Enter frequency</label>
@@ -339,19 +312,17 @@
             <input id="volumeSlider" type="range" min="0" max="0.16" value="0.045" step="0.005">
           </div>
         </div>
-        <p class="note">At 0 Hz the plate is still and no tone is produced.</p>
-      </div>
 
-      <div class="section">
-        <h2>Pythagorean monochord presets</h2>
-        <div class="preset-grid" id="presetGrid"></div>
-        <p class="note">These ratios control the audible pitch. The plate pattern changes to the nearest simulated resonance.</p>
+        <p class="note">
+          Changing frequency disturbs the old figure. The grains then reorganize toward the nearest simulated resonance.
+        </p>
       </div>
 
       <div class="section">
         <h2>Display</h2>
         <label class="checkrow"><input id="guidesCheckbox" type="checkbox"> Show faint nodal guides</label>
         <label class="checkrow"><input id="labelsCheckbox" type="checkbox" checked> Include label when exporting</label>
+
         <div class="button-grid" style="margin-top:10px">
           <button id="exportButton" class="gold">Save Pattern Image</button>
           <button id="fullscreenButton" class="secondary">Full Screen</button>
@@ -363,7 +334,7 @@
   <section class="about">
     <h2>About Chladni’s Discovery</h2>
     <p>
-      In the late eighteenth century, Ernst Chladni sprinkled sand on metal plates and set them vibrating with a violin bow. At resonant frequencies, the grains bounced away from strongly moving regions and collected along nearly motionless nodal lines. The symmetrical patterns became known as Chladni figures and helped make sound vibration visible.
+      In the late eighteenth century, Ernst Chladni sprinkled sand on metal plates and set them vibrating by drawing a violin bow along an edge. At resonant frequencies, the grains bounced away from strongly moving regions and collected along nearly motionless nodal lines. Modern demonstrations often use a speaker or electronic vibration driver so the frequency can be controlled precisely.
     </p>
   </section>
 
@@ -403,85 +374,62 @@
     let gainNode = null;
     let lastTime = performance.now();
     let pourQueue = 0;
+    let disturbance = 0;
 
-    const MAX_GRAINS = 12000;
-    const INITIAL_GRAINS = 6500;
-    const ADD_GRAINS = 1600;
+    const MAX_GRAINS = 14000;
+    const INITIAL_GRAINS = 7200;
+    const ADD_GRAINS = 1800;
 
     const squareModes = [
-      { f: 80,   m:1, n:1, mix:.00 },
-      { f: 120,  m:2, n:1, mix:.55 },
-      { f: 180,  m:2, n:2, mix:.00 },
-      { f: 240,  m:3, n:1, mix:.45 },
-      { f: 320,  m:3, n:2, mix:.60 },
-      { f: 440,  m:2, n:2, mix:.75 },
-      { f: 540,  m:4, n:2, mix:.48 },
-      { f: 660,  m:4, n:3, mix:.66 },
-      { f: 800,  m:5, n:2, mix:.50 },
-      { f: 990,  m:5, n:3, mix:.68 },
-      { f: 1200, m:6, n:3, mix:.57 },
-      { f: 1450, m:6, n:4, mix:.70 },
-      { f: 1760, m:7, n:4, mix:.62 },
-      { f: 2100, m:8, n:5, mix:.72 },
-      { f: 2640, m:9, n:6, mix:.66 },
-      { f: 3200, m:10,n:7, mix:.72 },
-      { f: 3520, m:11,n:8, mix:.74 }
+      { f:80,   m:1,n:1,mix:0.00 },
+      { f:120,  m:2,n:1,mix:0.55 },
+      { f:180,  m:2,n:2,mix:0.00 },
+      { f:240,  m:3,n:1,mix:0.45 },
+      { f:320,  m:3,n:2,mix:0.60 },
+      { f:440,  m:2,n:2,mix:0.75 },
+      { f:540,  m:4,n:2,mix:0.48 },
+      { f:660,  m:4,n:3,mix:0.66 },
+      { f:800,  m:5,n:2,mix:0.50 },
+      { f:990,  m:5,n:3,mix:0.68 },
+      { f:1200, m:6,n:3,mix:0.57 },
+      { f:1450, m:6,n:4,mix:0.70 },
+      { f:1760, m:7,n:4,mix:0.62 },
+      { f:2100, m:8,n:5,mix:0.72 },
+      { f:2640, m:9,n:6,mix:0.66 },
+      { f:3200, m:10,n:7,mix:0.72 },
+      { f:3520, m:11,n:8,mix:0.74 }
     ];
 
     const circleModes = [
-      { f: 80,   m:0, n:1, zero:2.4048 },
-      { f: 130,  m:1, n:1, zero:3.8317 },
-      { f: 190,  m:2, n:1, zero:5.1356 },
-      { f: 260,  m:0, n:2, zero:5.5201 },
-      { f: 360,  m:3, n:1, zero:6.3802 },
-      { f: 440,  m:2, n:2, zero:8.4172 },
-      { f: 560,  m:4, n:1, zero:7.5883 },
-      { f: 700,  m:3, n:2, zero:9.7610 },
-      { f: 880,  m:5, n:1, zero:8.7715 },
-      { f: 1050, m:4, n:2, zero:11.0647 },
-      { f: 1320, m:6, n:1, zero:9.9361 },
-      { f: 1580, m:5, n:2, zero:12.3386 },
-      { f: 1900, m:6, n:2, zero:13.5893 },
-      { f: 2300, m:7, n:2, zero:14.8213 },
-      { f: 2760, m:8, n:2, zero:16.0378 },
-      { f: 3200, m:9, n:2, zero:17.2412 },
-      { f: 3520, m:10,n:2, zero:18.4335 }
+      { f:80,   m:0,n:1,zero:2.4048 },
+      { f:130,  m:1,n:1,zero:3.8317 },
+      { f:190,  m:2,n:1,zero:5.1356 },
+      { f:260,  m:0,n:2,zero:5.5201 },
+      { f:360,  m:3,n:1,zero:6.3802 },
+      { f:440,  m:2,n:2,zero:8.4172 },
+      { f:560,  m:4,n:1,zero:7.5883 },
+      { f:700,  m:3,n:2,zero:9.7610 },
+      { f:880,  m:5,n:1,zero:8.7715 },
+      { f:1050, m:4,n:2,zero:11.0647 },
+      { f:1320, m:6,n:1,zero:9.9361 },
+      { f:1580, m:5,n:2,zero:12.3386 },
+      { f:1900, m:6,n:2,zero:13.5893 },
+      { f:2300, m:7,n:2,zero:14.8213 },
+      { f:2760, m:8,n:2,zero:16.0378 },
+      { f:3200, m:9,n:2,zero:17.2412 },
+      { f:3520, m:10,n:2,zero:18.4335 }
     ];
 
-    const presets = [
-      { name:"Unison", ratio:"1:1", hz:440 },
-      { name:"Whole Tone", ratio:"9:8", hz:495 },
-      { name:"Major Third", ratio:"81:64", hz:557 },
-      { name:"Perfect Fourth", ratio:"4:3", hz:587 },
-      { name:"Perfect Fifth", ratio:"3:2", hz:660 },
-      { name:"Major Sixth", ratio:"27:16", hz:743 },
-      { name:"Octave", ratio:"2:1", hz:880 },
-      { name:"Two Octaves", ratio:"4:1", hz:1760 },
-      { name:"Three Octaves", ratio:"8:1", hz:3520 }
-    ];
+    const factorialCache = [1];
 
-    function buildPresets(){
-      const grid = document.getElementById("presetGrid");
-      presets.forEach(p => {
-        const b = document.createElement("button");
-        b.innerHTML = `${p.name}<span>${p.ratio} · ${p.hz} Hz</span>`;
-        b.addEventListener("click", () => setFrequency(p.hz));
-        grid.appendChild(b);
-      });
-    }
-
-    function nearestMode(){
-      const list = plateShape === "square" ? squareModes : circleModes;
-      let best = list[0];
-      let bestDistance = Infinity;
-      for(const mode of list){
-        const distance = Math.abs(mode.f - frequency);
-        if(distance < bestDistance){
-          best = mode;
-          bestDistance = distance;
-        }
+    function factorial(n){
+      if(factorialCache[n] !== undefined) return factorialCache[n];
+      let value = factorialCache[factorialCache.length - 1];
+      for(let i = factorialCache.length; i <= n; i++){
+        value *= i;
+        factorialCache[i] = value;
       }
-      return best;
+      return factorialCache[n];
     }
 
     function besselJ(order, x){
@@ -495,18 +443,22 @@
       return sum;
     }
 
-    const factorialCache = [1];
-    function factorial(n){
-      if(factorialCache[n] != null) return factorialCache[n];
-      let value = factorialCache[factorialCache.length - 1];
-      for(let i = factorialCache.length; i <= n; i++){
-        value *= i;
-        factorialCache[i] = value;
+    function nearestMode(){
+      const list = plateShape === "square" ? squareModes : circleModes;
+      let best = list[0];
+      let bestDistance = Infinity;
+
+      for(const mode of list){
+        const distance = Math.abs(mode.f - frequency);
+        if(distance < bestDistance){
+          best = mode;
+          bestDistance = distance;
+        }
       }
-      return factorialCache[n];
+      return best;
     }
 
-    function squareWave(x, y, mode){
+    function squareWave(x,y,mode){
       const u = (x - plateMargin) / squareSize;
       const v = (y - plateMargin) / squareSize;
       if(u < 0 || u > 1 || v < 0 || v > 1) return 0;
@@ -516,92 +468,120 @@
       return a + mode.mix * b;
     }
 
-    function circleWave(x, y, mode){
+    function circleWave(x,y,mode){
       const dx = x - cx;
       const dy = y - cy;
-      const r = Math.hypot(dx, dy) / circleRadius;
+      const r = Math.hypot(dx,dy) / circleRadius;
       if(r > 1) return 0;
-      const theta = Math.atan2(dy, dx);
+
+      const theta = Math.atan2(dy,dx);
       const radial = besselJ(mode.m, mode.zero * r);
       const angular = mode.m === 0 ? 1 : Math.cos(mode.m * theta);
       return radial * angular;
     }
 
-    function waveValue(x, y){
+    function waveValue(x,y){
       const mode = nearestMode();
       return plateShape === "square"
-        ? squareWave(x, y, mode)
-        : circleWave(x, y, mode);
+        ? squareWave(x,y,mode)
+        : circleWave(x,y,mode);
     }
 
-    function energy(x, y){
-      const z = waveValue(x, y);
+    function energy(x,y){
+      const z = waveValue(x,y);
       return z * z;
     }
 
-    function insidePlate(x, y){
+    function insidePlate(x,y){
       if(plateShape === "square"){
         return x >= plateMargin && x <= W - plateMargin &&
                y >= plateMargin && y <= H - plateMargin;
       }
+
       return Math.hypot(x - cx, y - cy) <= circleRadius;
     }
 
     function randomPointOnPlate(){
       if(plateShape === "square"){
         return {
-          x: plateMargin + Math.random() * squareSize,
-          y: plateMargin + Math.random() * squareSize
+          x:plateMargin + Math.random() * squareSize,
+          y:plateMargin + Math.random() * squareSize
         };
       }
 
       const angle = Math.random() * Math.PI * 2;
       const radius = Math.sqrt(Math.random()) * circleRadius;
       return {
-        x: cx + Math.cos(angle) * radius,
-        y: cy + Math.sin(angle) * radius
+        x:cx + Math.cos(angle) * radius,
+        y:cy + Math.sin(angle) * radius
       };
     }
 
-    function createGrain(x, y, pouring = false){
+    function createGrain(x,y,pouring=false){
       return {
-        x, y,
-        vx: pouring ? (Math.random() - .5) * 1.6 : 0,
-        vy: pouring ? Math.random() * 1.2 : 0,
-        size: .85 + Math.random() * 1.25,
-        shade: 205 + Math.random() * 50,
-        settled: 0
+        x,y,
+        vx:pouring ? (Math.random() - .5) * 2.2 : 0,
+        vy:pouring ? .5 + Math.random() * 1.8 : 0,
+        size:.8 + Math.random() * 1.35,
+        shade:208 + Math.random() * 45,
+        settled:0
       };
     }
 
     function scatterSalt(count){
       const available = Math.max(0, MAX_GRAINS - grains.length);
-      count = Math.min(count, available);
-      for(let i = 0; i < count; i++){
+      const amount = Math.min(count,available);
+
+      for(let i = 0; i < amount; i++){
         const p = randomPointOnPlate();
-        grains.push(createGrain(p.x, p.y));
+        grains.push(createGrain(p.x,p.y));
       }
+
       updateGrainCount();
     }
 
     function queueSalt(count){
-      pourQueue = Math.min(pourQueue + count, MAX_GRAINS - grains.length);
+      pourQueue = Math.min(
+        pourQueue + count,
+        MAX_GRAINS - grains.length
+      );
     }
 
     function emitPouredSalt(){
       if(pourQueue <= 0) return;
-      const amount = Math.min(42, pourQueue);
+
+      /*
+        Release only a small handful each animation frame.
+        Every grain receives a completely independent random position,
+        so no rectangular pouring region can appear.
+      */
+      const amount = Math.min(10, pourQueue);
+
       for(let i = 0; i < amount; i++){
-        let x = cx + (Math.random() - .5) * squareSize * .22;
-        let y = plateMargin + 18 + Math.random() * 18;
-        if(plateShape === "circle"){
-          x = cx + (Math.random() - .5) * circleRadius * .45;
-          y = cy - circleRadius * .72 + Math.random() * 18;
-        }
-        grains.push(createGrain(x, y, true));
+        const p = randomPointOnPlate();
+        const g = createGrain(p.x, p.y, true);
+
+        // Give each grain its own tiny random hop in a random direction.
+        const angle = Math.random() * Math.PI * 2;
+        const speed = .35 + Math.random() * 1.9;
+        g.vx = Math.cos(angle) * speed;
+        g.vy = Math.sin(angle) * speed;
+
+        grains.push(g);
       }
+
       pourQueue -= amount;
       updateGrainCount();
+    }
+
+    function disturbGrains(amount){
+      disturbance = Math.max(disturbance,amount);
+
+      for(const g of grains){
+        g.vx += (Math.random() - .5) * amount;
+        g.vy += (Math.random() - .5) * amount;
+        g.settled = 0;
+      }
     }
 
     function updateGrains(dt){
@@ -610,82 +590,162 @@
       const eps = 2.2;
       const mode = nearestMode();
       const resonanceDistance = Math.abs(frequency - mode.f);
-      const resonanceStrength = Math.max(.18, 1 - resonanceDistance / 520);
-      const frequencyStrength = .48 + Math.sqrt(frequency / 3520) * 1.25;
-      const forceScale = 5.5 * resonanceStrength * frequencyStrength;
-      const jitter = .035 + frequencyStrength * .055;
+      const resonanceStrength = Math.max(.18,1 - resonanceDistance / 520);
+      const frequencyStrength = .48 + Math.sqrt(frequency / 3520) * 1.35;
+      const forceScale = 5.6 * resonanceStrength * frequencyStrength;
+      const baseJitter = .045 + frequencyStrength * .06;
+
+      disturbance *= Math.pow(.965,dt);
 
       for(const g of grains){
-        const eL = energy(g.x - eps, g.y);
-        const eR = energy(g.x + eps, g.y);
-        const eU = energy(g.x, g.y - eps);
-        const eD = energy(g.x, g.y + eps);
+        const eL = energy(g.x - eps,g.y);
+        const eR = energy(g.x + eps,g.y);
+        const eU = energy(g.x,g.y - eps);
+        const eD = energy(g.x,g.y + eps);
 
         const gradX = (eR - eL) / (2 * eps);
         const gradY = (eD - eU) / (2 * eps);
-        const localEnergy = energy(g.x, g.y);
+        const localEnergy = energy(g.x,g.y);
 
-        g.vx += (-gradX * forceScale + (Math.random() - .5) * jitter * (0.25 + localEnergy)) * dt;
-        g.vy += (-gradY * forceScale + (Math.random() - .5) * jitter * (0.25 + localEnergy)) * dt;
+        const shake = baseJitter * (0.3 + localEnergy * 1.6) + disturbance * .018;
 
-        const damping = localEnergy < .008 ? .82 : .91;
-        g.vx *= Math.pow(damping, dt);
-        g.vy *= Math.pow(damping, dt);
+        g.vx += (-gradX * forceScale + (Math.random() - .5) * shake) * dt;
+        g.vy += (-gradY * forceScale + (Math.random() - .5) * shake) * dt;
 
-        let nx = g.x + g.vx * dt * 3.2;
-        let ny = g.y + g.vy * dt * 3.2;
+        if(localEnergy > .12){
+          g.vx += (Math.random() - .5) * localEnergy * .09 * frequencyStrength;
+          g.vy += (Math.random() - .5) * localEnergy * .09 * frequencyStrength;
+        }
 
-        if(!insidePlate(nx, ny)){
+        const damping = localEnergy < .007 ? .80 : .91;
+        g.vx *= Math.pow(damping,dt);
+        g.vy *= Math.pow(damping,dt);
+
+        let nx = g.x + g.vx * dt * 3.25;
+        let ny = g.y + g.vy * dt * 3.25;
+
+        if(!insidePlate(nx,ny)){
           if(plateShape === "square"){
-            if(nx < plateMargin || nx > W - plateMargin) g.vx *= -.42;
-            if(ny < plateMargin || ny > H - plateMargin) g.vy *= -.42;
-            nx = Math.max(plateMargin + 1, Math.min(W - plateMargin - 1, nx));
-            ny = Math.max(plateMargin + 1, Math.min(H - plateMargin - 1, ny));
+            if(nx < plateMargin || nx > W - plateMargin) g.vx *= -.48;
+            if(ny < plateMargin || ny > H - plateMargin) g.vy *= -.48;
+
+            nx = Math.max(plateMargin + 1, Math.min(W - plateMargin - 1,nx));
+            ny = Math.max(plateMargin + 1, Math.min(H - plateMargin - 1,ny));
           } else {
-            const angle = Math.atan2(ny - cy, nx - cx);
+            const angle = Math.atan2(ny - cy,nx - cx);
             nx = cx + Math.cos(angle) * (circleRadius - 2);
             ny = cy + Math.sin(angle) * (circleRadius - 2);
-            const radialV = g.vx * Math.cos(angle) + g.vy * Math.sin(angle);
-            g.vx -= 1.45 * radialV * Math.cos(angle);
-            g.vy -= 1.45 * radialV * Math.sin(angle);
+
+            const radialVelocity = g.vx * Math.cos(angle) + g.vy * Math.sin(angle);
+            g.vx -= 1.5 * radialVelocity * Math.cos(angle);
+            g.vy -= 1.5 * radialVelocity * Math.sin(angle);
           }
         }
 
         g.x = nx;
         g.y = ny;
-        g.settled = localEnergy < .004 ? Math.min(1, g.settled + .02 * dt) : Math.max(0, g.settled - .03 * dt);
+        g.settled = localEnergy < .0035
+          ? Math.min(1,g.settled + .022 * dt)
+          : Math.max(0,g.settled - .035 * dt);
+      }
+
+      resolveNearbyCollisions();
+    }
+
+    function resolveNearbyCollisions(){
+      const cellSize = 8;
+      const grid = new Map();
+
+      for(let i = 0; i < grains.length; i++){
+        const g = grains[i];
+        const gx = Math.floor(g.x / cellSize);
+        const gy = Math.floor(g.y / cellSize);
+        const key = `${gx},${gy}`;
+
+        if(!grid.has(key)) grid.set(key,[]);
+        grid.get(key).push(i);
+      }
+
+      let checks = 0;
+      const maxChecks = 26000;
+
+      for(const [key,indices] of grid){
+        const [gx,gy] = key.split(",").map(Number);
+
+        for(let ox = -1; ox <= 1; ox++){
+          for(let oy = -1; oy <= 1; oy++){
+            const neighbor = grid.get(`${gx + ox},${gy + oy}`);
+            if(!neighbor) continue;
+
+            for(const i of indices){
+              for(const j of neighbor){
+                if(j <= i) continue;
+                checks++;
+                if(checks > maxChecks) return;
+
+                const a = grains[i];
+                const b = grains[j];
+                const dx = b.x - a.x;
+                const dy = b.y - a.y;
+                const minDistance = (a.size + b.size) * .52;
+                const distanceSq = dx * dx + dy * dy;
+
+                if(distanceSq > 0 && distanceSq < minDistance * minDistance){
+                  const distance = Math.sqrt(distanceSq);
+                  const overlap = (minDistance - distance) * .5;
+                  const nx = dx / distance;
+                  const ny = dy / distance;
+
+                  a.x -= nx * overlap;
+                  a.y -= ny * overlap;
+                  b.x += nx * overlap;
+                  b.y += ny * overlap;
+
+                  const impulse = .018;
+                  a.vx -= nx * impulse;
+                  a.vy -= ny * impulse;
+                  b.vx += nx * impulse;
+                  b.vy += ny * impulse;
+                }
+              }
+            }
+          }
+        }
       }
     }
 
     function drawBackground(){
-      ctx.clearRect(0, 0, W, H);
+      ctx.clearRect(0,0,W,H);
 
-      const wood = ctx.createLinearGradient(0, 0, W, H);
-      wood.addColorStop(0, "#dfcfb1");
-      wood.addColorStop(.52, "#cbb58f");
-      wood.addColorStop(1, "#eadcc3");
+      const wood = ctx.createLinearGradient(0,0,W,H);
+      wood.addColorStop(0,"#dfcfb1");
+      wood.addColorStop(.52,"#cbb58f");
+      wood.addColorStop(1,"#eadcc3");
       ctx.fillStyle = wood;
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillRect(0,0,W,H);
 
       ctx.save();
       ctx.globalAlpha = .1;
       ctx.strokeStyle = "#68451f";
+
       for(let i = 0; i < 28; i++){
         const y = (i / 28) * H + Math.sin(i * 2.1) * 7;
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.bezierCurveTo(W * .25, y + 14, W * .7, y - 12, W, y + 5);
+        ctx.moveTo(0,y);
+        ctx.bezierCurveTo(W * .25,y + 14,W * .7,y - 12,W,y + 5);
         ctx.stroke();
       }
+
       ctx.restore();
     }
 
     function platePath(){
       ctx.beginPath();
+
       if(plateShape === "square"){
-        ctx.roundRect(plateMargin, plateMargin, squareSize, squareSize, 9);
+        ctx.roundRect(plateMargin,plateMargin,squareSize,squareSize,9);
       } else {
-        ctx.arc(cx, cy, circleRadius, 0, Math.PI * 2);
+        ctx.arc(cx,cy,circleRadius,0,Math.PI * 2);
       }
     }
 
@@ -695,10 +755,15 @@
       ctx.shadowBlur = 24;
       ctx.shadowOffsetY = 12;
       platePath();
-      const metal = ctx.createRadialGradient(cx - 90, cy - 130, 30, cx, cy, circleRadius * 1.25);
-      metal.addColorStop(0, "#31363b");
-      metal.addColorStop(.38, "#12171b");
-      metal.addColorStop(1, "#020405");
+
+      const metal = ctx.createRadialGradient(
+        cx - 90,cy - 130,30,
+        cx,cy,circleRadius * 1.25
+      );
+      metal.addColorStop(0,"#31363b");
+      metal.addColorStop(.38,"#12171b");
+      metal.addColorStop(1,"#020405");
+
       ctx.fillStyle = metal;
       ctx.fill();
       ctx.restore();
@@ -707,21 +772,25 @@
       platePath();
       ctx.clip();
 
-      const sheen = ctx.createLinearGradient(plateMargin, plateMargin, W - plateMargin, H - plateMargin);
-      sheen.addColorStop(0, "rgba(255,255,255,.10)");
-      sheen.addColorStop(.4, "rgba(255,255,255,.015)");
-      sheen.addColorStop(.75, "rgba(255,255,255,.055)");
-      sheen.addColorStop(1, "rgba(255,255,255,.01)");
+      const sheen = ctx.createLinearGradient(
+        plateMargin,plateMargin,
+        W - plateMargin,H - plateMargin
+      );
+      sheen.addColorStop(0,"rgba(255,255,255,.10)");
+      sheen.addColorStop(.4,"rgba(255,255,255,.015)");
+      sheen.addColorStop(.75,"rgba(255,255,255,.055)");
+      sheen.addColorStop(1,"rgba(255,255,255,.01)");
+
       ctx.fillStyle = sheen;
-      ctx.fillRect(plateMargin, plateMargin, squareSize, squareSize);
+      ctx.fillRect(plateMargin,plateMargin,squareSize,squareSize);
 
       if(guidesCheckbox.checked) drawGuides();
 
       for(const g of grains){
-        const alpha = .72 + g.settled * .28;
+        const alpha = .68 + g.settled * .32;
         ctx.fillStyle = `rgba(${g.shade},${g.shade - 8},${Math.max(150,g.shade - 35)},${alpha})`;
         ctx.beginPath();
-        ctx.arc(g.x, g.y, g.size, 0, Math.PI * 2);
+        ctx.arc(g.x,g.y,g.size,0,Math.PI * 2);
         ctx.fill();
       }
 
@@ -732,6 +801,7 @@
       ctx.lineWidth = 5;
       ctx.strokeStyle = "#6d7478";
       ctx.stroke();
+
       platePath();
       ctx.lineWidth = 1.5;
       ctx.strokeStyle = "rgba(255,255,255,.38)";
@@ -743,11 +813,15 @@
 
     function drawDriver(){
       ctx.save();
-      ctx.translate(cx, cy);
-      const pulse = vibrating && frequency > 0 ? 1 + Math.sin(performance.now() * .018) * .08 : 1;
-      ctx.scale(pulse, pulse);
+      ctx.translate(cx,cy);
+
+      const pulse = vibrating && frequency > 0
+        ? 1 + Math.sin(performance.now() * .018) * .08
+        : 1;
+
+      ctx.scale(pulse,pulse);
       ctx.beginPath();
-      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.arc(0,0,10,0,Math.PI * 2);
       ctx.fillStyle = "#b48b45";
       ctx.fill();
       ctx.lineWidth = 2;
@@ -760,6 +834,7 @@
       const mode = nearestMode();
       const resolution = 170;
       const cell = W / resolution;
+
       ctx.save();
       ctx.globalAlpha = .18;
       ctx.fillStyle = "#8bd3ff";
@@ -768,13 +843,19 @@
         for(let gx = 0; gx < resolution; gx++){
           const x = (gx + .5) * cell;
           const y = (gy + .5) * cell;
-          if(!insidePlate(x, y)) continue;
-          const value = plateShape === "square" ? squareWave(x,y,mode) : circleWave(x,y,mode);
+
+          if(!insidePlate(x,y)) continue;
+
+          const value = plateShape === "square"
+            ? squareWave(x,y,mode)
+            : circleWave(x,y,mode);
+
           if(Math.abs(value) < .035){
-            ctx.fillRect(gx * cell, gy * cell, cell + .6, cell + .6);
+            ctx.fillRect(gx * cell,gy * cell,cell + .6,cell + .6);
           }
         }
       }
+
       ctx.restore();
     }
 
@@ -784,11 +865,13 @@
     }
 
     function loop(now){
-      const elapsed = Math.min(2.2, (now - lastTime) / 16.667);
+      const elapsed = Math.min(2.2,(now - lastTime) / 16.667);
       lastTime = now;
+
       emitPouredSalt();
       updateGrains(elapsed);
       render();
+
       animationId = requestAnimationFrame(loop);
     }
 
@@ -799,7 +882,10 @@
         gainNode.gain.value = Number(volumeSlider.value);
         gainNode.connect(audioContext.destination);
       }
-      if(audioContext.state === "suspended") audioContext.resume();
+
+      if(audioContext.state === "suspended"){
+        audioContext.resume();
+      }
     }
 
     function startAudio(){
@@ -810,14 +896,14 @@
 
       oscillator = audioContext.createOscillator();
       oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(frequency,audioContext.currentTime);
       oscillator.connect(gainNode);
       oscillator.start();
     }
 
     function stopOscillator(){
       if(oscillator){
-        try{ oscillator.stop(); }catch(e){}
+        try{oscillator.stop()}catch(error){}
         oscillator.disconnect();
         oscillator = null;
       }
@@ -836,32 +922,49 @@
     }
 
     function setFrequency(value){
-      frequency = Math.max(0, Math.min(3520, Math.round(Number(value) || 0)));
+      const previous = frequency;
+      frequency = Math.max(0,Math.min(3520,Math.round(Number(value) || 0)));
+
       frequencySlider.value = frequency;
       frequencyInput.value = frequency;
       frequencyReadout.textContent = frequency;
       frequencyStatus.textContent = frequency;
 
+      if(Math.abs(previous - frequency) >= 3){
+        disturbGrains(
+          Math.min(4.5,.8 + Math.abs(previous - frequency) / 260)
+        );
+      }
+
       if(vibrating){
         if(frequency === 0){
           stopOscillator();
         } else if(oscillator){
-          oscillator.frequency.setTargetAtTime(frequency, audioContext.currentTime, .015);
+          oscillator.frequency.setTargetAtTime(
+            frequency,
+            audioContext.currentTime,
+            .015
+          );
         } else {
           startAudio();
         }
       }
+
       updateModeStatus();
     }
 
     function setShape(shape){
       plateShape = shape;
       shapeStatus.textContent = shape === "square" ? "Square" : "Circular";
-      document.getElementById("squareButton").className = shape === "square" ? "active" : "secondary";
-      document.getElementById("circleButton").className = shape === "circle" ? "active" : "secondary";
+
+      document.getElementById("squareButton").className =
+        shape === "square" ? "active" : "secondary";
+
+      document.getElementById("circleButton").className =
+        shape === "circle" ? "active" : "secondary";
 
       for(const g of grains){
-        if(!insidePlate(g.x, g.y)){
+        if(!insidePlate(g.x,g.y)){
           const p = randomPointOnPlate();
           g.x = p.x;
           g.y = p.y;
@@ -869,17 +972,18 @@
           g.vy = 0;
         }
       }
+
+      disturbGrains(2.8);
       updateModeStatus();
       render();
     }
 
     function updateModeStatus(){
       const mode = nearestMode();
-      if(plateShape === "square"){
-        modeStatus.textContent = `(${mode.m}, ${mode.n})`;
-      } else {
-        modeStatus.textContent = `(${mode.m}, ${mode.n}) radial`;
-      }
+
+      modeStatus.textContent = plateShape === "square"
+        ? `(${mode.m}, ${mode.n})`
+        : `(${mode.m}, ${mode.n}) radial`;
     }
 
     function updateGrainCount(){
@@ -890,6 +994,7 @@
       stopVibration();
       grains = [];
       pourQueue = 0;
+      disturbance = 0;
       scatterSalt(INITIAL_GRAINS);
       render();
     }
@@ -898,13 +1003,14 @@
       const exportCanvas = document.createElement("canvas");
       exportCanvas.width = W;
       exportCanvas.height = labelsCheckbox.checked ? H + 72 : H;
-      const ex = exportCanvas.getContext("2d");
 
-      ex.drawImage(canvas, 0, 0);
+      const ex = exportCanvas.getContext("2d");
+      ex.drawImage(canvas,0,0);
 
       if(labelsCheckbox.checked){
         ex.fillStyle = "#f4ead8";
-        ex.fillRect(0, H, W, 72);
+        ex.fillRect(0,H,W,72);
+
         ex.fillStyle = "#1d2730";
         ex.font = "bold 25px Georgia";
         ex.textAlign = "center";
@@ -913,8 +1019,13 @@
           W / 2,
           H + 31
         );
+
         ex.font = "17px Arial";
-        ex.fillText(`Simulated mode ${modeStatus.textContent}`, W / 2, H + 56);
+        ex.fillText(
+          `Simulated mode ${modeStatus.textContent}`,
+          W / 2,
+          H + 56
+        );
       }
 
       const link = document.createElement("a");
@@ -923,33 +1034,44 @@
       link.click();
     }
 
-    frequencySlider.addEventListener("input", e => setFrequency(e.target.value));
-    frequencyInput.addEventListener("change", e => setFrequency(e.target.value));
-    volumeSlider.addEventListener("input", () => {
+    frequencySlider.addEventListener("input",event => {
+      setFrequency(event.target.value);
+    });
+
+    frequencyInput.addEventListener("change",event => {
+      setFrequency(event.target.value);
+    });
+
+    volumeSlider.addEventListener("input",() => {
       if(gainNode && audioContext){
-        gainNode.gain.setTargetAtTime(Number(volumeSlider.value), audioContext.currentTime, .02);
+        gainNode.gain.setTargetAtTime(
+          Number(volumeSlider.value),
+          audioContext.currentTime,
+          .02
+        );
       }
     });
 
-    document.getElementById("startButton").addEventListener("click", startVibration);
-    document.getElementById("stopButton").addEventListener("click", stopVibration);
-    document.getElementById("addSaltButton").addEventListener("click", () => queueSalt(ADD_GRAINS));
-    document.getElementById("resetButton").addEventListener("click", resetPlate);
-    document.getElementById("squareButton").addEventListener("click", () => setShape("square"));
-    document.getElementById("circleButton").addEventListener("click", () => setShape("circle"));
-    document.getElementById("exportButton").addEventListener("click", exportImage);
-    document.getElementById("fullscreenButton").addEventListener("click", () => {
-      const target = document.querySelector(".stage");
+    document.getElementById("startButton").addEventListener("click",startVibration);
+    document.getElementById("stopButton").addEventListener("click",stopVibration);
+    document.getElementById("addSaltButton").addEventListener("click",() => queueSalt(ADD_GRAINS));
+    document.getElementById("resetButton").addEventListener("click",resetPlate);
+    document.getElementById("squareButton").addEventListener("click",() => setShape("square"));
+    document.getElementById("circleButton").addEventListener("click",() => setShape("circle"));
+    document.getElementById("exportButton").addEventListener("click",exportImage);
+
+    document.getElementById("fullscreenButton").addEventListener("click",() => {
+      const app = document.getElementById("app");
+
       if(!document.fullscreenElement){
-        target.requestFullscreen?.();
+        app.requestFullscreen?.();
       } else {
         document.exitFullscreen?.();
       }
     });
 
-    guidesCheckbox.addEventListener("change", render);
+    guidesCheckbox.addEventListener("change",render);
 
-    buildPresets();
     scatterSalt(INITIAL_GRAINS);
     setFrequency(440);
     setShape("square");
