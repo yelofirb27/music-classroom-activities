@@ -6,54 +6,56 @@
 <title>Helmholtz: Sympathetic Tuning Forks</title>
 <style>
   :root{
-    --bg:#0d1117;
-    --panel:#161b22;
-    --panel2:#0f141b;
-    --edge:#30363d;
-    --text:#f0f6fc;
-    --muted:#9da7b3;
-    --blue:#76c7ff;
-    --gold:#f5c96a;
-    --green:#8fe388;
-    --orange:#ffad66;
-    --wood1:#b57a45;
-    --wood2:#7a4827;
-    --wood3:#4b2b19;
+    --bg:#030911;--panel:#0b1119;--panel2:#111820;--edge:#35404b;--text:#f4f7fb;
+    --muted:#b4bec9;--blue:#55b8ff;--gold:#f6c84d;--green:#77e16f;--orange:#d99a32;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 0,#17202b 0,#0d1117 48%,#090c11 100%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-  header{padding:18px 16px 10px;text-align:center}
-  h1{margin:0 0 6px;font-size:clamp(1.3rem,2.5vw,2rem)}
-  .sub{margin:0 auto;max-width:900px;color:var(--muted);line-height:1.45}
-  .wrap{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;padding:14px;max-width:1450px;margin:auto}
-  .panel{background:rgba(22,27,34,.94);border:1px solid var(--edge);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.28)}
-  .controls{padding:14px}
-  .controls h2{margin:0 0 12px;color:var(--blue);font-size:1.05rem}
-  .row{margin:0 0 16px}
+  html,body{margin:0;min-height:100%;background:#02070d;color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  body{overflow-x:hidden}
+  header{display:none}
+  .wrap{display:grid;grid-template-columns:292px minmax(0,1fr);gap:0;width:100%;max-width:1600px;min-height:760px;margin:auto;background:#030911}
+  .panel{border:1px solid var(--edge)}
+  .controls{position:relative;z-index:2;padding:18px;background:linear-gradient(180deg,#0c131c 0%,#080e15 100%);border-radius:0;border-top:0;border-bottom:0;box-shadow:8px 0 22px rgba(0,0,0,.28)}
+  .museumTitle{padding-bottom:18px;margin-bottom:16px;border-bottom:1px solid #4a5966}
+  .museumTitle h1{margin:0;color:#79c8ff;font-size:1.72rem;line-height:1.16;letter-spacing:.01em}
+  .museumTitle p{margin:14px 0 0;color:#eef2f6;line-height:1.42;font-size:.96rem}
+  .controls h2{margin:16px 0 10px;color:#69c3ff;font-size:.9rem;letter-spacing:.03em;text-transform:uppercase}
+  .sectionRule{height:1px;background:#3d4853;margin:14px 0}
+  .row{margin:0 0 13px}
   .rowTitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
-  .small{font-size:.9rem;color:var(--muted)}
-  .noteBtns{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-  button{border:1px solid #3b434d;border-radius:11px;padding:10px 8px;background:#252c35;color:var(--text);font-weight:800;cursor:pointer;transition:transform .12s ease,background .12s ease,border-color .12s ease}
-  button:hover{transform:translateY(-1px);background:#303946}
-  button.activeA{background:#174b6b;border-color:#76c7ff;color:#eaf8ff}
-  button.activeB{background:#6b5117;border-color:#f5c96a;color:#fff8df}
-  .bigbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-  .primaryA{background:#2d86b8;color:white;border-color:#59bdf3}
-  .primaryB{background:#9a741f;color:white;border-color:#e7bd59}
-  .good{background:#2b6f3b;border-color:#69bf7c}
-  .warn{background:#8a5126;border-color:#d9894c}
-  input[type=range]{width:100%;accent-color:#76c7ff}
-  .status{margin-top:12px;padding:10px 11px;border-radius:11px;background:#111820;border:1px solid #29313a;line-height:1.35;font-size:.92rem}
-  .status.match{border-color:#4f9b5f;background:#112118;color:#d9f7df}
-  .status.nomatch{border-color:#7d5d30;background:#21190f;color:#ffe4bc}
-  .sceneBox{min-height:500px;padding:10px;overflow:hidden;position:relative}
-  canvas{display:block;width:100%;height:100%;min-height:480px;background:linear-gradient(#0b1118 0 72%,#12171e 72% 100%);border:1px solid var(--edge);border-radius:12px}
-  .sceneBox:fullscreen{width:100vw;height:100vh;min-height:100vh;padding:12px;background:#090d12;border:0;border-radius:0}
-  .sceneBox:fullscreen canvas{width:100%;height:100%;min-height:0;border-radius:8px}
-  footer{max-width:1422px;margin:0 auto 22px;padding:14px 18px;text-align:center}
-  footer h3{margin:0 0 7px;color:var(--blue)}
-  footer p{margin:0 auto;max-width:980px;color:#c9d1d9;line-height:1.55}
-  @media(max-width:900px){.wrap{grid-template-columns:1fr}.sceneBox{min-height:430px}canvas{min-height:410px}}
+  .small{font-size:.77rem;color:var(--muted)}
+  .noteBtns{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  button{border:1px solid #3d4852;border-radius:5px;padding:8px 4px;background:#171e26;color:var(--text);font-weight:700;cursor:pointer;transition:.12s ease}
+  button:hover{background:#222d38}
+  button.activeA{background:#208acb;border-color:#64c8ff;color:#fff}
+  button.activeB{background:#d5a527;border-color:#ffd96b;color:#171000}
+  .bigbtns{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}
+  .primaryA{background:linear-gradient(#238ac7,#176a9d);border-color:#59bdf3}
+  .primaryB{background:linear-gradient(#b78b22,#8b6612);border-color:#edc557}
+  .good{background:#1a222b;border-color:#465360}
+  .warn{background:#1a222b;border-color:#465360}
+  input[type=range]{width:100%;accent-color:#55b8ff}
+  .status{margin-top:12px;padding:10px;border-radius:6px;background:#111820;border:1px solid #34414d;line-height:1.35;font-size:.82rem}
+  .status.match{border-color:#3d7650;color:#dbf7df}.status.nomatch{border-color:#765e38;color:#ffe6bd}
+  .aboutSide{margin-top:14px;padding:10px;border:1px solid #3b4650;border-radius:6px;color:#e5ebf0;font-size:.78rem;line-height:1.42;background:#0d141c}
+  .aboutSide b{display:block;color:#62c1ff;margin-bottom:4px}
+  .sceneBox{position:relative;min-width:0;min-height:760px;padding:0;overflow:hidden;border-radius:0;border-top:0;border-right:0;border-bottom:0;background:#020914}
+  canvas{display:block;width:100%;height:100%;min-height:760px;background:#020914}
+  footer{display:none}
+  body.fullscreen-mode{overflow:hidden}
+  body.fullscreen-mode .wrap{max-width:none;width:100vw;height:100vh;min-height:0;grid-template-columns:292px minmax(0,1fr)}
+  body.fullscreen-mode .controls{height:100vh;padding:12px 16px;overflow:hidden}
+  body.fullscreen-mode .museumTitle{padding-bottom:10px;margin-bottom:8px}
+  body.fullscreen-mode .museumTitle h1{font-size:1.42rem}
+  body.fullscreen-mode .museumTitle p{font-size:.78rem;margin-top:7px;line-height:1.3}
+  body.fullscreen-mode .controls h2{font-size:.76rem;margin:8px 0 5px}
+  body.fullscreen-mode .row{margin-bottom:7px}
+  body.fullscreen-mode button{padding:6px 3px;font-size:.78rem}
+  body.fullscreen-mode .bigbtns{gap:5px;margin-top:5px}
+  body.fullscreen-mode .status{margin-top:6px;padding:6px;font-size:.7rem}
+  body.fullscreen-mode .aboutSide{margin-top:6px;padding:6px;font-size:.67rem;line-height:1.25}
+  body.fullscreen-mode .sceneBox,body.fullscreen-mode canvas{height:100vh;min-height:0}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr;min-height:0}.controls{border-right:0}.sceneBox,canvas{min-height:560px}}
 </style>
 </head>
 <body>
@@ -65,7 +67,11 @@
 
 <main class="wrap">
   <section class="panel controls">
-    <h2>Choose Natural Frequencies (C = 256 Hz)</h2>
+    <div class="museumTitle">
+      <h1>Helmholtz:<br>Sympathetic<br>Tuning Forks</h1>
+      <p>Strike Fork A and observe how sound waves may cause Fork B to resonate when both forks have the same pitch.</p>
+    </div>
+    <h2>1. Select Pitches</h2>
 
     <div class="row">
       <div class="rowTitle"><b>Fork A</b><span class="small" id="infoA"></span></div>
@@ -77,6 +83,8 @@
       <div id="btnsB" class="noteBtns"></div>
     </div>
 
+    <div class="sectionRule"></div>
+    <h2>2. Controls</h2>
     <div class="row">
       <div class="rowTitle"><label for="vol"><b>Volume</b></label><span class="small" id="volLbl">0.70</span></div>
       <input id="vol" type="range" min="0" max="1" step="0.01" value="0.70">
@@ -87,16 +95,19 @@
       <button id="hitB" class="primaryB">Strike Fork B</button>
     </div>
     <div class="bigbtns">
-      <button id="reset" class="warn">Reset Motion</button>
+      <button id="reset" class="warn">↻ &nbsp; Reset Motion</button>
       <button id="mute" class="good">Sound: On</button>
       <button id="fullscreen" class="good" style="grid-column:1 / -1">Full Screen</button>
     </div>
 
+    <div class="sectionRule"></div>
+    <h2>3. Options</h2>
     <div id="status" class="status"></div>
+    <div class="aboutSide"><b>ABOUT</b>When two tuning forks share the same natural frequency, energy from one can cause the other to vibrate through sympathetic resonance.</div>
   </section>
 
   <section class="panel sceneBox">
-    <canvas id="scene" width="1280" height="520" aria-label="Two tuning forks mounted on wooden resonance boxes"></canvas>
+    <canvas id="scene" aria-label="Two tuning forks mounted on wooden resonance boxes"></canvas>
   </section>
 </main>
 
@@ -143,6 +154,20 @@
   let ballVelocity = 0;
   let ballContactCooldown = 0;
   let ballWasDriven = false;
+
+  function resizeCanvas(){
+    const rect = scene.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.max(320, Math.round(rect.width * dpr));
+    const height = Math.max(300, Math.round(rect.height * dpr));
+    if(scene.width !== width || scene.height !== height){
+      scene.width = width;
+      scene.height = height;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+  }
+  new ResizeObserver(resizeCanvas).observe(scene);
+  window.addEventListener('resize', resizeCanvas);
 
   function ensureAudio(){
     if(!audioCtx){
@@ -250,36 +275,25 @@
   }
 
   function drawResonator(cx, baseY, scale, label){
-    const w = 205*scale, h = 74*scale;
-    const x = cx-w/2, y = baseY-h;
-    const g = ctx.createLinearGradient(x,y,x+w,y+h);
-    g.addColorStop(0,'#c88a52'); g.addColorStop(.45,'#8a542f'); g.addColorStop(1,'#4b2b19');
-    roundRect(x,y,w,h,8*scale); ctx.fillStyle=g; ctx.fill();
-    ctx.strokeStyle='#2b170d'; ctx.lineWidth=2; ctx.stroke();
-
-    ctx.globalAlpha=.22;
-    for(let i=0;i<7;i++){
-      ctx.strokeStyle='#f3c18b'; ctx.lineWidth=1;
-      ctx.beginPath(); ctx.moveTo(x+18+i*29*scale,y+8); ctx.bezierCurveTo(x+5+i*30*scale,y+25,x+30+i*28*scale,y+46,x+15+i*29*scale,y+h-7); ctx.stroke();
-    }
-    ctx.globalAlpha=1;
-
-    const holeY = y + h*.46;
-    ctx.beginPath(); ctx.ellipse(cx,holeY,31*scale,12*scale,0,0,Math.PI*2);
-    ctx.fillStyle='#24130b'; ctx.fill();
-    ctx.beginPath(); ctx.ellipse(cx,holeY-1,24*scale,7*scale,0,0,Math.PI*2);
-    ctx.fillStyle='#0e0906'; ctx.fill();
-
-    ctx.fillStyle='rgba(255,255,255,.75)'; ctx.font=`${12*scale}px system-ui`; ctx.textAlign='center';
-    ctx.fillText(label,cx,baseY+22*scale);
-    return {top:y, x, w, h};
+    const w=235*scale,h=118*scale,x=cx-w/2,y=baseY-h;
+    const body=ctx.createLinearGradient(x,y,x+w,y+h);
+    body.addColorStop(0,'#d79a58');body.addColorStop(.28,'#9b5d2d');body.addColorStop(.72,'#704019');body.addColorStop(1,'#3b1d0b');
+    roundRect(x,y,w,h,5*scale);ctx.fillStyle=body;ctx.fill();ctx.strokeStyle='#2a1307';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.globalAlpha=.26;ctx.strokeStyle='#ffd19a';ctx.lineWidth=1;
+    for(let i=0;i<10;i++){ctx.beginPath();ctx.moveTo(x+10+i*23*scale,y+4);ctx.bezierCurveTo(x+2+i*24*scale,y+30,x+28+i*22*scale,y+72,x+12+i*23*scale,y+h-5);ctx.stroke();}
+    ctx.restore();
+    const openingW=145*scale,openingH=64*scale;
+    roundRect(cx-openingW/2,y+38*scale,openingW,openingH,4*scale);ctx.fillStyle='#170a04';ctx.fill();ctx.strokeStyle='#5b3015';ctx.lineWidth=3*scale;ctx.stroke();
+    const lip=ctx.createLinearGradient(0,y+35*scale,0,y+48*scale);lip.addColorStop(0,'#d49a5d');lip.addColorStop(1,'#4b240d');
+    ctx.fillStyle=lip;ctx.fillRect(cx-openingW/2+3*scale,y+38*scale,openingW-6*scale,8*scale);
+    return {top:y,x,w,h};
   }
 
   function drawFork(cx, baseY, amp, phase, scale, label, accent){
     const boxTop = baseY - 74*scale;
     const stemBottom = boxTop + 3*scale;
     const yokeY = stemBottom - 70*scale;
-    const prongTop = yokeY - 185*scale;
+    const prongTop = yokeY - 170*scale;
     const gap = 55*scale;
     const metalW = 13*scale;
     const wiggle = amp * 6.5 * scale * Math.sin(phase);
@@ -315,15 +329,14 @@
     return {rightX:cx+gap/2+wiggle, leftX:cx-gap/2-wiggle, prongTop, yokeY, midY:(prongTop+yokeY)/2, scale};
   }
 
-  function drawForkLabel(cx, y, line1, line2, accent, baseScale){
-    ctx.save();
-    ctx.textAlign='center';
-    ctx.fillStyle=accent;
-    ctx.font=`800 ${Math.round(27*baseScale)}px system-ui`;
-    ctx.fillText(line1,cx,y);
-    ctx.fillStyle='#eef5fb';
-    ctx.font=`700 ${Math.round(22*baseScale)}px system-ui`;
-    ctx.fillText(line2,cx,y+30*baseScale);
+  function drawForkLabel(cx, topY, forkName, note, hz, accent, baseScale, maxW){
+    ctx.save();ctx.textAlign='center';
+    ctx.fillStyle=accent;ctx.font=`800 ${Math.round(23*baseScale)}px system-ui`;
+    ctx.fillText(forkName,cx,topY+24*baseScale);
+    ctx.font=`900 ${Math.round(55*baseScale)}px system-ui`;
+    ctx.fillText(note,cx,topY+82*baseScale);
+    ctx.fillStyle='#f5f7fa';ctx.font=`800 ${Math.round(23*baseScale)}px system-ui`;
+    ctx.fillText(`${hz.toFixed(1)} Hz`,cx,topY+118*baseScale);
     ctx.restore();
   }
 
@@ -342,17 +355,16 @@
   }
 
   function drawEnergyTransfer(x1,x2,y,amount,now){
-    if(amount <= .01) return;
-    ctx.save();
-    const count=5;
+    if(amount<=.01)return;ctx.save();
+    const span=x2-x1, count=12;
     for(let i=0;i<count;i++){
-      const p=((now*.00035)+(i/count))%1;
-      const x=x1+(x2-x1)*p;
-      const pulse=Math.sin(Math.PI*p);
-      ctx.globalAlpha=amount*.3*pulse;
-      ctx.strokeStyle='#8fd8ff'; ctx.lineWidth=2.5;
-      ctx.beginPath(); ctx.arc(x,y,12+18*pulse,0,Math.PI*2); ctx.stroke();
+      const p=(i+1)/(count+1),x=x1+span*p,phase=((now*.0014)+p*2)%1;
+      const a=amount*(.2+.8*Math.sin(Math.PI*p));
+      ctx.globalAlpha=.14+.55*a;ctx.strokeStyle='#43b7ff';ctx.lineWidth=2.2;
+      const r=12+22*(.5+.5*Math.sin(phase*Math.PI*2));
+      ctx.beginPath();ctx.arc(x,y,r,-1.15,1.15);ctx.stroke();
     }
+    ctx.globalAlpha=.9*amount;ctx.fillStyle='#49baff';ctx.beginPath();ctx.moveTo((x1+x2)/2+22,y);ctx.lineTo((x1+x2)/2-3,y-9);ctx.lineTo((x1+x2)/2-3,y+9);ctx.closePath();ctx.fill();
     ctx.restore();
   }
 
@@ -398,7 +410,7 @@
   }
 
   function drawBall(fork){
-    const r = 11*fork.scale;
+    const r = 15*fork.scale;
     const restBallX = fork.rightX + r + 3*fork.scale;
     const restBallY = fork.midY;
     const cordLength = 132*fork.scale;
@@ -407,7 +419,7 @@
     const ballX = anchorX + Math.sin(ballAngle) * cordLength;
     const ballY = anchorY + Math.cos(ballAngle) * cordLength;
 
-    ctx.strokeStyle='#d4d9df'; ctx.lineWidth=1.5*fork.scale;
+    ctx.strokeStyle='#d9dde2'; ctx.lineWidth=1.2*fork.scale;
     ctx.beginPath(); ctx.moveTo(anchorX,anchorY); ctx.lineTo(ballX,ballY-r*.82); ctx.stroke();
     ctx.beginPath(); ctx.arc(anchorX,anchorY,3*fork.scale,0,Math.PI*2); ctx.fillStyle='#b8c0c8'; ctx.fill();
 
@@ -427,7 +439,8 @@
     strikeFlashB *= Math.exp(-dt/0.22);
     updateBall(dt);
 
-    const W=scene.width,H=scene.height;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W=scene.width/dpr,H=scene.height/dpr;
     ctx.clearRect(0,0,W,H);
     const sky=ctx.createLinearGradient(0,0,0,H);
     sky.addColorStop(0,'#0a1118'); sky.addColorStop(.72,'#111922'); sky.addColorStop(.721,'#1b2027'); sky.addColorStop(1,'#0f1318');
@@ -436,9 +449,9 @@
     ctx.fillStyle='rgba(255,255,255,.025)';
     for(let x=0;x<W;x+=80) ctx.fillRect(x,0,1,H*.72);
 
-    const baseY=H-78;
-    const cxA=W*.28, cxB=W*.72;
-    const baseScale=Math.max(.72,Math.min(1.08,W/1180));
+    const baseY=H-128;
+    const cxA=W*.25, cxB=W*.76;
+    const baseScale=Math.max(.62,Math.min(1.02,Math.min(W/1180,H/760))); 
     const scaleA=baseScale*forkSize(noteA);
     const scaleB=baseScale*forkSize(noteB);
 
@@ -454,20 +467,31 @@
     const forkA=drawFork(cxA,baseY,ampA,phaseA,scaleA,'','#76c7ff');
     const forkB=drawFork(cxB,baseY,ampB,phaseB,scaleB,'','#f5c96a');
 
-    const labelY = 92 * baseScale;
-    drawForkLabel(cxA,labelY,`Fork A — ${noteA}`,`${frequency(noteA).toFixed(1)} Hz`,'#76c7ff',baseScale);
-    drawForkLabel(cxB,labelY,`Fork B — ${noteB}`,`${frequency(noteB).toFixed(1)} Hz`,'#f5c96a',baseScale);
+    const labelTop = 18 * baseScale;
+    const labelMaxW = Math.max(155, W*.20);
+    drawForkLabel(cxA,labelTop,'FORK A',noteA,frequency(noteA),'#76c7ff',baseScale,labelMaxW);
+    drawForkLabel(cxB,labelTop,'FORK B',noteB,frequency(noteB),'#f5c96a',baseScale,labelMaxW);
 
     drawMallet(cxA,baseY,strikeFlashA,'left',scaleA);
     drawMallet(cxB,baseY,strikeFlashB,'right',scaleB);
     drawEnergyTransfer(forkA.rightX+22*baseScale,forkB.leftX-22*baseScale,(forkA.midY+forkB.midY)/2,transfer,now);
     drawBall(forkB);
 
-    ctx.textAlign='center'; ctx.font=`${13*baseScale}px system-ui`;
-    if(noteA===noteB && transfer>.04){
-      ctx.fillStyle=`rgba(143,227,136,${Math.min(.95,transfer)})`;
-      ctx.fillText('Energy at the matching frequency makes Fork B build up a sympathetic vibration.',W/2,35*baseScale);
+    // Museum-style match panel and bottom energy display.
+    if(noteA===noteB){
+      const mw=250*baseScale,mh=78*baseScale,mx=W/2-mw/2,my=22*baseScale;
+      roundRect(mx,my,mw,mh,8*baseScale);ctx.fillStyle='rgba(8,14,20,.88)';ctx.fill();ctx.strokeStyle='#384651';ctx.lineWidth=1;ctx.stroke();
+      ctx.textAlign='center';ctx.fillStyle='#79e36f';ctx.font=`900 ${Math.round(24*baseScale)}px system-ui`;ctx.fillText('MATCH!',W/2,my+29*baseScale);
+      ctx.fillStyle='#eef3f7';ctx.font=`${Math.round(14*baseScale)}px system-ui`;ctx.fillText('The forks are the same pitch.',W/2,my+52*baseScale);ctx.fillText('Fork B resonates sympathetically.',W/2,my+70*baseScale);
     }
+    const barX=70*baseScale,barW=W-140*baseScale,barH=92*baseScale,barY=H-barH-18*baseScale;
+    roundRect(barX,barY,barW,barH,8*baseScale);ctx.fillStyle='rgba(8,13,19,.93)';ctx.fill();ctx.strokeStyle='#39444e';ctx.stroke();
+    ctx.textAlign='left';ctx.fillStyle='#55b8ff';ctx.font=`800 ${Math.round(14*baseScale)}px system-ui`;ctx.fillText('Fork A (Source)',barX+58*baseScale,barY+31*baseScale);
+    ctx.fillStyle='#f5c84d';ctx.fillText('Fork B (Response)',barX+barW-225*baseScale,barY+31*baseScale);
+    ctx.textAlign='center';ctx.fillStyle='#55b8ff';ctx.fillText('Sound Energy Transfer',W/2,barY+31*baseScale);
+    for(let i=0;i<12;i++){ctx.beginPath();ctx.arc(W/2-88*baseScale+i*16*baseScale,barY+61*baseScale,4*baseScale,0,Math.PI*2);ctx.fillStyle=i<Math.round(transfer*12)?'#55b8ff':'#39434d';ctx.fill();}
+    ctx.textAlign='left';ctx.fillStyle='#eef3f7';ctx.font=`${Math.round(14*baseScale)}px system-ui`;ctx.fillText(ampA>.03?'Vibrating...':'Ready',barX+58*baseScale,barY+61*baseScale);
+    ctx.fillText(ampB>.03?'Resonating...':'Ready',barX+barW-225*baseScale,barY+61*baseScale);
 
     requestAnimationFrame(loop);
   }
@@ -478,18 +502,22 @@
   muteBtn.onclick=()=>setMute(!muted);
   fullscreenBtn.onclick=async()=>{
     try{
-      if(!document.fullscreenElement) await sceneBox.requestFullscreen();
+      if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
       else await document.exitFullscreen();
     }catch(err){ console.warn('Full-screen mode was unavailable.',err); }
   };
   document.addEventListener('fullscreenchange',()=>{
-    fullscreenBtn.textContent=document.fullscreenElement?'Exit Full Screen':'Full Screen';
+    const active=Boolean(document.fullscreenElement);
+    document.body.classList.toggle('fullscreen-mode',active);
+    fullscreenBtn.textContent=active?'Exit Full Screen':'Full Screen';
+    setTimeout(resizeCanvas,50);
   });
   vol.oninput=()=>{volLbl.textContent=Number(vol.value).toFixed(2);if(master&&!muted)master.gain.value=Number(vol.value);};
 
   makeButtons(btnsA,'A');
   makeButtons(btnsB,'B');
   refreshUI();
+  resizeCanvas();
   requestAnimationFrame(loop);
 })();
 </script>
