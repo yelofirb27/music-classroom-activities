@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helmholtz: Sympathetic Tuning Forks</title>
+<style>
+  :root{
+    --bg:#0d1117;
+    --panel:#161b22;
+    --panel2:#0f141b;
+    --edge:#30363d;
+    --text:#f0f6fc;
+    --muted:#9da7b3;
+    --blue:#76c7ff;
+    --gold:#f5c96a;
+    --green:#8fe388;
+    --orange:#ffad66;
+    --wood1:#b57a45;
+    --wood2:#7a4827;
+    --wood3:#4b2b19;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 0,#17202b 0,#0d1117 48%,#090c11 100%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+  header{padding:18px 16px 10px;text-align:center}
+  h1{margin:0 0 6px;font-size:clamp(1.3rem,2.5vw,2rem)}
+  .sub{margin:0 auto;max-width:900px;color:var(--muted);line-height:1.45}
+  .wrap{display:grid;grid-template-columns:330px minmax(0,1fr);gap:14px;padding:14px;max-width:1450px;margin:auto}
+  .panel{background:rgba(22,27,34,.94);border:1px solid var(--edge);border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.28)}
+  .controls{padding:14px}
+  .controls h2{margin:0 0 12px;color:var(--blue);font-size:1.05rem}
+  .row{margin:0 0 16px}
+  .rowTitle{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+  .small{font-size:.9rem;color:var(--muted)}
+  .noteBtns{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  button{border:1px solid #3b434d;border-radius:11px;padding:10px 8px;background:#252c35;color:var(--text);font-weight:800;cursor:pointer;transition:transform .12s ease,background .12s ease,border-color .12s ease}
+  button:hover{transform:translateY(-1px);background:#303946}
+  button.activeA{background:#174b6b;border-color:#76c7ff;color:#eaf8ff}
+  button.activeB{background:#6b5117;border-color:#f5c96a;color:#fff8df}
+  .bigbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .primaryA{background:#2d86b8;color:white;border-color:#59bdf3}
+  .primaryB{background:#9a741f;color:white;border-color:#e7bd59}
+  .good{background:#2b6f3b;border-color:#69bf7c}
+  .warn{background:#8a5126;border-color:#d9894c}
+  input[type=range]{width:100%;accent-color:#76c7ff}
+  .status{margin-top:12px;padding:10px 11px;border-radius:11px;background:#111820;border:1px solid #29313a;line-height:1.35;font-size:.92rem}
+  .status.match{border-color:#4f9b5f;background:#112118;color:#d9f7df}
+  .status.nomatch{border-color:#7d5d30;background:#21190f;color:#ffe4bc}
+  .sceneBox{min-height:500px;padding:10px;overflow:hidden}
+  canvas{display:block;width:100%;height:100%;min-height:480px;background:linear-gradient(#0b1118 0 72%,#12171e 72% 100%);border:1px solid var(--edge);border-radius:12px}
+  footer{max-width:1422px;margin:0 auto 22px;padding:14px 18px;text-align:center}
+  footer h3{margin:0 0 7px;color:var(--blue)}
+  footer p{margin:0 auto;max-width:980px;color:#c9d1d9;line-height:1.55}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr}.sceneBox{min-height:430px}canvas{min-height:410px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Sympathetic Tuning Forks — Helmholtz Demonstration</h1>
+  <p class="sub">Strike Fork A. When Fork B has the same natural frequency, energy travels through the air and resonance causes Fork B to vibrate. Its hanging ping-pong ball is tapped away, swings back, and rebounds from the moving prong.</p>
+</header>
+
+
+<main class="wrap">
+  <section class="panel controls">
+    <h2>Choose Natural Frequencies (C = 256 Hz)</h2>
+
+    <div class="row">
+      <div class="rowTitle"><b>Fork A</b><span class="small" id="infoA"></span></div>
+      <div id="btnsA" class="noteBtns"></div>
+    </div>
+
+    <div class="row">
+      <div class="rowTitle"><b>Fork B</b><span class="small" id="infoB"></span></div>
+      <div id="btnsB" class="noteBtns"></div>
+    </div>
+
+    <div class="row">
+      <div class="rowTitle"><label for="vol"><b>Volume</b></label><span class="small" id="volLbl">0.70</span></div>
+      <input id="vol" type="range" min="0" max="1" step="0.01" value="0.70">
+    </div>
+
+    <div class="bigbtns">
+      <button id="hitA" class="primaryA">Strike Fork A</button>
+      <button id="hitB" class="primaryB">Strike Fork B</button>
+    </div>
+    <div class="bigbtns">
+      <button id="reset" class="warn">Reset Motion</button>
+      <button id="mute" class="good">Sound: On</button>
+    </div>
+
+    <div id="status" class="status"></div>
+  </section>
+
+  <section class="panel sceneBox">
+    <canvas id="scene" width="1280" height="520" aria-label="Two tuning forks mounted on wooden resonance boxes"></canvas>
+  </section>
+</main>
+
+<footer class="panel">
+  <h3>About Helmholtz’s Demonstration</h3>
+  <p>Hermann von Helmholtz discussed sympathetic vibration in <i>On the Sensations of Tone</i> (1863). A tuning fork responds most strongly to vibrations at its own natural frequency. When two forks match, striking one can make the other vibrate even though it was never touched. The light ping-pong ball makes that otherwise-small motion easier to see.</p>
+</footer>
+
+<script>
+(() => {
+  const NOTES = ['C','D','E','F','G','A','B'];
+  const SEMITONES = {C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+  const frequency = note => 256 * Math.pow(2, SEMITONES[note] / 12);
+  const forkSize = note => Math.sqrt(256 / frequency(note)); // C largest; higher notes progressively smaller
+
+  const scene = document.getElementById('scene');
+  const ctx = scene.getContext('2d');
+  const btnsA = document.getElementById('btnsA');
+  const btnsB = document.getElementById('btnsB');
+  const infoA = document.getElementById('infoA');
+  const infoB = document.getElementById('infoB');
+  const vol = document.getElementById('vol');
+  const volLbl = document.getElementById('volLbl');
+  const hitA = document.getElementById('hitA');
+  const hitB = document.getElementById('hitB');
+  const resetBtn = document.getElementById('reset');
+  const muteBtn = document.getElementById('mute');
+  const status = document.getElementById('status');
+
+  let noteA = 'A';
+  let noteB = 'A';
+  let ampA = 0;
+  let ampB = 0;
+  let transfer = 0;
+  let strikeFlashA = 0;
+  let strikeFlashB = 0;
+  let audioCtx = null;
+  let master = null;
+  let muted = false;
+  let activeNodes = [];
+  let ballAngle = 0;
+  let ballVelocity = 0;
+  let ballContactCooldown = 0;
+
+  function ensureAudio(){
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      master = audioCtx.createGain();
+      master.gain.value = Number(vol.value);
+      master.connect(audioCtx.destination);
+    }
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function createForkTone(freq, gainAmount, duration, delay = 0){
+    ensureAudio();
+    const now = audioCtx.currentTime + delay;
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    osc1.type = 'sine';
+    osc2.type = 'sine';
+    osc1.frequency.value = freq;
+    osc2.frequency.value = freq * 2.01;
+    filter.type = 'lowpass';
+    filter.frequency.value = 3400;
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(gainAmount, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(filter).connect(master);
+    osc1.start(now); osc2.start(now);
+    osc1.stop(now + duration + 0.05); osc2.stop(now + duration + 0.05);
+    activeNodes.push(osc1, osc2, gain);
+  }
+
+  function setMute(value){
+    muted = value;
+    if(master) master.gain.value = muted ? 0 : Number(vol.value);
+    muteBtn.textContent = muted ? 'Sound: Off' : 'Sound: On';
+    muteBtn.className = muted ? 'warn' : 'good';
+  }
+
+  function makeButtons(holder, which){
+    holder.innerHTML = '';
+    NOTES.forEach(note => {
+      const b = document.createElement('button');
+      b.textContent = note;
+      b.dataset.note = note;
+      b.onclick = () => {
+        if(which === 'A') noteA = note; else noteB = note;
+        ampA = ampB = transfer = 0;
+        ballAngle = ballVelocity = ballContactCooldown = 0;
+        refreshUI();
+      };
+      holder.appendChild(b);
+    });
+  }
+
+  function refreshUI(){
+    const fA = frequency(noteA);
+    const fB = frequency(noteB);
+    infoA.textContent = `${noteA} · ${fA.toFixed(1)} Hz`;
+    infoB.textContent = `${noteB} · ${fB.toFixed(1)} Hz`;
+    [...btnsA.children].forEach(b => b.className = b.dataset.note === noteA ? 'activeA' : '');
+    [...btnsB.children].forEach(b => b.className = b.dataset.note === noteB ? 'activeB' : '');
+    const match = noteA === noteB;
+    status.className = `status ${match ? 'match' : 'nomatch'}`;
+    status.innerHTML = match
+      ? `<b>Matching frequencies:</b> Fork B can resonate sympathetically when Fork A is struck.`
+      : `<b>Different frequencies:</b> Fork B will not build a strong sympathetic vibration.`;
+  }
+
+  function strikeA(){
+    const fA = frequency(noteA);
+    createForkTone(fA, 0.55, 5.5);
+    ampA = 1;
+    strikeFlashA = 1;
+    transfer = 0;
+    if(noteA === noteB){
+      setTimeout(() => {
+        ampB = Math.max(ampB, 0.72);
+        transfer = 1;
+        createForkTone(frequency(noteB), 0.17, 4.8);
+      }, 280);
+    }
+  }
+
+  function strikeB(){
+    createForkTone(frequency(noteB), 0.5, 5.2);
+    ampB = 1;
+    strikeFlashB = 1;
+  }
+
+  function roundRect(x,y,w,h,r){
+    const rr = Math.min(r,w/2,h/2);
+    ctx.beginPath();
+    ctx.moveTo(x+rr,y); ctx.arcTo(x+w,y,x+w,y+h,rr); ctx.arcTo(x+w,y+h,x,y+h,rr);
+    ctx.arcTo(x,y+h,x,y,rr); ctx.arcTo(x,y,x+w,y,rr); ctx.closePath();
+  }
+
+  function drawResonator(cx, baseY, scale, label){
+    const w = 205*scale, h = 74*scale;
+    const x = cx-w/2, y = baseY-h;
+    const g = ctx.createLinearGradient(x,y,x+w,y+h);
+    g.addColorStop(0,'#c88a52'); g.addColorStop(.45,'#8a542f'); g.addColorStop(1,'#4b2b19');
+    roundRect(x,y,w,h,8*scale); ctx.fillStyle=g; ctx.fill();
+    ctx.strokeStyle='#2b170d'; ctx.lineWidth=2; ctx.stroke();
+
+    ctx.globalAlpha=.22;
+    for(let i=0;i<7;i++){
+      ctx.strokeStyle='#f3c18b'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x+18+i*29*scale,y+8); ctx.bezierCurveTo(x+5+i*30*scale,y+25,x+30+i*28*scale,y+46,x+15+i*29*scale,y+h-7); ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+
+    const holeY = y + h*.46;
+    ctx.beginPath(); ctx.ellipse(cx,holeY,31*scale,12*scale,0,0,Math.PI*2);
+    ctx.fillStyle='#24130b'; ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx,holeY-1,24*scale,7*scale,0,0,Math.PI*2);
+    ctx.fillStyle='#0e0906'; ctx.fill();
+
+    ctx.fillStyle='rgba(255,255,255,.75)'; ctx.font=`${12*scale}px system-ui`; ctx.textAlign='center';
+    ctx.fillText(label,cx,baseY+22*scale);
+    return {top:y, x, w, h};
+  }
+
+  function drawFork(cx, baseY, amp, phase, scale, label, accent){
+    const boxTop = baseY - 74*scale;
+    const stemBottom = boxTop + 3*scale;
+    const yokeY = stemBottom - 70*scale;
+    const prongTop = yokeY - 185*scale;
+    const gap = 55*scale;
+    const metalW = 13*scale;
+    const wiggle = amp * 6.5 * scale * Math.sin(phase);
+
+    const metal = ctx.createLinearGradient(cx-gap,cx-20,cx+gap,cx+20);
+    metal.addColorStop(0,'#5f6873'); metal.addColorStop(.25,'#e7edf3'); metal.addColorStop(.52,'#aab4bf'); metal.addColorStop(.78,'#f8fbff'); metal.addColorStop(1,'#68717c');
+    ctx.strokeStyle=metal; ctx.lineWidth=metalW; ctx.lineCap='round'; ctx.lineJoin='round';
+
+    ctx.beginPath(); ctx.moveTo(cx,stemBottom); ctx.lineTo(cx,yokeY+6*scale); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-gap/2,yokeY); ctx.quadraticCurveTo(cx,yokeY+16*scale,cx+gap/2,yokeY); ctx.stroke();
+
+    ctx.beginPath(); ctx.moveTo(cx-gap/2,yokeY); ctx.quadraticCurveTo(cx-gap/2+wiggle*.15,yokeY-85*scale,cx-gap/2-wiggle,prongTop); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+gap/2,yokeY); ctx.quadraticCurveTo(cx+gap/2-wiggle*.15,yokeY-85*scale,cx+gap/2+wiggle,prongTop); ctx.stroke();
+
+    ctx.globalAlpha=.75;
+    ctx.strokeStyle='#ffffff'; ctx.lineWidth=1.5*scale;
+    ctx.beginPath(); ctx.moveTo(cx-gap/2+3*scale,yokeY-10*scale); ctx.lineTo(cx-gap/2-wiggle+3*scale,prongTop+8*scale); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+gap/2-3*scale,yokeY-10*scale); ctx.lineTo(cx+gap/2+wiggle-3*scale,prongTop+8*scale); ctx.stroke();
+    ctx.globalAlpha=1;
+
+    if(amp>.025){
+      ctx.strokeStyle=accent;
+      for(let i=1;i<=3;i++){
+        ctx.globalAlpha=.18*(1-i*.18)*amp;
+        ctx.lineWidth=3*scale;
+        const spread=i*14*scale + amp*5*scale;
+        ctx.beginPath(); ctx.moveTo(cx-gap/2-spread,yokeY-15*scale); ctx.quadraticCurveTo(cx-gap/2-spread-5*scale,(yokeY+prongTop)/2,cx-gap/2-spread,prongTop+8*scale); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx+gap/2+spread,yokeY-15*scale); ctx.quadraticCurveTo(cx+gap/2+spread+5*scale,(yokeY+prongTop)/2,cx+gap/2+spread,prongTop+8*scale); ctx.stroke();
+      }
+      ctx.globalAlpha=1;
+    }
+
+    ctx.fillStyle='#dfe7ef'; ctx.font=`600 ${13*scale}px system-ui`; ctx.textAlign='center';
+    ctx.fillText(label,cx,prongTop-24*scale);
+
+    return {rightX:cx+gap/2+wiggle, leftX:cx-gap/2-wiggle, prongTop, yokeY, midY:(prongTop+yokeY)/2, scale};
+  }
+
+  function drawMallet(cx, baseY, flash, side, scale){
+    if(flash <= .01) return;
+    const alpha = Math.min(1,flash*1.8);
+    ctx.save(); ctx.globalAlpha=alpha;
+    const x = side==='left' ? cx-105*scale : cx+105*scale;
+    const y = baseY-255*scale + (1-flash)*30*scale;
+    ctx.translate(x,y); ctx.rotate(side==='left' ? -.52 : .52);
+    ctx.strokeStyle='#9b6a3c'; ctx.lineWidth=7*scale; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(72*scale,0); ctx.stroke();
+    ctx.fillStyle='#d8c3a2'; roundRect(-18*scale,-15*scale,34*scale,30*scale,8*scale); ctx.fill();
+    ctx.strokeStyle='#7b6a54'; ctx.lineWidth=2; ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawEnergyTransfer(x1,x2,y,amount,now){
+    if(amount <= .01) return;
+    ctx.save();
+    const count=5;
+    for(let i=0;i<count;i++){
+      const p=((now*.00035)+(i/count))%1;
+      const x=x1+(x2-x1)*p;
+      const pulse=Math.sin(Math.PI*p);
+      ctx.globalAlpha=amount*.3*pulse;
+      ctx.strokeStyle='#8fd8ff'; ctx.lineWidth=2.5;
+      ctx.beginPath(); ctx.arc(x,y,12+18*pulse,0,Math.PI*2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function updateBall(dt){
+    // A short pendulum hanging beside Fork B. Angle 0 is vertical and nearly touching the prong.
+    const gravity = 14.5;
+    const damping = 0.32;
+    ballContactCooldown = Math.max(0, ballContactCooldown - dt);
+
+    ballVelocity += (-gravity * Math.sin(ballAngle) - damping * ballVelocity) * dt;
+    ballAngle += ballVelocity * dt;
+
+    // The fork repeatedly taps the ball while vibrating. The ball cannot pass through the fork,
+    // so returning to vertical produces a smaller rebound, like the classroom demonstration.
+    if(ballAngle <= 0){
+      ballAngle = 0;
+      if(ballVelocity < 0){
+        const rebound = Math.min(2.9, 0.45 + ampB * 2.4);
+        ballVelocity = Math.max(-ballVelocity * 0.48, rebound);
+      }
+      if(ampB > .035 && ballContactCooldown <= 0){
+        ballVelocity = Math.max(ballVelocity, 0.55 + ampB * 2.15);
+        ballContactCooldown = 0.09;
+      }
+    }
+
+    const maxAngle = 0.92;
+    if(ballAngle > maxAngle){
+      ballAngle = maxAngle;
+      ballVelocity *= -0.18;
+    }
+    if(ampB < .012 && Math.abs(ballAngle) < .002 && Math.abs(ballVelocity) < .02){
+      ballAngle = 0;
+      ballVelocity = 0;
+    }
+  }
+
+  function drawBall(fork){
+    const r = 11*fork.scale;
+    const restBallX = fork.rightX + r + 3*fork.scale;
+    const restBallY = fork.midY;
+    const cordLength = 132*fork.scale;
+    const anchorX = restBallX;
+    const anchorY = restBallY - cordLength;
+    const ballX = anchorX + Math.sin(ballAngle) * cordLength;
+    const ballY = anchorY + Math.cos(ballAngle) * cordLength;
+
+    ctx.strokeStyle='#d4d9df'; ctx.lineWidth=1.5*fork.scale;
+    ctx.beginPath(); ctx.moveTo(anchorX,anchorY); ctx.lineTo(ballX,ballY-r*.82); ctx.stroke();
+    ctx.beginPath(); ctx.arc(anchorX,anchorY,3*fork.scale,0,Math.PI*2); ctx.fillStyle='#b8c0c8'; ctx.fill();
+
+    const ballGrad=ctx.createRadialGradient(ballX-4*fork.scale,ballY-5*fork.scale,2,ballX,ballY,r);
+    ballGrad.addColorStop(0,'#ffffff'); ballGrad.addColorStop(.7,'#e8edf1'); ballGrad.addColorStop(1,'#aab3bc');
+    ctx.beginPath(); ctx.arc(ballX,ballY,r,0,Math.PI*2); ctx.fillStyle=ballGrad; ctx.fill();
+    ctx.strokeStyle=ampB>.12?'#8fe388':'#7e8791'; ctx.lineWidth=2; ctx.stroke();
+  }
+
+  let last = performance.now();
+  function loop(now){
+    const dt = Math.min(.05,(now-last)/1000); last=now;
+    ampA *= Math.exp(-dt/2.4);
+    ampB *= Math.exp(-dt/2.7);
+    transfer *= Math.exp(-dt/2.1);
+    strikeFlashA *= Math.exp(-dt/0.22);
+    strikeFlashB *= Math.exp(-dt/0.22);
+    updateBall(dt);
+
+    const W=scene.width,H=scene.height;
+    ctx.clearRect(0,0,W,H);
+    const sky=ctx.createLinearGradient(0,0,0,H);
+    sky.addColorStop(0,'#0a1118'); sky.addColorStop(.72,'#111922'); sky.addColorStop(.721,'#1b2027'); sky.addColorStop(1,'#0f1318');
+    ctx.fillStyle=sky; ctx.fillRect(0,0,W,H);
+
+    ctx.fillStyle='rgba(255,255,255,.025)';
+    for(let x=0;x<W;x+=80) ctx.fillRect(x,0,1,H*.72);
+
+    const baseY=H-78;
+    const cxA=W*.28, cxB=W*.72;
+    const baseScale=Math.max(.72,Math.min(1.08,W/1180));
+    const scaleA=baseScale*forkSize(noteA);
+    const scaleB=baseScale*forkSize(noteB);
+
+    ctx.fillStyle='rgba(0,0,0,.32)';
+    ctx.beginPath(); ctx.ellipse(cxA,baseY+9,150*baseScale,16*baseScale,0,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cxB,baseY+9,150*baseScale,16*baseScale,0,0,Math.PI*2); ctx.fill();
+
+    drawResonator(cxA,baseY,baseScale,'Resonance box A');
+    drawResonator(cxB,baseY,baseScale,'Resonance box B');
+
+    const phaseA=now*.025*Math.sqrt(frequency(noteA)/256);
+    const phaseB=now*.025*Math.sqrt(frequency(noteB)/256)+.8;
+    const forkA=drawFork(cxA,baseY,ampA,phaseA,scaleA,`Fork A: ${noteA}  ${frequency(noteA).toFixed(1)} Hz`,'#76c7ff');
+    const forkB=drawFork(cxB,baseY,ampB,phaseB,scaleB,`Fork B: ${noteB}  ${frequency(noteB).toFixed(1)} Hz`,'#f5c96a');
+
+    drawMallet(cxA,baseY,strikeFlashA,'left',scaleA);
+    drawMallet(cxB,baseY,strikeFlashB,'right',scaleB);
+    drawEnergyTransfer(forkA.rightX+22*baseScale,forkB.leftX-22*baseScale,(forkA.midY+forkB.midY)/2,transfer,now);
+    drawBall(forkB);
+
+    ctx.textAlign='center'; ctx.font=`${13*baseScale}px system-ui`;
+    if(noteA===noteB && transfer>.04){
+      ctx.fillStyle=`rgba(143,227,136,${Math.min(.95,transfer)})`;
+      ctx.fillText('Energy at the matching frequency makes Fork B build up a sympathetic vibration.',W/2,35*baseScale);
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  hitA.onclick=strikeA;
+  hitB.onclick=strikeB;
+  resetBtn.onclick=()=>{ampA=ampB=transfer=strikeFlashA=strikeFlashB=0;ballAngle=ballVelocity=ballContactCooldown=0;};
+  muteBtn.onclick=()=>setMute(!muted);
+  vol.oninput=()=>{volLbl.textContent=Number(vol.value).toFixed(2);if(master&&!muted)master.gain.value=Number(vol.value);};
+
+  makeButtons(btnsA,'A');
+  makeButtons(btnsB,'B');
+  refreshUI();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
