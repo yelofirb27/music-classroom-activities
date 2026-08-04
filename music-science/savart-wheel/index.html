@@ -1,330 +1,1230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Savart Wheel Simulator</title>
-<style>
-*{box-sizing:border-box}
-:root{--bg:#0b0906;--panel:#17120c;--gold:#d2a64e;--cream:#f2e1b8;--line:#6d5227}
-body{margin:0;min-height:100vh;color:var(--cream);font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at top left,#3a2b16 0,transparent 36%),linear-gradient(145deg,#080705,#17120c)}
-header{text-align:center;padding:22px 16px 10px}
-h1{margin:0;font:700 clamp(2.2rem,5vw,4rem) Georgia,serif;color:#f4dfaa}
-header p{max-width:850px;margin:8px auto 0;line-height:1.45;color:#d9caa6}
-.layout{width:min(1320px,calc(100% - 20px));margin:12px auto 28px;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
-.panel{border:1px solid var(--line);border-radius:16px;background:rgba(18,14,9,.94);box-shadow:0 16px 35px rgba(0,0,0,.35)}
-.stagePanel{padding:10px}
-.stage{position:relative;overflow:hidden;width:100%;aspect-ratio:1245/789;border-radius:11px;background:#000}
-.apparatus{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* Cover the original large coil enough for the new wagon wheel to dominate. */
-.large-wheel-cover{position:absolute;left:11.5%;top:6.7%;width:44%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#15110c 0 50%,rgba(12,9,6,.92) 67%,rgba(12,9,6,.25) 76%,transparent 79%);pointer-events:none}
+  <title>Savart Wheel Simulator</title>
 
-.wagonWheel{position:absolute;left:12.4%;top:7.5%;width:42.2%;height:auto;overflow:visible;filter:drop-shadow(0 4px 3px rgba(0,0,0,.8));pointer-events:none}
-#middleWheel{position:absolute;left:20%;top:15.2%;width:27.8%;aspect-ratio:1;border-radius:50%;background-image:url("savart-wheel-image.png");background-repeat:no-repeat;background-size:359.7% 227.6%;background-position:27.7% 21.1%;transform-origin:50% 50%;pointer-events:none;will-change:transform}
-#lowerWheel{position:absolute;left:16.9%;top:25.1%;width:31.8%;aspect-ratio:1;border-radius:50%;background-image:url("savart-wheel-image.png");background-repeat:no-repeat;background-size:314.5% 199.2%;background-position:24.7% 34%;transform-origin:50% 50%;pointer-events:none;will-change:transform}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-#gearSvg{position:absolute;left:61.2%;top:23.8%;width:18.3%;height:auto;overflow:visible;filter:drop-shadow(0 2px 1px rgba(0,0,0,.75));pointer-events:none}
+    :root {
+      --navy: #08182e;
+      --navy-light: #12345c;
+      --panel: rgba(8, 27, 51, 0.88);
+      --panel-border: rgba(255, 255, 255, 0.18);
+      --gold: #f3bd52;
+      --gold-light: #ffe09a;
+      --cream: #fff8e8;
+      --blue: #62c6ff;
+      --green: #83e3a7;
+      --red: #ff857c;
+    }
 
-.card-arm{position:absolute;left:58.8%;top:19%;width:1.2%;height:23%;transform-origin:50% 0;transition:transform .35s ease;pointer-events:none}
-.card-arm.lifted{transform:rotate(-18deg)}
-.card-arm.lowered{transform:rotate(0)}
-.card-strip{position:absolute;inset:0;border:1px solid #4f3d27;border-radius:3px;background:linear-gradient(90deg,#8c7754,#e1d1aa 45%,#77633f);box-shadow:0 2px 5px rgba(0,0,0,.45)}
-.card-tip{position:absolute;left:-15%;bottom:-4%;width:130%;height:12%;clip-path:polygon(0 0,100% 0,60% 100%,35% 100%);background:#d9c89d;border:1px solid #55452f}
-.card-arm.lowered .card-strip{animation:flexCard .055s linear infinite alternate}
-@keyframes flexCard{from{transform:skewX(-1deg)}to{transform:skewX(1.8deg)}}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      background:
+        radial-gradient(circle at top left, rgba(58, 151, 217, 0.25), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(243, 189, 82, 0.19), transparent 37%),
+        linear-gradient(145deg, #061225, #102f54 58%, #11172e);
+    }
 
-.status{position:absolute;right:12px;top:12px;padding:8px 12px;border-radius:999px;font-weight:700;font-size:.86rem;color:#f0d6cf;background:rgba(123,45,37,.88);border:1px solid #b76356}
-.status.touching{color:#e7f7dc;background:rgba(54,99,39,.9);border-color:#7ebc62}
-.formula{margin-top:10px;padding:10px 14px;text-align:center;border-radius:10px;border:1px solid #66502a;color:#f2d996;background:rgba(110,78,29,.18)}
+    header {
+      padding: 24px 18px 10px;
+      text-align: center;
+    }
 
-.controls{padding:18px}
-.controls h2{margin:0 0 17px;text-align:center;color:#ead39b;font:700 1.35rem Georgia,serif;letter-spacing:.08em}
-.group{margin-bottom:19px}.labelRow{display:flex;justify-content:space-between;gap:12px;margin-bottom:7px;align-items:baseline}
-label{font-weight:700}.value{color:#efc663;font-weight:700;font-variant-numeric:tabular-nums}
-input[type=range]{width:100%;accent-color:#c9993f}
-select{width:100%;padding:10px;border:1px solid #6a532b;border-radius:9px;color:#f4e5bf;background:#1a160f;font-size:1rem}
-.buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:17px}
-button{min-height:46px;border-radius:9px;border:1px solid #6b542d;font-size:.95rem;font-weight:700;cursor:pointer;color:#f7e8c1;background:linear-gradient(#302719,#1c170f)}
-button.primary{color:#f4f7ec;border-color:#658642;background:linear-gradient(#41652b,#29431c)}
-button.danger{border-color:#8e4538;background:linear-gradient(#673027,#41201b)}
-button.active{color:#18220f;border-color:#91bf67;background:linear-gradient(#b5dc86,#7eaf57)}
-.readouts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.readout{min-height:88px;padding:10px;text-align:center;border-radius:9px;border:1px solid #554321;background:rgba(255,255,255,.035)}
-.readout small{display:block;margin-bottom:7px;color:#bfb191}
-.readout strong{display:block;color:#f5e5bd;font-size:1.23rem;font-variant-numeric:tabular-nums}
-.explanation{width:min(1320px,calc(100% - 20px));margin:0 auto 35px;padding:18px 22px;line-height:1.55}
-.explanation h2{margin:0 0 8px;color:#ead39b;font-family:Georgia,serif}
-.explanation p{margin:6px 0;color:#ddd0af}
-@media(max-width:930px){.layout{grid-template-columns:1fr}}
-@media(max-width:520px){.layout,.explanation{width:calc(100% - 10px)}.buttons{grid-template-columns:1fr}.status{font-size:.7rem}}
-</style>
+    header h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      color: var(--gold-light);
+      text-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
+    }
+
+    header p {
+      max-width: 850px;
+      margin: 10px auto 0;
+      color: #dcecff;
+      line-height: 1.45;
+      font-size: 1rem;
+    }
+
+    main {
+      width: min(1180px, calc(100% - 24px));
+      margin: 12px auto 30px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.8fr);
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 22px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.32);
+      backdrop-filter: blur(8px);
+    }
+
+    .experiment-panel {
+      padding: 18px;
+    }
+
+    .wheel-stage {
+      position: relative;
+      min-height: 570px;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        radial-gradient(circle at 50% 42%, rgba(90, 164, 213, 0.21), transparent 46%),
+        linear-gradient(180deg, #102c4b, #071527);
+      background-size: 28px 28px, 28px 28px, auto, auto;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 570px;
+      touch-action: none;
+    }
+
+    .instruction {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      max-width: 280px;
+      padding: 10px 13px;
+      border-radius: 12px;
+      background: rgba(3, 14, 29, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #edf7ff;
+      font-size: 0.88rem;
+      line-height: 1.35;
+      pointer-events: none;
+    }
+
+    .status-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(255, 133, 124, 0.16);
+      border: 1px solid rgba(255, 133, 124, 0.55);
+      color: #ffd8d4;
+      font-weight: bold;
+      pointer-events: none;
+    }
+
+    .status-badge.touching {
+      color: #caffdc;
+      border-color: rgba(131, 227, 167, 0.7);
+      background: rgba(131, 227, 167, 0.16);
+    }
+
+    .formula {
+      margin-top: 15px;
+      padding: 13px 15px;
+      border-radius: 14px;
+      text-align: center;
+      background: rgba(243, 189, 82, 0.1);
+      border: 1px solid rgba(243, 189, 82, 0.34);
+      color: #fff3ca;
+      font-size: 1rem;
+    }
+
+    .formula strong {
+      color: var(--gold-light);
+    }
+
+    .controls {
+      padding: 20px;
+    }
+
+    .controls h2 {
+      margin: 0 0 17px;
+      color: var(--gold-light);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.6rem;
+    }
+
+    .control-group {
+      margin-bottom: 19px;
+    }
+
+    .control-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .control-value {
+      color: var(--gold-light);
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    select {
+      width: 100%;
+      padding: 11px 12px;
+      color: white;
+      background: #102c4b;
+      border: 1px solid rgba(255, 255, 255, 0.23);
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0 20px;
+    }
+
+    button {
+      min-height: 47px;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.96rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition:
+        transform 0.15s ease,
+        filter 0.15s ease,
+        background 0.15s ease;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .primary-button {
+      color: #172033;
+      background: linear-gradient(180deg, #ffe19b, #eeb444);
+    }
+
+    .contact-button {
+      color: #f4f8ff;
+      background: linear-gradient(180deg, #347bb1, #1d527c);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .contact-button.active {
+      color: #092518;
+      background: linear-gradient(180deg, #a3f2bd, #65ce8b);
+    }
+
+    .stop-button {
+      color: white;
+      background: linear-gradient(180deg, #a6403c, #762421);
+    }
+
+    .mute-button {
+      color: white;
+      background: linear-gradient(180deg, #655c83, #433b5c);
+    }
+
+    .readout-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .readout {
+      min-height: 88px;
+      padding: 12px;
+      border-radius: 13px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.065);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .readout-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #b9d5ed;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .readout-number {
+      display: block;
+      color: white;
+      font-size: 1.45rem;
+      font-weight: bold;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .readout-note {
+      color: var(--gold-light);
+    }
+
+    .wave-panel {
+      margin-top: 17px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .wave-panel h3 {
+      margin: 0 0 8px;
+      color: #d8edff;
+      font-size: 0.95rem;
+    }
+
+    #waveCanvas {
+      width: 100%;
+      min-height: 95px;
+      height: 95px;
+      border-radius: 9px;
+      background: #06101f;
+    }
+
+    .history {
+      width: min(1180px, calc(100% - 24px));
+      margin: 0 auto 35px;
+      padding: 20px 23px;
+    }
+
+    .history h2 {
+      margin: 0 0 10px;
+      color: var(--gold-light);
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .history p {
+      margin: 7px 0;
+      line-height: 1.55;
+      color: #e1edf8;
+    }
+
+    .history .question {
+      margin-top: 15px;
+      padding: 13px 15px;
+      border-left: 4px solid var(--gold);
+      border-radius: 8px;
+      background: rgba(243, 189, 82, 0.09);
+      color: #fff2c9;
+    }
+
+    @media (max-width: 860px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .wheel-stage,
+      canvas {
+        min-height: 500px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      header {
+        padding-top: 18px;
+      }
+
+      main {
+        width: min(100% - 14px, 1180px);
+        gap: 12px;
+      }
+
+      .experiment-panel,
+      .controls {
+        padding: 11px;
+      }
+
+      .wheel-stage,
+      canvas {
+        min-height: 445px;
+      }
+
+      .instruction {
+        max-width: 205px;
+        font-size: 0.74rem;
+      }
+
+      .button-row {
+        grid-template-columns: 1fr;
+      }
+
+      .readout-number {
+        font-size: 1.2rem;
+      }
+
+      .history {
+        width: min(100% - 14px, 1180px);
+      }
+    }
+  </style>
 </head>
+
 <body>
-<header>
-  <h1>Savart Wheel</h1>
-  <p>Adjust the belt-driven apparatus, choose the number of teeth on the small wheel, and lower the flexible card until it touches the teeth.</p>
-</header>
+  <header>
+    <h1>Savart Wheel</h1>
 
-<main class="layout">
-  <section class="panel stagePanel">
-    <div class="stage">
-      <img class="apparatus" src="savart-wheel-image.png" alt="Historic Savart wheel apparatus on a wooden stand">
+    <p>
+      Spin a toothed wheel against a flexible card. At low speeds, individual
+      impacts sound like separate clicks. As the wheel speeds up, the clicks
+      join together and create a musical pitch.
+    </p>
+  </header>
 
-      <div class="large-wheel-cover"></div>
+  <main>
+    <section class="panel experiment-panel">
+      <div class="wheel-stage">
+        <canvas id="wheelCanvas"></canvas>
 
-      <svg class="wagonWheel" viewBox="-120 -120 240 240" aria-label="Large wooden wagon-style drive wheel">
-        <g id="wagonRotator">
-          <circle r="105" fill="#4b2f18" stroke="#b58143" stroke-width="7"/>
-          <circle r="91" fill="none" stroke="#21150c" stroke-width="11"/>
-          <g id="wagonSpokes" stroke="#8a5a2c" stroke-width="12" stroke-linecap="round"></g>
-          <circle r="29" fill="#362519" stroke="#b18a58" stroke-width="6"/>
-          <circle r="12" fill="#17120d" stroke="#756149" stroke-width="3"/>
-        </g>
-      </svg>
+        <div class="instruction">
+          Start the wheel, then lower the card until it touches the teeth.
+          Change the speed and number of teeth to investigate pitch.
+        </div>
 
-      <div id="middleWheel"></div>
-      <div id="lowerWheel"></div>
-
-      <svg id="gearSvg" viewBox="-120 -120 240 240" aria-label="Adjustable toothed wheel">
-        <g id="gearRotator">
-          <path id="gearPath" fill="#22201d" stroke="#c0b39a" stroke-width="2"></path>
-          <circle r="72" fill="#181816" stroke="#827a69" stroke-width="3"></circle>
-          <g id="gearSpokes" stroke="#9a9281" stroke-width="11" stroke-linecap="round"></g>
-          <circle r="23" fill="#5d584d" stroke="#beb39d" stroke-width="4"></circle>
-          <circle r="8" fill="#171615"></circle>
-        </g>
-      </svg>
-
-      <div id="cardArm" class="card-arm lifted">
-        <div class="card-strip"></div>
-        <div class="card-tip"></div>
+        <div class="status-badge" id="statusBadge">
+          Card lifted
+        </div>
       </div>
 
-      <div id="status" class="status">Card lifted</div>
-    </div>
+      <div class="formula">
+        <strong>Frequency</strong> =
+        number of teeth × revolutions per second
+      </div>
+    </section>
 
-    <div class="formula"><strong>Frequency</strong> = number of teeth × revolutions per second</div>
+    <aside class="panel controls">
+      <h2>Experiment Controls</h2>
+
+      <div class="control-group">
+        <label class="control-label" for="teethSelect">
+          <span>Number of teeth</span>
+          <span class="control-value" id="teethValue">48</span>
+        </label>
+
+        <select id="teethSelect">
+          <option value="12">12 teeth</option>
+          <option value="24">24 teeth</option>
+          <option value="36">36 teeth</option>
+          <option value="48" selected>48 teeth</option>
+          <option value="60">60 teeth</option>
+          <option value="72">72 teeth</option>
+          <option value="96">96 teeth</option>
+          <option value="120">120 teeth</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="rpmSlider">
+          <span>Wheel speed</span>
+          <span class="control-value" id="rpmValue">0 RPM</span>
+        </label>
+
+        <input
+          id="rpmSlider"
+          type="range"
+          min="0"
+          max="1200"
+          value="0"
+          step="1"
+        >
+      </div>
+
+      <div class="control-group">
+        <label class="control-label" for="volumeSlider">
+          <span>Volume</span>
+          <span class="control-value" id="volumeValue">45%</span>
+        </label>
+
+        <input
+          id="volumeSlider"
+          type="range"
+          min="0"
+          max="100"
+          value="45"
+          step="1"
+        >
+      </div>
+
+      <div class="button-row">
+        <button class="primary-button" id="startButton">
+          Start Audio
+        </button>
+
+        <button class="contact-button" id="contactButton">
+          Lower Card
+        </button>
+
+        <button class="stop-button" id="stopButton">
+          Stop Wheel
+        </button>
+
+        <button class="mute-button" id="muteButton">
+          Mute
+        </button>
+      </div>
+
+      <div class="readout-grid">
+        <div class="readout">
+          <span class="readout-label">Revolutions</span>
+          <span class="readout-number" id="rpsReadout">0.00/sec</span>
+        </div>
+
+        <div class="readout">
+          <span class="readout-label">Tooth impacts</span>
+          <span class="readout-number" id="frequencyReadout">0.0 Hz</span>
+        </div>
+
+        <div class="readout">
+          <span class="readout-label">Nearest note</span>
+          <span class="readout-number readout-note" id="noteReadout">—</span>
+        </div>
+
+        <div class="readout">
+          <span class="readout-label">Pitch difference</span>
+          <span class="readout-number" id="centsReadout">—</span>
+        </div>
+      </div>
+
+      <div class="wave-panel">
+        <h3>Tooth-impact pattern</h3>
+        <canvas id="waveCanvas"></canvas>
+      </div>
+    </aside>
+  </main>
+
+  <section class="panel history">
+    <h2>What does the wheel demonstrate?</h2>
+
+    <p>
+      Each tooth produces one impact when it strikes the card. The impacts occur
+      slowly when the wheel turns slowly, so they can be heard as separate
+      clicks. As the impacts become faster and more regular, the ear begins to
+      perceive them as a continuous musical tone.
+    </p>
+
+    <p>
+      Doubling the wheel speed doubles the frequency. Keeping the same speed
+      while doubling the number of teeth also doubles the frequency, producing
+      a pitch approximately one octave higher.
+    </p>
+
+    <div class="question">
+      <strong>Experiment:</strong> Set the wheel to 24 teeth and note its
+      frequency. Then change it to 48 teeth without changing the RPM. What
+      happens to the frequency and musical note?
+    </div>
   </section>
 
-  <aside class="panel controls">
-    <h2>CONTROLS</h2>
+  <script>
+    "use strict";
 
-    <div class="group">
-      <div class="labelRow"><label for="rpm">Wheel speed</label><span id="rpmValue" class="value">0 RPM</span></div>
-      <input id="rpm" type="range" min="0" max="1200" value="0" step="1">
-    </div>
+    const wheelCanvas = document.getElementById("wheelCanvas");
+    const wheelContext = wheelCanvas.getContext("2d");
 
-    <div class="group">
-      <div class="labelRow"><label for="teeth">Number of teeth</label><span id="teethValue" class="value">48</span></div>
-      <select id="teeth">
-        <option value="12">12 teeth</option><option value="24">24 teeth</option><option value="36">36 teeth</option>
-        <option value="48" selected>48 teeth</option><option value="60">60 teeth</option><option value="72">72 teeth</option>
-        <option value="96">96 teeth</option><option value="120">120 teeth</option>
-      </select>
-    </div>
+    const waveCanvas = document.getElementById("waveCanvas");
+    const waveContext = waveCanvas.getContext("2d");
 
-    <div class="group">
-      <div class="labelRow"><label for="volume">Volume</label><span id="volumeValue" class="value">45%</span></div>
-      <input id="volume" type="range" min="0" max="100" value="45">
-    </div>
+    const teethSelect = document.getElementById("teethSelect");
+    const rpmSlider = document.getElementById("rpmSlider");
+    const volumeSlider = document.getElementById("volumeSlider");
 
-    <div class="buttons">
-      <button id="audioButton" class="primary">Start Audio</button>
-      <button id="cardButton">Lower Card</button>
-      <button id="stopButton" class="danger">Stop Wheel</button>
-      <button id="muteButton">Mute</button>
-    </div>
+    const teethValue = document.getElementById("teethValue");
+    const rpmValue = document.getElementById("rpmValue");
+    const volumeValue = document.getElementById("volumeValue");
 
-    <div class="readouts">
-      <div class="readout"><small>Revolutions</small><strong id="rpsReadout">0.00/sec</strong></div>
-      <div class="readout"><small>Tooth impacts</small><strong id="frequencyReadout">0.0 Hz</strong></div>
-      <div class="readout"><small>Nearest note</small><strong id="noteReadout">—</strong></div>
-      <div class="readout"><small>Pitch difference</small><strong id="centsReadout">—</strong></div>
-    </div>
-  </aside>
-</main>
+    const rpsReadout = document.getElementById("rpsReadout");
+    const frequencyReadout = document.getElementById("frequencyReadout");
+    const noteReadout = document.getElementById("noteReadout");
+    const centsReadout = document.getElementById("centsReadout");
 
-<section class="panel explanation">
-  <h2>What is happening?</h2>
-  <p>Each tooth creates one click when it strikes the card. Slow impacts are heard separately. As the impacts speed up, the ear blends them into a continuous pitch.</p>
-</section>
+    const startButton = document.getElementById("startButton");
+    const contactButton = document.getElementById("contactButton");
+    const stopButton = document.getElementById("stopButton");
+    const muteButton = document.getElementById("muteButton");
+    const statusBadge = document.getElementById("statusBadge");
 
-<script>
-"use strict";
+    let teeth = Number(teethSelect.value);
+    let rpm = Number(rpmSlider.value);
+    let volume = Number(volumeSlider.value) / 100;
 
-const rpmSlider=document.getElementById("rpm");
-const teethSelect=document.getElementById("teeth");
-const volumeSlider=document.getElementById("volume");
-const rpmValue=document.getElementById("rpmValue");
-const teethValue=document.getElementById("teethValue");
-const volumeValue=document.getElementById("volumeValue");
-const rpsReadout=document.getElementById("rpsReadout");
-const frequencyReadout=document.getElementById("frequencyReadout");
-const noteReadout=document.getElementById("noteReadout");
-const centsReadout=document.getElementById("centsReadout");
-const wagonRotator=document.getElementById("wagonRotator");
-const middleWheel=document.getElementById("middleWheel");
-const lowerWheel=document.getElementById("lowerWheel");
-const gearRotator=document.getElementById("gearRotator");
-const gearPath=document.getElementById("gearPath");
-const gearSpokes=document.getElementById("gearSpokes");
-const wagonSpokes=document.getElementById("wagonSpokes");
-const cardArm=document.getElementById("cardArm");
-const status=document.getElementById("status");
-const audioButton=document.getElementById("audioButton");
-const cardButton=document.getElementById("cardButton");
-const stopButton=document.getElementById("stopButton");
-const muteButton=document.getElementById("muteButton");
+    let angle = 0;
+    let lastFrameTime = performance.now();
 
-let wagonAngle=0,middleAngle=0,lowerAngle=0,gearAngle=0,lastTime=performance.now();
-let cardTouching=false,muted=false;
-let audioContext=null,masterGain=null;
-let schedulerTimer=null,nextClickTime=0;
-let nextClickIndex=0;
+    let cardTouching = false;
+    let muted = false;
 
-function state(){
-  const rpm=Number(rpmSlider.value),teeth=Number(teethSelect.value),rps=rpm/60;
-  return {rpm,teeth,rps,frequency:teeth*rps};
-}
+    let audioContext = null;
+    let masterGain = null;
+    let soundSource = null;
 
-function makeSpokes(group,count,inner,outer){
-  group.innerHTML="";
-  for(let i=0;i<count;i++){
-    const a=Math.PI*2*i/count;
-    const line=document.createElementNS("http://www.w3.org/2000/svg","line");
-    line.setAttribute("x1",Math.cos(a)*inner); line.setAttribute("y1",Math.sin(a)*inner);
-    line.setAttribute("x2",Math.cos(a)*outer); line.setAttribute("y2",Math.sin(a)*outer);
-    group.appendChild(line);
-  }
-}
+    function resizeCanvas(canvas, context) {
+      const rectangle = canvas.getBoundingClientRect();
+      const scale = window.devicePixelRatio || 1;
 
-function createGear(teeth){
-  const inner=88,outer=104,steps=teeth*4;
-  let d="";
-  for(let i=0;i<steps;i++){
-    const a=Math.PI*2*i/steps;
-    const p=i%4;
-    const r=(p===1||p===2)?outer:inner;
-    const x=Math.cos(a)*r,y=Math.sin(a)*r;
-    d+=(i===0?"M":"L")+" "+x.toFixed(2)+" "+y.toFixed(2)+" ";
-  }
-  gearPath.setAttribute("d",d+"Z");
-}
+      canvas.width = Math.round(rectangle.width * scale);
+      canvas.height = Math.round(rectangle.height * scale);
 
-function noteInfo(f){
-  if(f<16)return{note:"Clicks",cents:"Below pitch"};
-  const midi=Math.round(69+12*Math.log2(f/440));
-  const names=["C","C♯","D","D♯","E","F","F♯","G","G♯","A","A♯","B"];
-  const exact=440*Math.pow(2,(midi-69)/12);
-  const cents=1200*Math.log2(f/exact);
-  return{note:names[(midi%12+12)%12]+(Math.floor(midi/12)-1),cents:(cents>=0?"+":"")+cents.toFixed(1)+" cents"};
-}
+      context.setTransform(scale, 0, 0, scale, 0, 0);
+    }
 
-function updateReadouts(){
-  const s=state();
-  rpmValue.textContent=s.rpm+" RPM";
-  teethValue.textContent=s.teeth;
-  volumeValue.textContent=volumeSlider.value+"%";
-  rpsReadout.textContent=s.rps.toFixed(2)+"/sec";
-  frequencyReadout.textContent=s.frequency.toFixed(1)+" Hz";
-  if(!cardTouching||s.rpm===0){noteReadout.textContent="—";centsReadout.textContent="—";}
-  else{const n=noteInfo(s.frequency);noteReadout.textContent=n.note;centsReadout.textContent=n.cents;}
-}
+    function resizeAllCanvases() {
+      resizeCanvas(wheelCanvas, wheelContext);
+      resizeCanvas(waveCanvas, waveContext);
+    }
 
-function animate(now){
-  const dt=Math.min(.05,(now-lastTime)/1000);lastTime=now;
-  const s=state(),base=s.rps*Math.PI*2;
-  wagonAngle+=base*dt;
-  middleAngle+=base*1.35*dt;
-  lowerAngle+=base*1.7*dt;
-  gearAngle+=base*3.2*dt;
-  wagonRotator.setAttribute("transform","rotate("+(wagonAngle*180/Math.PI)+")");
-  middleWheel.style.transform="rotate("+(-middleAngle)+"rad)";
-  lowerWheel.style.transform="rotate("+lowerAngle+"rad)";
-  gearRotator.setAttribute("transform","rotate("+(gearAngle*180/Math.PI)+")");
-  requestAnimationFrame(animate);
-}
+    function getFrequency() {
+      const revolutionsPerSecond = rpm / 60;
+      return teeth * revolutionsPerSecond;
+    }
 
-async function initAudio(){
-  if(!audioContext){
-    audioContext=new(window.AudioContext||window.webkitAudioContext)();
-    masterGain=audioContext.createGain();
-    masterGain.gain.value=.9;
-    masterGain.connect(audioContext.destination);
-  }
-  await audioContext.resume();
-  audioButton.textContent="Audio Ready";
-  restartScheduler();
-}
+    function getNoteInformation(frequency) {
+      if (frequency < 16) {
+        return {
+          note: "Clicks",
+          cents: "Below pitch range"
+        };
+      }
 
-function playClick(time,frequency,index){
-  const vol=Number(volumeSlider.value)/100;
-  const clickGain=audioContext.createGain();
-  clickGain.gain.setValueAtTime(0.0001,time);
-  clickGain.gain.exponentialRampToValueAtTime(Math.max(.0002,vol*.36),time+.001);
-  clickGain.gain.exponentialRampToValueAtTime(.0001,time+.018);
+      const midiNumber = Math.round(69 + 12 * Math.log2(frequency / 440));
+      const noteFrequency = 440 * Math.pow(2, (midiNumber - 69) / 12);
+      const cents = 1200 * Math.log2(frequency / noteFrequency);
 
-  const osc=audioContext.createOscillator();
-  osc.type="square";
-  const clickPitch=Math.min(4200,900+frequency*1.5+(index%3)*40);
-  osc.frequency.setValueAtTime(clickPitch,time);
-  osc.frequency.exponentialRampToValueAtTime(Math.max(120,clickPitch*.35),time+.016);
+      const noteNames = [
+        "C", "C♯", "D", "D♯", "E", "F",
+        "F♯", "G", "G♯", "A", "A♯", "B"
+      ];
 
-  osc.connect(clickGain);
-  clickGain.connect(masterGain);
-  osc.start(time);
-  osc.stop(time+.022);
-}
+      const noteName = noteNames[
+        ((midiNumber % 12) + 12) % 12
+      ];
 
-function scheduler(){
-  if(!audioContext)return;
-  const s=state();
-  const shouldPlay=cardTouching&&!muted&&s.frequency>=1&&s.rpm>0;
-  if(!shouldPlay){nextClickTime=audioContext.currentTime+.04;return;}
+      const octave = Math.floor(midiNumber / 12) - 1;
 
-  const interval=1/s.frequency;
-  const horizon=.10;
-  if(nextClickTime<audioContext.currentTime-.05)nextClickTime=audioContext.currentTime+.01;
+      return {
+        note: `${noteName}${octave}`,
+        cents: `${cents >= 0 ? "+" : ""}${cents.toFixed(1)} cents`
+      };
+    }
 
-  while(nextClickTime<audioContext.currentTime+horizon){
-    playClick(nextClickTime,s.frequency,nextClickIndex++);
-    nextClickTime+=interval;
-  }
-}
+    function updateReadouts() {
+      const revolutionsPerSecond = rpm / 60;
+      const frequency = getFrequency();
+      const noteInformation = getNoteInformation(frequency);
 
-function restartScheduler(){
-  if(!audioContext)return;
-  nextClickTime=audioContext.currentTime+.03;
-  if(schedulerTimer)clearInterval(schedulerTimer);
-  schedulerTimer=setInterval(scheduler,25);
-}
+      teethValue.textContent = teeth;
+      rpmValue.textContent = `${rpm} RPM`;
+      volumeValue.textContent = `${Math.round(volume * 100)}%`;
 
-function setCard(touching){
-  cardTouching=touching;
-  cardArm.classList.toggle("lifted",!touching);
-  cardArm.classList.toggle("lowered",touching);
-  cardButton.classList.toggle("active",touching);
-  status.classList.toggle("touching",touching);
-  cardButton.textContent=touching?"Raise Card":"Lower Card";
-  status.textContent=touching?"Card touching wheel":"Card lifted";
-  updateReadouts();
-  if(audioContext)restartScheduler();
-}
+      rpsReadout.textContent = `${revolutionsPerSecond.toFixed(2)}/sec`;
+      frequencyReadout.textContent = `${frequency.toFixed(1)} Hz`;
 
-rpmSlider.addEventListener("input",()=>{updateReadouts();if(audioContext)restartScheduler();});
-teethSelect.addEventListener("change",()=>{createGear(Number(teethSelect.value));updateReadouts();if(audioContext)restartScheduler();});
-volumeSlider.addEventListener("input",updateReadouts);
-audioButton.addEventListener("click",initAudio);
-cardButton.addEventListener("click",async()=>{if(!audioContext)await initAudio();setCard(!cardTouching);});
-stopButton.addEventListener("click",()=>{rpmSlider.value=0;updateReadouts();if(audioContext)restartScheduler();});
-muteButton.addEventListener("click",()=>{muted=!muted;muteButton.textContent=muted?"Unmute":"Mute";if(audioContext)restartScheduler();});
+      if (rpm === 0 || !cardTouching) {
+        noteReadout.textContent = "—";
+        centsReadout.textContent = "—";
+      } else {
+        noteReadout.textContent = noteInformation.note;
+        centsReadout.textContent = noteInformation.cents;
+      }
 
-makeSpokes(wagonSpokes,10,31,86);
-makeSpokes(gearSpokes,8,25,70);
-createGear(Number(teethSelect.value));
-updateReadouts();
-requestAnimationFrame(animate);
-</script>
+      drawWaveform();
+    }
+
+    function drawWheel() {
+      const width = wheelCanvas.clientWidth;
+      const height = wheelCanvas.clientHeight;
+
+      wheelContext.clearRect(0, 0, width, height);
+
+      const centerX = width * 0.49;
+      const centerY = height * 0.52;
+
+      const radius = Math.min(width, height) * 0.27;
+      const toothDepth = Math.max(8, radius * 0.09);
+      const axleRadius = radius * 0.12;
+
+      drawSupport(centerX, centerY, radius);
+      drawSpinningWheel(
+        centerX,
+        centerY,
+        radius,
+        toothDepth,
+        axleRadius
+      );
+      drawCard(centerX, centerY, radius, toothDepth);
+      drawMotionArrow(centerX, centerY, radius);
+    }
+
+    function drawSupport(centerX, centerY, radius) {
+      const baseY = centerY + radius * 1.38;
+
+      wheelContext.save();
+
+      wheelContext.fillStyle = "#684527";
+      wheelContext.strokeStyle = "#342111";
+      wheelContext.lineWidth = 3;
+
+      wheelContext.beginPath();
+      wheelContext.roundRect(
+        centerX - radius * 1.15,
+        baseY,
+        radius * 2.3,
+        radius * 0.22,
+        8
+      );
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.fillStyle = "#8b6037";
+
+      wheelContext.beginPath();
+      wheelContext.moveTo(centerX - radius * 0.72, baseY);
+      wheelContext.lineTo(centerX - radius * 0.48, centerY);
+      wheelContext.lineTo(centerX - radius * 0.34, centerY);
+      wheelContext.lineTo(centerX - radius * 0.43, baseY);
+      wheelContext.closePath();
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.beginPath();
+      wheelContext.moveTo(centerX + radius * 0.72, baseY);
+      wheelContext.lineTo(centerX + radius * 0.48, centerY);
+      wheelContext.lineTo(centerX + radius * 0.34, centerY);
+      wheelContext.lineTo(centerX + radius * 0.43, baseY);
+      wheelContext.closePath();
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.restore();
+    }
+
+    function drawSpinningWheel(
+      centerX,
+      centerY,
+      radius,
+      toothDepth,
+      axleRadius
+    ) {
+      wheelContext.save();
+      wheelContext.translate(centerX, centerY);
+      wheelContext.rotate(angle);
+
+      const displayTeeth = Math.min(teeth, 72);
+      const outerRadius = radius + toothDepth;
+      const innerRadius = radius - toothDepth * 0.15;
+
+      wheelContext.beginPath();
+
+      for (let index = 0; index < displayTeeth; index += 1) {
+        const toothAngle = (Math.PI * 2 * index) / displayTeeth;
+        const nextAngle = (
+          Math.PI * 2 * (index + 1)
+        ) / displayTeeth;
+
+        const firstInnerAngle = toothAngle;
+        const firstOuterAngle =
+          toothAngle + (nextAngle - toothAngle) * 0.25;
+        const secondOuterAngle =
+          toothAngle + (nextAngle - toothAngle) * 0.72;
+        const secondInnerAngle = nextAngle;
+
+        const points = [
+          {
+            x: Math.cos(firstInnerAngle) * innerRadius,
+            y: Math.sin(firstInnerAngle) * innerRadius
+          },
+          {
+            x: Math.cos(firstOuterAngle) * outerRadius,
+            y: Math.sin(firstOuterAngle) * outerRadius
+          },
+          {
+            x: Math.cos(secondOuterAngle) * outerRadius,
+            y: Math.sin(secondOuterAngle) * outerRadius
+          },
+          {
+            x: Math.cos(secondInnerAngle) * innerRadius,
+            y: Math.sin(secondInnerAngle) * innerRadius
+          }
+        ];
+
+        if (index === 0) {
+          wheelContext.moveTo(points[0].x, points[0].y);
+        }
+
+        for (const point of points) {
+          wheelContext.lineTo(point.x, point.y);
+        }
+      }
+
+      wheelContext.closePath();
+
+      const wheelGradient = wheelContext.createRadialGradient(
+        -radius * 0.25,
+        -radius * 0.3,
+        radius * 0.05,
+        0,
+        0,
+        outerRadius
+      );
+
+      wheelGradient.addColorStop(0, "#f9e2a1");
+      wheelGradient.addColorStop(0.35, "#be8b36");
+      wheelGradient.addColorStop(0.75, "#735020");
+      wheelGradient.addColorStop(1, "#2c1c0b");
+
+      wheelContext.fillStyle = wheelGradient;
+      wheelContext.strokeStyle = "#f0cb72";
+      wheelContext.lineWidth = 1.5;
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.fillStyle = "rgba(25, 17, 7, 0.44)";
+      wheelContext.beginPath();
+      wheelContext.arc(0, 0, radius * 0.72, 0, Math.PI * 2);
+      wheelContext.fill();
+
+      wheelContext.strokeStyle = "#d7ae5c";
+      wheelContext.lineWidth = Math.max(4, radius * 0.035);
+
+      for (let spoke = 0; spoke < 8; spoke += 1) {
+        const spokeAngle = (Math.PI * 2 * spoke) / 8;
+
+        wheelContext.beginPath();
+        wheelContext.moveTo(
+          Math.cos(spokeAngle) * axleRadius,
+          Math.sin(spokeAngle) * axleRadius
+        );
+        wheelContext.lineTo(
+          Math.cos(spokeAngle) * radius * 0.68,
+          Math.sin(spokeAngle) * radius * 0.68
+        );
+        wheelContext.stroke();
+      }
+
+      wheelContext.fillStyle = "#8b6233";
+      wheelContext.strokeStyle = "#f3d184";
+      wheelContext.lineWidth = 3;
+
+      wheelContext.beginPath();
+      wheelContext.arc(0, 0, axleRadius, 0, Math.PI * 2);
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.fillStyle = "#24170c";
+      wheelContext.beginPath();
+      wheelContext.arc(0, 0, axleRadius * 0.36, 0, Math.PI * 2);
+      wheelContext.fill();
+
+      wheelContext.restore();
+    }
+
+    function drawCard(centerX, centerY, radius, toothDepth) {
+      const outerRadius = radius + toothDepth;
+      const contactY = centerY - outerRadius;
+      const cardBottom = cardTouching
+        ? contactY + 3
+        : contactY - radius * 0.28;
+
+      const cardTop = centerY - radius * 1.75;
+      const cardWidth = radius * 0.22;
+      const cardX = centerX + radius * 0.07;
+
+      wheelContext.save();
+
+      wheelContext.strokeStyle = cardTouching
+        ? "#f6e6b3"
+        : "#bbc9d5";
+
+      wheelContext.fillStyle = cardTouching
+        ? "#f5deb0"
+        : "#d2dbe3";
+
+      wheelContext.lineWidth = 2;
+
+      wheelContext.beginPath();
+      wheelContext.moveTo(cardX, cardTop);
+      wheelContext.lineTo(
+        cardX + cardWidth * 0.2,
+        cardBottom - radius * 0.2
+      );
+      wheelContext.quadraticCurveTo(
+        cardX + cardWidth * 0.38,
+        cardBottom - radius * 0.06,
+        cardX + cardWidth * 0.07,
+        cardBottom
+      );
+      wheelContext.lineTo(
+        cardX - cardWidth * 0.36,
+        cardBottom - radius * 0.12
+      );
+      wheelContext.lineTo(cardX - cardWidth, cardTop);
+      wheelContext.closePath();
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.fillStyle = "#74502b";
+      wheelContext.strokeStyle = "#392514";
+
+      wheelContext.beginPath();
+      wheelContext.roundRect(
+        cardX - cardWidth * 1.5,
+        cardTop - radius * 0.2,
+        cardWidth * 2.8,
+        radius * 0.28,
+        5
+      );
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      if (cardTouching && rpm > 0) {
+        wheelContext.strokeStyle = "rgba(255, 230, 150, 0.9)";
+        wheelContext.lineWidth = 2;
+
+        for (let spark = 0; spark < 3; spark += 1) {
+          const offset = spark * 7;
+
+          wheelContext.beginPath();
+          wheelContext.moveTo(
+            cardX + radius * 0.02,
+            cardBottom + offset
+          );
+          wheelContext.lineTo(
+            cardX + radius * 0.14,
+            cardBottom + offset + 4
+          );
+          wheelContext.stroke();
+        }
+      }
+
+      wheelContext.restore();
+    }
+
+    function drawMotionArrow(centerX, centerY, radius) {
+      if (rpm === 0) {
+        return;
+      }
+
+      wheelContext.save();
+      wheelContext.strokeStyle = "rgba(98, 198, 255, 0.9)";
+      wheelContext.fillStyle = "rgba(98, 198, 255, 0.9)";
+      wheelContext.lineWidth = 4;
+      wheelContext.lineCap = "round";
+
+      const arrowRadius = radius * 1.23;
+      const startAngle = Math.PI * 0.85;
+      const endAngle = Math.PI * 1.45;
+
+      wheelContext.beginPath();
+      wheelContext.arc(
+        centerX,
+        centerY,
+        arrowRadius,
+        startAngle,
+        endAngle
+      );
+      wheelContext.stroke();
+
+      const tipX = centerX + Math.cos(endAngle) * arrowRadius;
+      const tipY = centerY + Math.sin(endAngle) * arrowRadius;
+
+      wheelContext.beginPath();
+      wheelContext.moveTo(tipX, tipY);
+      wheelContext.lineTo(tipX - 13, tipY - 4);
+      wheelContext.lineTo(tipX - 5, tipY + 10);
+      wheelContext.closePath();
+      wheelContext.fill();
+
+      wheelContext.restore();
+    }
+
+    function drawWaveform() {
+      const width = waveCanvas.clientWidth;
+      const height = waveCanvas.clientHeight;
+
+      waveContext.clearRect(0, 0, width, height);
+      waveContext.fillStyle = "#06101f";
+      waveContext.fillRect(0, 0, width, height);
+
+      const frequency = getFrequency();
+
+      waveContext.strokeStyle = "rgba(255, 255, 255, 0.13)";
+      waveContext.lineWidth = 1;
+
+      waveContext.beginPath();
+      waveContext.moveTo(0, height / 2);
+      waveContext.lineTo(width, height / 2);
+      waveContext.stroke();
+
+      if (!cardTouching || frequency === 0) {
+        waveContext.fillStyle = "#91abc2";
+        waveContext.font = "13px Arial";
+        waveContext.textAlign = "center";
+        waveContext.fillText(
+          cardTouching ? "Wheel is stopped" : "Lower the card to create impacts",
+          width / 2,
+          height / 2 + 5
+        );
+        return;
+      }
+
+      waveContext.strokeStyle = "#f3bd52";
+      waveContext.lineWidth = 2;
+      waveContext.beginPath();
+
+      const visiblePulses = Math.min(70, Math.max(2, frequency / 6));
+      const pulseSpacing = width / visiblePulses;
+
+      waveContext.moveTo(0, height * 0.7);
+
+      for (let pulse = 0; pulse <= visiblePulses; pulse += 1) {
+        const x = pulse * pulseSpacing;
+
+        waveContext.lineTo(x, height * 0.7);
+        waveContext.lineTo(x + 1, height * 0.2);
+        waveContext.lineTo(x + Math.min(6, pulseSpacing * 0.35), height * 0.7);
+      }
+
+      waveContext.stroke();
+    }
+
+    function animate(currentTime) {
+      const elapsedSeconds = Math.min(
+        0.05,
+        (currentTime - lastFrameTime) / 1000
+      );
+
+      lastFrameTime = currentTime;
+
+      const revolutionsPerSecond = rpm / 60;
+      angle += revolutionsPerSecond * Math.PI * 2 * elapsedSeconds;
+
+      if (angle > Math.PI * 2) {
+        angle %= Math.PI * 2;
+      }
+
+      drawWheel();
+      requestAnimationFrame(animate);
+    }
+
+    async function initializeAudio() {
+      if (!audioContext) {
+        audioContext = new (
+          window.AudioContext || window.webkitAudioContext
+        )();
+
+        masterGain = audioContext.createGain();
+        masterGain.gain.value = 0;
+        masterGain.connect(audioContext.destination);
+      }
+
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+
+      startButton.textContent = "Audio Ready";
+      updateSound();
+    }
+
+    function stopSoundSource() {
+      if (soundSource) {
+        try {
+          soundSource.stop();
+        } catch (error) {
+          // The source may already be stopped.
+        }
+
+        soundSource.disconnect();
+        soundSource = null;
+      }
+    }
+
+    function createImpactBuffer(frequency) {
+      const sampleRate = audioContext.sampleRate;
+
+      /*
+        A one-second loop makes each tooth impact occur at a regular interval.
+        At low frequencies, the result sounds like separate clicks.
+        At higher frequencies, the repeated impulses form a pitch.
+      */
+      const bufferLength = sampleRate;
+      const buffer = audioContext.createBuffer(
+        1,
+        bufferLength,
+        sampleRate
+      );
+
+      const channel = buffer.getChannelData(0);
+      const samplesPerImpact = sampleRate / frequency;
+      const impactLength = Math.max(
+        8,
+        Math.min(130, Math.floor(sampleRate * 0.003))
+      );
+
+      for (
+        let impactStart = 0;
+        impactStart < bufferLength;
+        impactStart += samplesPerImpact
+      ) {
+        const startSample = Math.floor(impactStart);
+
+        for (
+          let sample = 0;
+          sample < impactLength &&
+          startSample + sample < bufferLength;
+          sample += 1
+        ) {
+          const decay = Math.exp(-sample / (impactLength * 0.2));
+          const noise = Math.random() * 2 - 1;
+          const sharpImpulse = sample === 0 ? 1 : 0;
+
+          channel[startSample + sample] +=
+            (noise * 0.5 + sharpImpulse * 0.85) * decay;
+        }
+      }
+
+      return buffer;
+    }
+
+    function updateSound() {
+      if (!audioContext || !masterGain) {
+        return;
+      }
+
+      const frequency = getFrequency();
+
+      stopSoundSource();
+
+      const shouldPlay =
+        cardTouching &&
+        rpm > 0 &&
+        frequency >= 1 &&
+        !muted;
+
+      const targetVolume = shouldPlay
+        ? volume * 0.42
+        : 0;
+
+      masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+      masterGain.gain.setTargetAtTime(
+        targetVolume,
+        audioContext.currentTime,
+        0.025
+      );
+
+      if (!shouldPlay) {
+        return;
+      }
+
+      soundSource = audioContext.createBufferSource();
+      soundSource.buffer = createImpactBuffer(frequency);
+      soundSource.loop = true;
+      soundSource.connect(masterGain);
+      soundSource.start();
+    }
+
+    function setCardContact(touching) {
+      cardTouching = touching;
+
+      contactButton.textContent = touching
+        ? "Lift Card"
+        : "Lower Card";
+
+      contactButton.classList.toggle("active", touching);
+      statusBadge.classList.toggle("touching", touching);
+
+      statusBadge.textContent = touching
+        ? "Card touching wheel"
+        : "Card lifted";
+
+      updateReadouts();
+      updateSound();
+    }
+
+    teethSelect.addEventListener("change", () => {
+      teeth = Number(teethSelect.value);
+      updateReadouts();
+      updateSound();
+    });
+
+    rpmSlider.addEventListener("input", () => {
+      rpm = Number(rpmSlider.value);
+      updateReadouts();
+    });
+
+    rpmSlider.addEventListener("change", () => {
+      updateSound();
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      volume = Number(volumeSlider.value) / 100;
+      updateReadouts();
+
+      if (masterGain && audioContext) {
+        const targetVolume =
+          cardTouching && rpm > 0 && !muted
+            ? volume * 0.42
+            : 0;
+
+        masterGain.gain.setTargetAtTime(
+          targetVolume,
+          audioContext.currentTime,
+          0.02
+        );
+      }
+    });
+
+    startButton.addEventListener("click", initializeAudio);
+
+    contactButton.addEventListener("click", async () => {
+      if (!audioContext) {
+        await initializeAudio();
+      }
+
+      setCardContact(!cardTouching);
+    });
+
+    stopButton.addEventListener("click", () => {
+      rpm = 0;
+      rpmSlider.value = "0";
+      updateReadouts();
+      updateSound();
+    });
+
+    muteButton.addEventListener("click", () => {
+      muted = !muted;
+      muteButton.textContent = muted ? "Unmute" : "Mute";
+      updateSound();
+    });
+
+    window.addEventListener("resize", resizeAllCanvases);
+
+    resizeAllCanvases();
+    updateReadouts();
+    requestAnimationFrame(animate);
+  </script>
 </body>
 </html>
