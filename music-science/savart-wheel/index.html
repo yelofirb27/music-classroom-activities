@@ -518,25 +518,26 @@
   </main>
 
   <section class="panel history">
-    <h2>What does the wheel demonstrate?</h2>
+    <h2>About Savart's Discovery</h2>
 
     <p>
-      Each tooth produces one impact when it strikes the card. The impacts occur
-      slowly when the wheel turns slowly, so they can be heard as separate
-      clicks. As the impacts become faster and more regular, the ear begins to
-      perceive them as a continuous musical tone.
+      Around 1830, French physicist <strong>Félix Savart</strong> refined the
+      toothed-wheel experiment to investigate how people perceive sound. He
+      demonstrated that slowly repeated impacts are heard as separate clicks,
+      but when the impacts occur rapidly and regularly, they blend into a
+      continuous musical pitch.
     </p>
 
     <p>
-      Doubling the wheel speed doubles the frequency. Keeping the same speed
-      while doubling the number of teeth also doubles the frequency, producing
-      a pitch approximately one octave higher.
+      Savart's experiments showed that pitch depends on the number of vibrations
+      or impacts produced each second. Increasing the wheel speed or using a
+      wheel with more teeth raises the frequency and therefore raises the pitch.
     </p>
 
     <div class="question">
-      <strong>Experiment:</strong> Set the wheel to 24 teeth and note its
-      frequency. Then change it to 48 teeth without changing the RPM. What
-      happens to the frequency and musical note?
+      <strong>Try It:</strong> Set the wheel to 24 teeth and choose a speed.
+      Then change it to 48 teeth without changing the RPM. What happens to the
+      frequency and the nearest musical note?
     </div>
   </section>
 
@@ -654,267 +655,517 @@
       drawWaveform();
     }
 
+
     function drawWheel() {
       const width = wheelCanvas.clientWidth;
       const height = wheelCanvas.clientHeight;
 
       wheelContext.clearRect(0, 0, width, height);
 
-      const centerX = width * 0.49;
-      const centerY = height * 0.52;
-
-      const radius = Math.min(width, height) * 0.27;
-      const toothDepth = Math.max(8, radius * 0.09);
-      const axleRadius = radius * 0.12;
-
-      drawSupport(centerX, centerY, radius);
-      drawSpinningWheel(
-        centerX,
-        centerY,
-        radius,
-        toothDepth,
-        axleRadius
-      );
-      drawCard(centerX, centerY, radius, toothDepth);
-      drawMotionArrow(centerX, centerY, radius);
-    }
-
-    function drawSupport(centerX, centerY, radius) {
-      const baseY = centerY + radius * 1.38;
+      const scale = Math.min(width / 760, height / 570);
+      const originX = (width - 760 * scale) / 2;
+      const originY = (height - 570 * scale) / 2;
 
       wheelContext.save();
+      wheelContext.translate(originX, originY);
+      wheelContext.scale(scale, scale);
 
-      wheelContext.fillStyle = "#684527";
-      wheelContext.strokeStyle = "#342111";
-      wheelContext.lineWidth = 3;
-
-      wheelContext.beginPath();
-      wheelContext.roundRect(
-        centerX - radius * 1.15,
-        baseY,
-        radius * 2.3,
-        radius * 0.22,
-        8
-      );
-      wheelContext.fill();
-      wheelContext.stroke();
-
-      wheelContext.fillStyle = "#8b6037";
-
-      wheelContext.beginPath();
-      wheelContext.moveTo(centerX - radius * 0.72, baseY);
-      wheelContext.lineTo(centerX - radius * 0.48, centerY);
-      wheelContext.lineTo(centerX - radius * 0.34, centerY);
-      wheelContext.lineTo(centerX - radius * 0.43, baseY);
-      wheelContext.closePath();
-      wheelContext.fill();
-      wheelContext.stroke();
-
-      wheelContext.beginPath();
-      wheelContext.moveTo(centerX + radius * 0.72, baseY);
-      wheelContext.lineTo(centerX + radius * 0.48, centerY);
-      wheelContext.lineTo(centerX + radius * 0.34, centerY);
-      wheelContext.lineTo(centerX + radius * 0.43, baseY);
-      wheelContext.closePath();
-      wheelContext.fill();
-      wheelContext.stroke();
+      drawWorkshopBackground();
+      drawWoodenFrame();
+      drawDriveWheel();
+      drawPulleySystem();
+      drawToothedWheel();
+      drawFlexibleCard();
+      drawLabels();
 
       wheelContext.restore();
     }
 
-    function drawSpinningWheel(
-      centerX,
-      centerY,
-      radius,
-      toothDepth,
-      axleRadius
-    ) {
-      wheelContext.save();
-      wheelContext.translate(centerX, centerY);
-      wheelContext.rotate(angle);
+    function drawWorkshopBackground() {
+      const background = wheelContext.createLinearGradient(0, 0, 0, 570);
+      background.addColorStop(0, "#173754");
+      background.addColorStop(0.64, "#0b2137");
+      background.addColorStop(1, "#071521");
 
-      const displayTeeth = Math.min(teeth, 72);
-      const outerRadius = radius + toothDepth;
-      const innerRadius = radius - toothDepth * 0.15;
+      wheelContext.fillStyle = background;
+      wheelContext.fillRect(0, 0, 760, 570);
 
-      wheelContext.beginPath();
+      wheelContext.strokeStyle = "rgba(255,255,255,0.035)";
+      wheelContext.lineWidth = 1;
 
-      for (let index = 0; index < displayTeeth; index += 1) {
-        const toothAngle = (Math.PI * 2 * index) / displayTeeth;
-        const nextAngle = (
-          Math.PI * 2 * (index + 1)
-        ) / displayTeeth;
-
-        const firstInnerAngle = toothAngle;
-        const firstOuterAngle =
-          toothAngle + (nextAngle - toothAngle) * 0.25;
-        const secondOuterAngle =
-          toothAngle + (nextAngle - toothAngle) * 0.72;
-        const secondInnerAngle = nextAngle;
-
-        const points = [
-          {
-            x: Math.cos(firstInnerAngle) * innerRadius,
-            y: Math.sin(firstInnerAngle) * innerRadius
-          },
-          {
-            x: Math.cos(firstOuterAngle) * outerRadius,
-            y: Math.sin(firstOuterAngle) * outerRadius
-          },
-          {
-            x: Math.cos(secondOuterAngle) * outerRadius,
-            y: Math.sin(secondOuterAngle) * outerRadius
-          },
-          {
-            x: Math.cos(secondInnerAngle) * innerRadius,
-            y: Math.sin(secondInnerAngle) * innerRadius
-          }
-        ];
-
-        if (index === 0) {
-          wheelContext.moveTo(points[0].x, points[0].y);
-        }
-
-        for (const point of points) {
-          wheelContext.lineTo(point.x, point.y);
-        }
+      for (let x = 0; x <= 760; x += 28) {
+        wheelContext.beginPath();
+        wheelContext.moveTo(x, 0);
+        wheelContext.lineTo(x, 570);
+        wheelContext.stroke();
       }
 
-      wheelContext.closePath();
+      for (let y = 0; y <= 570; y += 28) {
+        wheelContext.beginPath();
+        wheelContext.moveTo(0, y);
+        wheelContext.lineTo(760, y);
+        wheelContext.stroke();
+      }
+    }
 
-      const wheelGradient = wheelContext.createRadialGradient(
-        -radius * 0.25,
-        -radius * 0.3,
-        radius * 0.05,
-        0,
-        0,
-        outerRadius
-      );
+    function drawWoodPlank(x, y, width, height, radius = 7) {
+      const wood = wheelContext.createLinearGradient(x, y, x, y + height);
+      wood.addColorStop(0, "#9a6838");
+      wood.addColorStop(0.5, "#704722");
+      wood.addColorStop(1, "#4a2c15");
 
-      wheelGradient.addColorStop(0, "#f9e2a1");
-      wheelGradient.addColorStop(0.35, "#be8b36");
-      wheelGradient.addColorStop(0.75, "#735020");
-      wheelGradient.addColorStop(1, "#2c1c0b");
+      wheelContext.fillStyle = wood;
+      wheelContext.strokeStyle = "#2c190c";
+      wheelContext.lineWidth = 3;
 
-      wheelContext.fillStyle = wheelGradient;
-      wheelContext.strokeStyle = "#f0cb72";
-      wheelContext.lineWidth = 1.5;
+      wheelContext.beginPath();
+      wheelContext.roundRect(x, y, width, height, radius);
       wheelContext.fill();
       wheelContext.stroke();
 
-      wheelContext.fillStyle = "rgba(25, 17, 7, 0.44)";
+      wheelContext.strokeStyle = "rgba(255,220,155,0.16)";
+      wheelContext.lineWidth = 1.2;
+
+      for (let line = 10; line < height; line += 11) {
+        wheelContext.beginPath();
+        wheelContext.moveTo(x + 8, y + line);
+        wheelContext.bezierCurveTo(
+          x + width * 0.3,
+          y + line - 4,
+          x + width * 0.65,
+          y + line + 4,
+          x + width - 8,
+          y + line
+        );
+        wheelContext.stroke();
+      }
+    }
+
+    function drawWoodenFrame() {
+      drawWoodPlank(78, 372, 606, 72, 8);
+      drawWoodPlank(105, 440, 42, 102, 5);
+      drawWoodPlank(612, 440, 42, 102, 5);
+      drawWoodPlank(132, 505, 500, 27, 5);
+
+      wheelContext.fillStyle = "#b88a53";
+      wheelContext.strokeStyle = "#3d2513";
+      wheelContext.lineWidth = 2;
+
+      for (const bolt of [
+        [112, 404], [650, 404], [185, 404], [572, 404]
+      ]) {
+        wheelContext.beginPath();
+        wheelContext.arc(bolt[0], bolt[1], 5, 0, Math.PI * 2);
+        wheelContext.fill();
+        wheelContext.stroke();
+      }
+    }
+
+    function drawWheelRim(cx, cy, radius, rotation, spokeCount, rimWidth) {
+      wheelContext.save();
+      wheelContext.translate(cx, cy);
+      wheelContext.rotate(rotation);
+
+      const rimGradient = wheelContext.createRadialGradient(
+        -radius * 0.35,
+        -radius * 0.35,
+        radius * 0.15,
+        0,
+        0,
+        radius
+      );
+
+      rimGradient.addColorStop(0, "#c28a4c");
+      rimGradient.addColorStop(0.55, "#865226");
+      rimGradient.addColorStop(1, "#39200f");
+
+      wheelContext.strokeStyle = rimGradient;
+      wheelContext.lineWidth = rimWidth;
       wheelContext.beginPath();
-      wheelContext.arc(0, 0, radius * 0.72, 0, Math.PI * 2);
-      wheelContext.fill();
+      wheelContext.arc(0, 0, radius - rimWidth / 2, 0, Math.PI * 2);
+      wheelContext.stroke();
 
-      wheelContext.strokeStyle = "#d7ae5c";
-      wheelContext.lineWidth = Math.max(4, radius * 0.035);
+      wheelContext.strokeStyle = "#b3773d";
+      wheelContext.lineWidth = Math.max(8, rimWidth * 0.34);
+      wheelContext.lineCap = "round";
 
-      for (let spoke = 0; spoke < 8; spoke += 1) {
-        const spokeAngle = (Math.PI * 2 * spoke) / 8;
-
+      for (let spoke = 0; spoke < spokeCount; spoke += 1) {
+        const spokeAngle = (Math.PI * 2 * spoke) / spokeCount;
         wheelContext.beginPath();
         wheelContext.moveTo(
-          Math.cos(spokeAngle) * axleRadius,
-          Math.sin(spokeAngle) * axleRadius
+          Math.cos(spokeAngle) * radius * 0.17,
+          Math.sin(spokeAngle) * radius * 0.17
         );
         wheelContext.lineTo(
-          Math.cos(spokeAngle) * radius * 0.68,
-          Math.sin(spokeAngle) * radius * 0.68
+          Math.cos(spokeAngle) * radius * 0.76,
+          Math.sin(spokeAngle) * radius * 0.76
         );
         wheelContext.stroke();
       }
 
-      wheelContext.fillStyle = "#8b6233";
-      wheelContext.strokeStyle = "#f3d184";
-      wheelContext.lineWidth = 3;
-
+      wheelContext.fillStyle = "#5a3920";
+      wheelContext.strokeStyle = "#d0a56d";
+      wheelContext.lineWidth = 4;
       wheelContext.beginPath();
-      wheelContext.arc(0, 0, axleRadius, 0, Math.PI * 2);
+      wheelContext.arc(0, 0, radius * 0.18, 0, Math.PI * 2);
       wheelContext.fill();
       wheelContext.stroke();
 
-      wheelContext.fillStyle = "#24170c";
+      wheelContext.fillStyle = "#1d1712";
       wheelContext.beginPath();
-      wheelContext.arc(0, 0, axleRadius * 0.36, 0, Math.PI * 2);
+      wheelContext.arc(0, 0, radius * 0.07, 0, Math.PI * 2);
       wheelContext.fill();
 
       wheelContext.restore();
     }
 
-    function drawCard(centerX, centerY, radius, toothDepth) {
-      const outerRadius = radius + toothDepth;
-      const contactY = centerY - outerRadius;
-      const cardBottom = cardTouching
-        ? contactY + 3
-        : contactY - radius * 0.28;
+    function drawDriveWheel() {
+      drawWheelRim(242, 255, 145, angle, 10, 28);
 
-      const cardTop = centerY - radius * 1.75;
-      const cardWidth = radius * 0.22;
-      const cardX = centerX + radius * 0.07;
-
-      wheelContext.save();
-
-      wheelContext.strokeStyle = cardTouching
-        ? "#f6e6b3"
-        : "#bbc9d5";
-
-      wheelContext.fillStyle = cardTouching
-        ? "#f5deb0"
-        : "#d2dbe3";
-
-      wheelContext.lineWidth = 2;
-
+      wheelContext.fillStyle = "#5f4938";
+      wheelContext.strokeStyle = "#22170f";
+      wheelContext.lineWidth = 3;
       wheelContext.beginPath();
-      wheelContext.moveTo(cardX, cardTop);
-      wheelContext.lineTo(
-        cardX + cardWidth * 0.2,
-        cardBottom - radius * 0.2
-      );
-      wheelContext.quadraticCurveTo(
-        cardX + cardWidth * 0.38,
-        cardBottom - radius * 0.06,
-        cardX + cardWidth * 0.07,
-        cardBottom
-      );
-      wheelContext.lineTo(
-        cardX - cardWidth * 0.36,
-        cardBottom - radius * 0.12
-      );
-      wheelContext.lineTo(cardX - cardWidth, cardTop);
-      wheelContext.closePath();
+      wheelContext.roundRect(222, 250, 40, 133, 5);
       wheelContext.fill();
       wheelContext.stroke();
 
-      wheelContext.fillStyle = "#74502b";
-      wheelContext.strokeStyle = "#392514";
+      wheelContext.fillStyle = "#b7a58c";
+      wheelContext.beginPath();
+      wheelContext.arc(242, 255, 13, 0, Math.PI * 2);
+      wheelContext.fill();
+    }
+
+
+    function drawPulleySystem() {
+      const pulleyRotation = angle * 1.75;
+      drawWheelRim(445, 310, 70, pulleyRotation, 8, 16);
+
+      wheelContext.fillStyle = "#544337";
+      wheelContext.strokeStyle = "#21170f";
+      wheelContext.lineWidth = 3;
+      wheelContext.beginPath();
+      wheelContext.roundRect(430, 303, 30, 77, 4);
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      drawContinuousBelt();
+    }
+
+    function drawContinuousBelt() {
+      /*
+        One continuous belt runs around:
+        1. the large wooden drive wheel,
+        2. the smaller wooden pulley,
+        3. the center pulley of the toothed wheel.
+
+        The points below are tangent-like contact points chosen to make the belt
+        look as though it is actually seated in the grooves of all three wheels.
+      */
+      const beltPoints = [
+        { x: 157, y: 139 },  // upper-left contact on large wheel
+        { x: 326, y: 150 },  // upper-right contact on large wheel
+        { x: 493, y: 253 },  // upper-right contact on middle wheel
+        { x: 587, y: 294 },  // upper contact on toothed-wheel hub
+        { x: 616, y: 329 },  // lower-right contact on toothed-wheel hub
+        { x: 500, y: 349 },  // lower-right contact on middle wheel
+        { x: 390, y: 360 },  // lower-left contact on middle wheel
+        { x: 171, y: 373 }   // lower contact returning to large wheel
+      ];
+
+      wheelContext.save();
+
+      // Dark outer edge gives the belt thickness and depth.
+      wheelContext.strokeStyle = "#120f0d";
+      wheelContext.lineWidth = 13;
+      wheelContext.lineJoin = "round";
+      wheelContext.lineCap = "round";
+      wheelContext.beginPath();
+      wheelContext.moveTo(beltPoints[0].x, beltPoints[0].y);
+
+      // Top run from large wheel to middle wheel.
+      wheelContext.bezierCurveTo(
+        228, 125,
+        294, 134,
+        beltPoints[1].x,
+        beltPoints[1].y
+      );
+
+      wheelContext.lineTo(beltPoints[2].x, beltPoints[2].y);
+
+      // Upper run from middle wheel to toothed-wheel hub.
+      wheelContext.bezierCurveTo(
+        526, 267,
+        556, 281,
+        beltPoints[3].x,
+        beltPoints[3].y
+      );
+
+      // Wrap around the center hub of toothed wheel.
+      wheelContext.bezierCurveTo(
+        625, 300,
+        628, 318,
+        beltPoints[4].x,
+        beltPoints[4].y
+      );
+
+      // Lower run back toward middle wooden wheel.
+      wheelContext.bezierCurveTo(
+        579, 339,
+        541, 346,
+        beltPoints[5].x,
+        beltPoints[5].y
+      );
+
+      // Wrap around lower half of middle wheel.
+      wheelContext.bezierCurveTo(
+        472, 374,
+        425, 377,
+        beltPoints[6].x,
+        beltPoints[6].y
+      );
+
+      // Lower return toward large wheel.
+      wheelContext.lineTo(beltPoints[7].x, beltPoints[7].y);
+
+      // Wrap around the left side of the large wooden wheel.
+      wheelContext.bezierCurveTo(
+        100, 337,
+        93, 198,
+        beltPoints[0].x,
+        beltPoints[0].y
+      );
+
+      wheelContext.closePath();
+      wheelContext.stroke();
+
+      // Main leather belt surface.
+      wheelContext.strokeStyle = rpm > 650
+        ? "rgba(91, 77, 62, 0.84)"
+        : "#4b4034";
+      wheelContext.lineWidth = 8;
+      wheelContext.stroke();
+
+      // Moving highlight indicates belt direction.
+      if (rpm > 0) {
+        wheelContext.setLineDash([18, 14]);
+        wheelContext.lineDashOffset = -(angle * 58);
+        wheelContext.strokeStyle = "rgba(235, 211, 169, 0.30)";
+        wheelContext.lineWidth = 2.2;
+        wheelContext.stroke();
+      }
+
+      wheelContext.restore();
+
+      drawPulleyGrooves();
+    }
+
+    function drawPulleyGrooves() {
+      wheelContext.save();
+
+      // Groove on the large wooden drive wheel.
+      wheelContext.strokeStyle = "rgba(24, 17, 11, 0.86)";
+      wheelContext.lineWidth = 5;
+      wheelContext.beginPath();
+      wheelContext.arc(242, 255, 132, 0, Math.PI * 2);
+      wheelContext.stroke();
+
+      // Groove on the middle wooden wheel.
+      wheelContext.lineWidth = 4;
+      wheelContext.beginPath();
+      wheelContext.arc(445, 310, 61, 0, Math.PI * 2);
+      wheelContext.stroke();
+
+      // Small center pulley mounted on the toothed wheel axle.
+      const hubGradient = wheelContext.createRadialGradient(
+        592, 302, 2,
+        602, 315, 24
+      );
+      hubGradient.addColorStop(0, "#d6b47d");
+      hubGradient.addColorStop(0.45, "#85643c");
+      hubGradient.addColorStop(1, "#2f2418");
+
+      wheelContext.fillStyle = hubGradient;
+      wheelContext.strokeStyle = "#dcc69f";
+      wheelContext.lineWidth = 3;
+      wheelContext.beginPath();
+      wheelContext.arc(602, 315, 23, 0, Math.PI * 2);
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      // Belt groove around the toothed-wheel hub.
+      wheelContext.strokeStyle = "#251b12";
+      wheelContext.lineWidth = 5;
+      wheelContext.beginPath();
+      wheelContext.arc(602, 315, 18, 0, Math.PI * 2);
+      wheelContext.stroke();
+
+      wheelContext.restore();
+    }
+
+    function drawToothedWheel() {
+      const cx = 602;
+      const cy = 315;
+      const displayTeeth = Math.min(teeth, 72);
+      const innerRadius = 53;
+      const outerRadius = 62;
+
+      wheelContext.save();
+      wheelContext.translate(cx, cy);
+      wheelContext.rotate(angle * 3.2);
 
       wheelContext.beginPath();
-      wheelContext.roundRect(
-        cardX - cardWidth * 1.5,
-        cardTop - radius * 0.2,
-        cardWidth * 2.8,
-        radius * 0.28,
-        5
+
+      for (let index = 0; index < displayTeeth; index += 1) {
+        const a0 = (Math.PI * 2 * index) / displayTeeth;
+        const a1 = (Math.PI * 2 * (index + 0.25)) / displayTeeth;
+        const a2 = (Math.PI * 2 * (index + 0.72)) / displayTeeth;
+        const a3 = (Math.PI * 2 * (index + 1)) / displayTeeth;
+
+        const points = [
+          [a0, innerRadius],
+          [a1, outerRadius],
+          [a2, outerRadius],
+          [a3, innerRadius]
+        ];
+
+        for (let point = 0; point < points.length; point += 1) {
+          const x = Math.cos(points[point][0]) * points[point][1];
+          const y = Math.sin(points[point][0]) * points[point][1];
+
+          if (index === 0 && point === 0) {
+            wheelContext.moveTo(x, y);
+          } else {
+            wheelContext.lineTo(x, y);
+          }
+        }
+      }
+
+      wheelContext.closePath();
+
+      const gearGradient = wheelContext.createRadialGradient(
+        -18, -20, 3, 0, 0, outerRadius
       );
+      gearGradient.addColorStop(0, "#d7c5a2");
+      gearGradient.addColorStop(0.42, "#726a5d");
+      gearGradient.addColorStop(1, "#24211d");
+
+      wheelContext.fillStyle = gearGradient;
+      wheelContext.strokeStyle = "#e7d8b8";
+      wheelContext.lineWidth = 1.4;
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.fillStyle = "#151515";
+      wheelContext.beginPath();
+      wheelContext.arc(0, 0, 39, 0, Math.PI * 2);
+      wheelContext.fill();
+
+      wheelContext.strokeStyle = "#91897b";
+      wheelContext.lineWidth = 7;
+
+      for (let spoke = 0; spoke < 8; spoke += 1) {
+        const spokeAngle = (Math.PI * 2 * spoke) / 8;
+        wheelContext.beginPath();
+        wheelContext.moveTo(
+          Math.cos(spokeAngle) * 14,
+          Math.sin(spokeAngle) * 14
+        );
+        wheelContext.lineTo(
+          Math.cos(spokeAngle) * 36,
+          Math.sin(spokeAngle) * 36
+        );
+        wheelContext.stroke();
+      }
+
+      wheelContext.fillStyle = "#766b5a";
+      wheelContext.strokeStyle = "#d5c5a8";
+      wheelContext.lineWidth = 3;
+      wheelContext.beginPath();
+      wheelContext.arc(0, 0, 16, 0, Math.PI * 2);
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.restore();
+
+      wheelContext.fillStyle = "#504238";
+      wheelContext.strokeStyle = "#20150d";
+      wheelContext.lineWidth = 3;
+      wheelContext.beginPath();
+      wheelContext.roundRect(586, 314, 32, 68, 4);
+      wheelContext.fill();
+      wheelContext.stroke();
+    }
+
+    function drawFlexibleCard() {
+      const contactX = 602;
+      const contactY = 252;
+      const topX = 552;
+      const topY = 112;
+
+      const cardTipX = cardTouching
+        ? contactX
+        : contactX - 27;
+
+      const cardTipY = cardTouching
+        ? contactY
+        : contactY - 37;
+
+      wheelContext.save();
+
+      wheelContext.fillStyle = "#6a4b2d";
+      wheelContext.strokeStyle = "#2d1b0e";
+      wheelContext.lineWidth = 3;
+      wheelContext.beginPath();
+      wheelContext.roundRect(topX - 12, topY - 14, 25, 165, 5);
+      wheelContext.fill();
+      wheelContext.stroke();
+
+      wheelContext.strokeStyle = cardTouching
+        ? "#f4e2b1"
+        : "#cbd4dc";
+      wheelContext.lineWidth = 11;
+      wheelContext.lineCap = "round";
+
+      wheelContext.beginPath();
+      wheelContext.moveTo(topX, topY);
+
+      const vibration = cardTouching && rpm > 0
+        ? Math.sin(angle * Math.max(10, teeth / 2)) * 4
+        : 0;
+
+      wheelContext.bezierCurveTo(
+        topX + 8,
+        topY + 58,
+        cardTipX - 18 + vibration,
+        cardTipY - 32,
+        cardTipX,
+        cardTipY
+      );
+      wheelContext.stroke();
+
+      wheelContext.strokeStyle = "#6a6254";
+      wheelContext.lineWidth = 2;
+      wheelContext.stroke();
+
+      wheelContext.fillStyle = "#b4864b";
+      wheelContext.strokeStyle = "#382314";
+      wheelContext.lineWidth = 2;
+      wheelContext.beginPath();
+      wheelContext.arc(topX, topY + 34, 10, 0, Math.PI * 2);
       wheelContext.fill();
       wheelContext.stroke();
 
       if (cardTouching && rpm > 0) {
-        wheelContext.strokeStyle = "rgba(255, 230, 150, 0.9)";
+        wheelContext.strokeStyle = "rgba(255,225,140,0.88)";
         wheelContext.lineWidth = 2;
 
         for (let spark = 0; spark < 3; spark += 1) {
-          const offset = spark * 7;
-
           wheelContext.beginPath();
-          wheelContext.moveTo(
-            cardX + radius * 0.02,
-            cardBottom + offset
-          );
+          wheelContext.moveTo(contactX + 4, contactY + spark * 5);
           wheelContext.lineTo(
-            cardX + radius * 0.14,
-            cardBottom + offset + 4
+            contactX + 18 + spark * 2,
+            contactY - 4 + spark * 5
           );
           wheelContext.stroke();
         }
@@ -923,42 +1174,24 @@
       wheelContext.restore();
     }
 
-    function drawMotionArrow(centerX, centerY, radius) {
-      if (rpm === 0) {
-        return;
-      }
-
+    function drawLabels() {
       wheelContext.save();
-      wheelContext.strokeStyle = "rgba(98, 198, 255, 0.9)";
-      wheelContext.fillStyle = "rgba(98, 198, 255, 0.9)";
-      wheelContext.lineWidth = 4;
-      wheelContext.lineCap = "round";
+      wheelContext.font = "bold 15px Arial";
+      wheelContext.fillStyle = "rgba(232,244,255,0.86)";
+      wheelContext.textAlign = "center";
 
-      const arrowRadius = radius * 1.23;
-      const startAngle = Math.PI * 0.85;
-      const endAngle = Math.PI * 1.45;
+      wheelContext.fillText("WOODEN DRIVE WHEEL", 242, 52);
+      wheelContext.fillText(`${teeth} TOOTH WHEEL`, 602, 218);
 
-      wheelContext.beginPath();
-      wheelContext.arc(
-        centerX,
-        centerY,
-        arrowRadius,
-        startAngle,
-        endAngle
-      );
-      wheelContext.stroke();
-
-      const tipX = centerX + Math.cos(endAngle) * arrowRadius;
-      const tipY = centerY + Math.sin(endAngle) * arrowRadius;
-
-      wheelContext.beginPath();
-      wheelContext.moveTo(tipX, tipY);
-      wheelContext.lineTo(tipX - 13, tipY - 4);
-      wheelContext.lineTo(tipX - 5, tipY + 10);
-      wheelContext.closePath();
-      wheelContext.fill();
+      wheelContext.font = "13px Arial";
+      wheelContext.fillStyle = "rgba(210,226,239,0.78)";
+      wheelContext.fillText("belt-driven pulley", 445, 406);
 
       wheelContext.restore();
+    }
+
+    function drawMotionArrow() {
+      // Motion is now shown by rotating spokes, pulleys, gear teeth, and moving belts.
     }
 
     function drawWaveform() {
