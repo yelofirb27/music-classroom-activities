@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notable</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Notable</h1>
+
+        <div id="setup-screen">
+            <h2>Game Setup</h2>
+            <label for="difficulty-select">Difficulty:</label>
+            <select id="difficulty-select">
+                <option value="easy-treble">Easy (Treble Clef)</option>
+                <option value="easy-bass">Easy (Bass Clef)</option>
+                <option value="easy-tenor">Easy (Tenor Clef)</option>
+                <option value="medium">Medium (Treble & Bass Clefs)</option>
+                <option value="hard">Hard (All Clefs)</option>
+            </select>
+
+            <button id="start-game-btn">Start Game</button>
+            <div class="rules-box">
+                <h2>How to Play Notable</h2>
+                <div class="rule-block">
+                  Welcome to Notable!<br>
+                  The goal of the game is to find as many words in the time limit as possible.<br>
+                  But there's a twist, rather than the standard alphabet, we're using musical notes.
+                </div>
+
+                <h3>Gameplay:</h3>
+                <div class="rule-block">
+                  A grid of musical notes, representing letters, will appear.<br>
+                  Click on adjacent notes to form a word.<br>
+                  Notes can only be used once per word.<br>
+                  Words must be at least 3 letters long.<br>
+                  Submit your word by clicking the "Submit Word" button.<br>
+                  The game has a timer of three minutes.<br>
+                  All words are composed of A-G.<br>
+                  A musical tone will confirm the word is valid.
+                </div>
+                <h3>Scoring:</h3>
+                <div class="rule-item">
+                  A three letter word is worth one point.<br>
+                  For each additional letter, an extra point is granted.<br>
+                  Each valid word also extends the timer by five seconds!
+                </div>
+            </div>
+        </div>
+
+        <div id="game-screen" style="display:none;">
+            <div class="main-game-layout">
+                <div id="player1-words" class="found-words-list">
+                    <h4>Found Words:</h4>
+                    <ul id="p1-word-list"></ul>
+                </div>
+
+                <div class="game-board-section">
+                    <div id="current-word-section">
+                        <div class="current-word-buttons">
+                            <button id="submit-word-btn" class="green-button">Submit Word</button>
+                            <button id="clear-selection-btn" class="yellow-button">Clear Selection</button>
+                            <button id="pass-forfeit-btn" class="red-button">Forfeit</button>
+                            <button id="restart-game-btn">New Game (Restart)</button>
+                        </div>
+                    </div>
+                    <div id="grid-container">
+                    </div>
+                </div>
+              <div class="game-info-sidebar">
+                  <div id="timer-container">
+                      <span class="timer-label">Time Left:</span>
+                      <div><span id="timer-display">00:00</span></div>
+                  </div>
+                  <div id="score-board">
+                      <span class="score-label">Score:</span>
+                      <div><span id="player-score">0</span></div>
+                  </div>
+                  <div id="solvable-words-fraction-container">
+                      <span class="solvable-words-label">Solvable Words:</span>
+                      <div class="fraction">
+                          <span id="found-words-count" class="numerator">0</span>
+                          <span class="denominator-line"></span>
+                          <span id="total-solvable-count" class="denominator">0</span>
+                      </div>
+                  </div>
+                  <div id="current-word-display-area">
+                      <span class="current-word-label">Current Word:</span>
+                      <div><span id="current-word-display"></span></div>
+                  </div>
+              </div>
+            </div>
+            <div id="message-area" class="message-area"></div>
+            <div id="missed-words-definitions"></div>
+        </div>
+    </div>
+
+    <script src="game.js" type="module"></script>
+</body>
+</html>
