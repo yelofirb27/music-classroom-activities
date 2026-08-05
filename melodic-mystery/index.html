@@ -759,7 +759,9 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.disabled = true;
       nextBtn.disabled = false;
 
-      nextRoundTimer = setTimeout(startNewRound, 6000);
+      // Keep the result and definition visible until the student chooses Next
+      // or presses Enter again.
+      nextRoundTimer = null;
     } else {
       definitionPanel.textContent = "";
       setMessage("Incorrect guess. Try again!", "error");
@@ -778,7 +780,10 @@ document.addEventListener("DOMContentLoaded", () => {
   wordInput.addEventListener("keydown", event => {
     if (event.key !== "Enter") return;
 
+    // Prevent this same Enter press from also reaching the document-level
+    // listener after submitGuess disables the input.
     event.preventDefault();
+    event.stopPropagation();
 
     if (locked && !nextBtn.disabled) {
       clearTimeout(nextRoundTimer);
