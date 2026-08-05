@@ -659,10 +659,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function drawFilledNotehead(x, y) {
     ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(-0.18);
     ctx.beginPath();
-    ctx.ellipse(0, 0, 50, 36, 0, 0, Math.PI * 2);
+    ctx.arc(x, y, 42, 0, Math.PI * 2);
     ctx.fillStyle = "#000";
     ctx.fill();
     ctx.restore();
@@ -692,7 +690,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
     ctx.font = '505px "Noto Music", "Bravura Text", "Segoe UI Symbol", "Arial Unicode MS", serif';
-    ctx.fillText("𝄞", 180, 492);
+    ctx.fillText("𝄞", 180, 474);
     ctx.restore();
 
     const count = noteSequence.length;
@@ -736,7 +734,7 @@ document.addEventListener("DOMContentLoaded", () => {
     definitionPanel.textContent = "";
     setMessage("Guess the word based on the notes!", "info");
     redrawStaff();
-    wordInput.focus();
+    requestAnimationFrame(() => wordInput.focus());
   }
 
   function submitGuess() {
@@ -778,7 +776,28 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   wordInput.addEventListener("keydown", event => {
-    if (event.key === "Enter") submitGuess();
+    if (event.key !== "Enter") return;
+
+    event.preventDefault();
+
+    if (locked && !nextBtn.disabled) {
+      clearTimeout(nextRoundTimer);
+      startNewRound();
+    } else {
+      submitGuess();
+    }
+  });
+
+  // Keep Enter working even after the answer field becomes disabled.
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Enter") return;
+    if (document.activeElement === wordInput) return;
+
+    if (locked && !nextBtn.disabled) {
+      event.preventDefault();
+      clearTimeout(nextRoundTimer);
+      startNewRound();
+    }
   });
 
   restartBtn.addEventListener("click", () => {
