@@ -16,22 +16,23 @@
 
   .page {
     width: min(1500px, 98vw);
+    min-height: 100dvh;
     margin: 0 auto;
-    padding: 8px 10px 12px;
+    padding: clamp(4px, 1vh, 12px) clamp(6px, 1vw, 14px);
     text-align: center;
   }
 
   h1 {
-    margin: 0 0 2px;
+    margin: 0 0 clamp(2px, .8vh, 8px);
     color: #49ad4e;
-    font-size: clamp(2.2rem, 4vw, 3.7rem);
+    font-size: clamp(2rem, 4vw, 3.7rem);
     line-height: 1;
   }
 
   .setup-screen {
-    max-width: 700px;
-    margin: 70px auto 0;
-    padding: 34px;
+    width: min(700px, 94vw);
+    margin: clamp(28px, 8vh, 70px) auto 0;
+    padding: clamp(22px, 4vw, 34px);
     border: 1px solid #d8d8d8;
     border-radius: 16px;
     box-shadow: 0 10px 28px rgba(0,0,0,.08);
@@ -67,7 +68,7 @@
   #mysteryStaff {
     display: block;
     width: 100%;
-    height: min(31vh, 285px);
+    height: clamp(180px, 29dvh, 285px);
     object-fit: fill;
   }
 
@@ -80,7 +81,7 @@
   .reference-image {
     display: block;
     width: min(1040px, 96%);
-    height: min(24vh, 225px);
+    height: clamp(150px, 23dvh, 225px);
     object-fit: contain;
     margin: -4px auto 0;
   }
@@ -184,12 +185,97 @@
     margin-top: 8px;
   }
 
+
+  @media (max-width: 900px) {
+    .page {
+      width: 100%;
+      padding-inline: 8px;
+    }
+
+    #mysteryStaff {
+      height: clamp(170px, 26dvh, 235px);
+    }
+
+    .reference-image {
+      height: clamp(145px, 21dvh, 195px);
+    }
+
+    .guess-controls {
+      gap: 8px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    h1 {
+      font-size: clamp(2rem, 10vw, 2.8rem);
+    }
+
+    #mysteryStaff {
+      height: clamp(150px, 24dvh, 210px);
+    }
+
+    .reference-image {
+      height: clamp(135px, 20dvh, 180px);
+    }
+
+    .guess-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: min(100%, 560px);
+      margin-inline: auto;
+    }
+
+    #wordInput {
+      grid-column: 1 / -1;
+      width: 100%;
+    }
+
+    #submitBtn,
+    #nextBtn {
+      width: 100%;
+    }
+
+    #definitionPanel,
+    #messagePanel {
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-height: 650px) and (orientation: landscape) {
+    h1 {
+      font-size: 2rem;
+    }
+
+    #mysteryStaff {
+      height: 180px;
+    }
+
+    .reference-image {
+      height: 140px;
+    }
+
+    .reference-title,
+    .score {
+      margin-block: 2px;
+    }
+
+    #definitionPanel,
+    #messagePanel {
+      padding-block: 7px;
+      min-height: 38px;
+    }
+
+    #restartBtn {
+      margin-top: 5px;
+    }
+  }
+
   @media (max-width: 700px) {
     .page { width: 100%; }
     .staff-wrap { overflow-x: auto; }
-    #mysteryStaff { min-width: 900px; }
-    .reference-image { min-width: 700px; }
-    .reference-scroll { overflow-x: auto; }
+    #mysteryStaff { min-width: 0; }
+    .reference-image { min-width: 0; }
+    .reference-scroll { overflow: visible; }
   }
 </style>
 </head>
