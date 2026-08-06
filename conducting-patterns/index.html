@@ -78,6 +78,13 @@ h1{
   border:2px solid var(--gold);
   box-shadow:0 0 16px rgba(243,207,90,.28);
 }
+.meter-btn:disabled{
+  opacity:.38;
+  cursor:not-allowed;
+  color:#a6b0b9;
+  border-color:#344453;
+  box-shadow:none;
+}
 .control-block{
   margin-top:18px;
   padding-top:18px;
@@ -245,10 +252,10 @@ h1{
   <aside class="panel controls">
     <div class="section-title">CHOOSE PATTERN</div>
     <div class="meter-grid">
-      <button class="meter-btn" data-meter="2/4">2/4</button>
-      <button class="meter-btn" data-meter="3/4">3/4</button>
+      <button class="meter-btn" data-meter="2/4" disabled aria-disabled="true" title="Coming later">2/4</button>
+      <button class="meter-btn" data-meter="3/4" disabled aria-disabled="true" title="Coming later">3/4</button>
       <button class="meter-btn active" data-meter="4/4">4/4</button>
-      <button class="meter-btn" data-meter="6/8">6/8</button>
+      <button class="meter-btn" data-meter="6/8" disabled aria-disabled="true" title="Coming later">6/8</button>
     </div>
 
     <div class="control-block">
@@ -626,6 +633,7 @@ function stop(reset=true){
 
 document.querySelectorAll(".meter-btn").forEach(btn=>{
   btn.addEventListener("click",()=>{
+    if(btn.disabled) return;
     document.querySelectorAll(".meter-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     meter=btn.dataset.meter;
