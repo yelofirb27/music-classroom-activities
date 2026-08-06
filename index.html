@@ -96,7 +96,7 @@
 
     .category-tabs {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 14px;
       width: min(900px, calc(100% - 30px));
       margin: -22px auto 36px;
@@ -188,6 +188,10 @@
       background: linear-gradient(135deg, #2878b5, #18598d);
     }
 
+    .movement .section-icon {
+      background: linear-gradient(135deg, #4caf78, #268c59);
+    }
+
     .science .section-icon {
       background: linear-gradient(135deg, #25a9a2, #14746f);
     }
@@ -200,7 +204,7 @@
 
     .activity-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      grid-template-columns: repeat(3, minmax(235px, 1fr));
       gap: 18px;
     }
 
@@ -277,6 +281,16 @@
       font-size: 0.95rem;
     }
 
+    @media (max-width: 900px) {
+      .category-tabs {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .activity-grid {
+        grid-template-columns: repeat(2, minmax(235px, 1fr));
+      }
+    }
+
     @media (max-width: 760px) {
       .category-tabs {
         grid-template-columns: 1fr;
@@ -327,7 +341,8 @@
   <nav class="category-tabs" aria-label="Main categories">
     <a class="category-tab" href="#music-theory">🎼 Music Theory</a>
     <a class="category-tab" href="#instruments">🎺 Instruments</a>
-    <a class="category-tab" href="#historic-science">🔬 Historic Music &amp; Science Experiments</a>
+    <a class="category-tab" href="#movement">🚦 Movement</a>
+    <a class="category-tab" href="#music-science">🔬 Music &amp; Science</a>
   </nav>
 
   <main>
@@ -423,10 +438,28 @@
       </div>
     </section>
 
-    <section class="activity-section science" id="historic-science">
+    <section class="activity-section movement" id="movement">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">🚦</div>
+        <h2>Movement</h2>
+      </div>
+
+      <div class="activity-grid">
+        <a class="activity-card" href="./move-signals/">
+          <div class="card-icon green" aria-hidden="true">🚦</div>
+          <div class="card-body">
+            <h3>Movement Signals</h3>
+            <p>Use large color signals to guide classroom movement activities.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="activity-section science" id="music-science">
       <div class="section-title">
         <div class="section-icon" aria-hidden="true">🔬</div>
-        <h2>Historic Music &amp; Science Experiments</h2>
+        <h2>Music &amp; Science</h2>
       </div>
 
       <div class="activity-grid">
