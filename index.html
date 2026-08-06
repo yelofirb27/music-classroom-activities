@@ -3,26 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Music Classroom Activities | Brian Foley</title>
 
   <style>
     :root {
-      --navy: #16324f;
+      --navy: #102e55;
+      --navy-dark: #071a33;
       --blue: #2878b5;
-      --light-blue: #eaf6ff;
       --gold: #f6b73c;
       --coral: #ef6f6c;
       --green: #4caf78;
       --purple: #7559b7;
-      --pink: #c84d91;
-      --teal: #239b95;
+      --teal: #25a9a2;
       --cream: #fffaf0;
       --text: #203040;
       --muted: #5d6b78;
       --white: #ffffff;
       --shadow: 0 10px 28px rgba(22, 50, 79, 0.14);
-      --shadow-hover: 0 17px 38px rgba(22, 50, 79, 0.23);
     }
 
     * {
@@ -39,48 +36,44 @@
       font-family: Arial, Helvetica, sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 10% 8%, rgba(246, 183, 60, 0.20), transparent 25%),
-        radial-gradient(circle at 92% 12%, rgba(40, 120, 181, 0.17), transparent 24%),
+        radial-gradient(circle at 10% 8%, rgba(246, 183, 60, 0.19), transparent 25%),
+        radial-gradient(circle at 92% 12%, rgba(40, 120, 181, 0.16), transparent 24%),
         linear-gradient(180deg, #eef9ff 0%, #fffaf0 100%);
     }
 
-    a {
-      color: inherit;
-    }
-
-    .site-header {
+    header {
       position: relative;
       overflow: hidden;
-      padding: 42px 20px 38px;
+      padding: 40px 20px 34px;
       text-align: center;
-      color: var(--white);
-      background: linear-gradient(135deg, var(--navy), #24577f);
+      color: white;
+      background: linear-gradient(135deg, var(--navy-dark), var(--navy));
     }
 
-    .site-header::before,
-    .site-header::after {
-      content: "♪  ♫  ♩";
+    header::before,
+    header::after {
+      content: "♪ ♫ ♩";
       position: absolute;
-      white-space: nowrap;
-      font-size: clamp(56px, 8vw, 92px);
-      letter-spacing: 16px;
       opacity: 0.11;
+      font-size: clamp(58px, 8vw, 92px);
+      letter-spacing: 18px;
+      white-space: nowrap;
       pointer-events: none;
     }
 
-    .site-header::before {
-      top: -4px;
+    header::before {
+      top: -5px;
       left: 2%;
       transform: rotate(-8deg);
     }
 
-    .site-header::after {
+    header::after {
       right: 1%;
       bottom: -18px;
       transform: rotate(8deg);
     }
 
-    .header-content {
+    .header-inner {
       position: relative;
       z-index: 1;
       width: min(900px, 100%);
@@ -89,82 +82,90 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(2.25rem, 6vw, 4.3rem);
+      font-size: clamp(2.2rem, 6vw, 4.2rem);
       line-height: 1;
-      letter-spacing: -0.03em;
     }
 
     .subtitle {
-      max-width: 780px;
-      margin: 16px auto 0;
-      font-size: clamp(1rem, 2.2vw, 1.28rem);
+      max-width: 760px;
+      margin: 15px auto 0;
+      font-size: clamp(1rem, 2.2vw, 1.24rem);
       line-height: 1.55;
-      opacity: 0.96;
+      opacity: 0.95;
     }
 
-    .quick-links {
+    .category-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      width: min(900px, calc(100% - 30px));
+      margin: -22px auto 36px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .category-tab {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 23px;
-    }
-
-    .quick-links a {
-      display: inline-flex;
       align-items: center;
-      min-height: 42px;
-      padding: 10px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.42);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.12);
-      color: var(--white);
-      font-weight: 700;
+      justify-content: center;
+      min-height: 76px;
+      padding: 15px 18px;
+      border: 3px solid transparent;
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+      color: var(--navy);
+      font-size: 1.08rem;
+      font-weight: 800;
+      text-align: center;
       text-decoration: none;
-      transition: background 0.18s ease, transform 0.18s ease;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
 
-    .quick-links a:hover,
-    .quick-links a:focus-visible {
-      background: rgba(255, 255, 255, 0.22);
-      transform: translateY(-2px);
+    .category-tab:hover,
+    .category-tab:focus-visible {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 15px 34px rgba(22, 50, 79, 0.20);
       outline: none;
     }
 
     main {
       width: min(1180px, calc(100% - 30px));
-      margin: 34px auto 52px;
+      margin: 0 auto 52px;
     }
 
-    .welcome {
-      max-width: 850px;
-      margin: 0 auto 38px;
+    .choose {
+      max-width: 820px;
+      margin: 0 auto 35px;
       text-align: center;
     }
 
-    .welcome h2 {
-      margin: 0 0 10px;
+    .choose h2 {
+      margin: 0 0 9px;
       color: var(--navy);
-      font-size: clamp(1.65rem, 3vw, 2.35rem);
+      font-size: clamp(1.75rem, 3.5vw, 2.45rem);
     }
 
-    .welcome p {
+    .choose p {
       margin: 0;
       color: var(--muted);
       font-size: 1.08rem;
-      line-height: 1.62;
+      line-height: 1.6;
     }
 
     .activity-section {
-      margin-top: 42px;
-      scroll-margin-top: 20px;
+      margin-top: 44px;
+      scroll-margin-top: 18px;
     }
 
-    .section-heading {
+    .section-title {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 18px;
+      gap: 13px;
+      margin-bottom: 19px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid rgba(22, 50, 79, 0.10);
     }
 
     .section-icon {
@@ -173,153 +174,100 @@
       width: 54px;
       height: 54px;
       place-items: center;
-      border-radius: 16px;
-      color: var(--white);
+      border-radius: 15px;
+      color: white;
       font-size: 28px;
-      box-shadow: 0 7px 18px rgba(22, 50, 79, 0.17);
+      box-shadow: 0 7px 18px rgba(22, 50, 79, 0.16);
     }
 
-    .section-heading h2 {
-      margin: 0;
-      color: var(--navy);
-      font-size: clamp(1.5rem, 3vw, 2rem);
-    }
-
-    .section-heading p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      line-height: 1.4;
-    }
-
-    .reading .section-icon {
-      background: linear-gradient(135deg, var(--pink), #8c356b);
-    }
-
-    .rhythm .section-icon {
-      background: linear-gradient(135deg, var(--coral), #c94151);
-    }
-
-    .instruments .section-icon {
-      background: linear-gradient(135deg, var(--blue), #18598d);
-    }
-
-    .science .section-icon {
-      background: linear-gradient(135deg, var(--teal), #146f6b);
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
-      gap: 22px;
-    }
-
-    .card {
-      display: flex;
-      min-height: 292px;
-      flex-direction: column;
-      overflow: hidden;
-      border: 3px solid transparent;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.97);
-      box-shadow: var(--shadow);
-      color: var(--text);
-      text-decoration: none;
-      transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease;
-    }
-
-    .card:hover,
-    .card:focus-visible {
-      transform: translateY(-7px);
-      border-color: var(--gold);
-      box-shadow: var(--shadow-hover);
-      outline: none;
-    }
-
-    .card-top {
-      display: grid;
-      min-height: 122px;
-      place-items: center;
-      color: var(--white);
-      font-size: 67px;
-    }
-
-    .coral {
-      background: linear-gradient(135deg, #ef6f6c, #d8495b);
-    }
-
-    .gold {
-      background: linear-gradient(135deg, #f6b73c, #ed8f24);
-    }
-
-    .blue {
-      background: linear-gradient(135deg, #2878b5, #18598d);
-    }
-
-    .green {
-      background: linear-gradient(135deg, #4caf78, #268c59);
-    }
-
-    .purple {
+    .theory .section-icon {
       background: linear-gradient(135deg, #7559b7, #573a99);
     }
 
-    .pink {
-      background: linear-gradient(135deg, #dc63a5, #a83f80);
+    .instruments .section-icon {
+      background: linear-gradient(135deg, #2878b5, #18598d);
     }
 
-    .teal {
+    .science .section-icon {
       background: linear-gradient(135deg, #25a9a2, #14746f);
     }
 
-    .slate {
-      background: linear-gradient(135deg, #6d7a8a, #44515f);
+    .section-title h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(1.55rem, 3vw, 2.1rem);
     }
+
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+      gap: 18px;
+    }
+
+    .activity-card {
+      display: flex;
+      min-height: 205px;
+      flex-direction: column;
+      overflow: hidden;
+      border: 3px solid transparent;
+      border-radius: 19px;
+      background: white;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      text-decoration: none;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .activity-card:hover,
+    .activity-card:focus-visible {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: 0 17px 38px rgba(22, 50, 79, 0.22);
+      outline: none;
+    }
+
+    .card-icon {
+      display: grid;
+      min-height: 82px;
+      place-items: center;
+      color: white;
+      font-size: 45px;
+    }
+
+    .purple { background: linear-gradient(135deg, #7559b7, #573a99); }
+    .pink { background: linear-gradient(135deg, #dc63a5, #a83f80); }
+    .teal { background: linear-gradient(135deg, #25a9a2, #14746f); }
+    .coral { background: linear-gradient(135deg, #ef6f6c, #d8495b); }
+    .gold { background: linear-gradient(135deg, #f6b73c, #ed8f24); }
+    .blue { background: linear-gradient(135deg, #2878b5, #18598d); }
+    .green { background: linear-gradient(135deg, #4caf78, #268c59); }
+    .slate { background: linear-gradient(135deg, #6d7a8a, #44515f); }
 
     .card-body {
       display: flex;
       flex: 1;
       flex-direction: column;
-      padding: 20px 20px 18px;
+      padding: 17px 18px 16px;
     }
 
-    .card h3 {
-      margin: 0 0 9px;
+    .activity-card h3 {
+      margin: 0 0 8px;
       color: var(--navy);
-      font-size: 1.34rem;
+      font-size: 1.22rem;
+      line-height: 1.25;
     }
 
-    .card p {
+    .activity-card p {
       flex: 1;
-      margin: 0 0 18px;
-      line-height: 1.48;
+      margin: 0 0 14px;
+      color: #465565;
+      line-height: 1.45;
     }
 
-    .launch {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+    .open-label {
       align-self: flex-start;
-      min-height: 42px;
-      padding: 10px 16px;
-      border-radius: 999px;
-      background: var(--navy);
-      color: var(--white);
-      font-weight: 700;
-    }
-
-    .site-note {
-      max-width: 860px;
-      margin: 42px auto 0;
-      padding: 19px 22px;
-      border-left: 6px solid var(--gold);
-      border-radius: 14px;
-      background: var(--white);
-      box-shadow: 0 6px 18px rgba(22, 50, 79, 0.10);
-      text-align: center;
-      line-height: 1.55;
+      color: var(--blue);
+      font-weight: 800;
     }
 
     footer {
@@ -329,13 +277,29 @@
       font-size: 0.95rem;
     }
 
-    @media (max-width: 700px) {
-      .site-header {
-        padding-top: 32px;
+    @media (max-width: 760px) {
+      .category-tabs {
+        grid-template-columns: 1fr;
+        width: min(600px, calc(100% - 24px));
+        margin-top: -15px;
       }
 
-      .section-heading {
-        align-items: flex-start;
+      .category-tab {
+        min-height: 58px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      header {
+        padding-top: 30px;
+      }
+
+      main {
+        width: min(100% - 20px, 1180px);
+      }
+
+      .activity-grid {
+        grid-template-columns: 1fr;
       }
 
       .section-icon {
@@ -345,236 +309,191 @@
         font-size: 24px;
       }
     }
-
-    @media (max-width: 550px) {
-      main {
-        width: min(100% - 20px, 1180px);
-        margin-top: 25px;
-      }
-
-      .quick-links {
-        gap: 8px;
-      }
-
-      .quick-links a {
-        min-height: 39px;
-        padding: 9px 13px;
-        font-size: 0.92rem;
-      }
-
-      .activity-section {
-        margin-top: 34px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .card {
-        min-height: 250px;
-      }
-
-      .card-top {
-        min-height: 105px;
-        font-size: 58px;
-      }
-    }
   </style>
 </head>
 
 <body>
 
-  <header class="site-header">
-    <div class="header-content">
+  <header>
+    <div class="header-inner">
       <h1>Music Classroom Activities</h1>
-
       <p class="subtitle">
-        Interactive music learning resources, classroom activities,
-        and historic music-and-science explorations created by Brian Foley.
+        Interactive classroom resources for music theory, instruments,
+        and historic music-and-science experiments.
       </p>
-
-      <nav class="quick-links" aria-label="Activity categories">
-        <a href="#reading">Music Reading</a>
-        <a href="#rhythm">Rhythm &amp; Movement</a>
-        <a href="#instruments">Instruments</a>
-        <a href="#science">Music &amp; Science</a>
-      </nav>
     </div>
   </header>
 
+  <nav class="category-tabs" aria-label="Main categories">
+    <a class="category-tab" href="#music-theory">🎼 Music Theory</a>
+    <a class="category-tab" href="#instruments">🎺 Instruments</a>
+    <a class="category-tab" href="#historic-science">🔬 Historic Music &amp; Science Experiments</a>
+  </nav>
+
   <main>
 
-    <section class="welcome">
+    <section class="choose">
       <h2>Choose an Activity</h2>
       <p>
-        Open a collection below for whole-class instruction, student practice,
-        movement, rhythm, melodic reading, instrument recognition,
-        or exploration of the science behind music and sound.
+        Select a category above or choose an individual activity below.
       </p>
     </section>
 
-    <section class="activity-section reading" id="reading">
-      <div class="section-heading">
+    <section class="activity-section theory" id="music-theory">
+      <div class="section-title">
         <div class="section-icon" aria-hidden="true">🎼</div>
-        <div>
-          <h2>Music Reading &amp; Melody</h2>
-          <p>Practice pitch recognition, solfège, note reading, and melodic memory.</p>
-        </div>
+        <h2>Music Theory</h2>
       </div>
 
-      <div class="grid">
-        <a class="card" href="./melodic-reading/">
-          <div class="card-top pink" aria-hidden="true">🎵</div>
+      <div class="activity-grid">
+        <a class="activity-card" href="./melodic-reading/">
+          <div class="card-icon pink" aria-hidden="true">🎵</div>
           <div class="card-body">
             <h3>Melodic Reading</h3>
-            <p>
-              Practice solfège reading with hand signs, three-line and
-              five-line staffs, and teacher-selected pitches.
-            </p>
-            <span class="launch">Open Activity →</span>
+            <p>Practice solfège and melodic reading on three-line and five-line staffs.</p>
+            <span class="open-label">Open Activity →</span>
           </div>
         </a>
 
-        <a class="card" href="./melodic-mystery/">
-          <div class="card-top teal" aria-hidden="true">🔤</div>
+        <a class="activity-card" href="./melodic-mystery/">
+          <div class="card-icon teal" aria-hidden="true">🔤</div>
           <div class="card-body">
             <h3>Melodic Mystery</h3>
-            <p>
-              Spell mystery words by reading note names on the staff.
-              Choose treble or bass clef and learn a definition after each answer.
-            </p>
-            <span class="launch">Open Activity →</span>
+            <p>Read notes in treble or bass clef to spell mystery words.</p>
+            <span class="open-label">Open Activity →</span>
           </div>
         </a>
 
-        <a class="card" href="./recall/">
-          <div class="card-top purple" aria-hidden="true">🎶</div>
+        <a class="activity-card" href="./recall/">
+          <div class="card-icon purple" aria-hidden="true">🎶</div>
           <div class="card-body">
             <h3>Recall</h3>
-            <p>
-              Listen as a melody grows one note at a time, then repeat
-              the sequence to strengthen melodic memory.
-            </p>
-            <span class="launch">Open Activity →</span>
+            <p>Listen to an expanding melody and repeat the notes in the correct order.</p>
+            <span class="open-label">Open Activity →</span>
           </div>
         </a>
-      </div>
-    </section>
 
-    <section class="activity-section rhythm" id="rhythm">
-      <div class="section-heading">
-        <div class="section-icon" aria-hidden="true">🥁</div>
-        <div>
-          <h2>Rhythm &amp; Movement</h2>
-          <p>Create patterns, explore form, and guide active music-making.</p>
-        </div>
-      </div>
-
-      <div class="grid">
-        <a class="card" href="./body-percussion/">
-          <div class="card-top coral" aria-hidden="true">👏</div>
+        <a class="activity-card" href="./body-percussion/">
+          <div class="card-icon coral" aria-hidden="true">👏</div>
           <div class="card-body">
             <h3>Body Percussion Staff</h3>
-            <p>
-              Create and display four-beat body percussion patterns
-              using snap, clap, pat, and stamp.
-            </p>
-            <span class="launch">Open Activity →</span>
+            <p>Create four-beat patterns using snap, clap, pat, and stamp.</p>
+            <span class="open-label">Open Activity →</span>
           </div>
         </a>
 
-        <a class="card" href="./candy-bar-rondo/">
-          <div class="card-top gold" aria-hidden="true">🍫</div>
+        <a class="activity-card" href="./candy-bar-rondo/">
+          <div class="card-icon gold" aria-hidden="true">🍫</div>
           <div class="card-body">
             <h3>Candy Bar Rondo</h3>
-            <p>
-              Arrange candy-bar rhythm sections while keeping the
-              complete ABACA rondo form visible on screen.
-            </p>
-            <span class="launch">Open Activity →</span>
+            <p>Build and display an ABACA rondo using candy-bar rhythm sections.</p>
+            <span class="open-label">Open Activity →</span>
           </div>
         </a>
 
-        <a class="card" href="./move-signals/">
-          <div class="card-top green" aria-hidden="true">🚦</div>
-          <div class="card-body">
-            <h3>Movement Signals</h3>
-            <p>
-              Use large color signals for classroom movement activities,
-              controlled quickly from the keyboard.
-            </p>
-            <span class="launch">Open Activity →</span>
-          </div>
-        </a>
-
-        <a class="card" href="./rhythm-cards/">
-          <div class="card-top purple" aria-hidden="true">♩</div>
+        <a class="activity-card" href="./rhythm-cards/">
+          <div class="card-icon blue" aria-hidden="true">🥁</div>
           <div class="card-body">
             <h3>Rhythm Cards</h3>
-            <p>
-              Display interactive rhythm materials for reading,
-              practice, improvisation, and whole-class participation.
-            </p>
-            <span class="launch">Open Activity →</span>
+            <p>Use interactive rhythm cards for reading, practice, and performance.</p>
+            <span class="open-label">Open Activity →</span>
           </div>
         </a>
       </div>
     </section>
 
     <section class="activity-section instruments" id="instruments">
-      <div class="section-heading">
+      <div class="section-title">
         <div class="section-icon" aria-hidden="true">🎺</div>
-        <div>
-          <h2>Instrument Recognition</h2>
-          <p>Explore instrument families, classroom instruments, and visual identification.</p>
-        </div>
+        <h2>Instruments</h2>
       </div>
 
-      <div class="grid">
-        <a class="card" href="./instrument-matching/">
-          <div class="card-top blue" aria-hidden="true">🎻</div>
+      <div class="activity-grid">
+        <a class="activity-card" href="./instrument-matching/">
+          <div class="card-icon blue" aria-hidden="true">🎻</div>
           <div class="card-body">
-            <h3>Instrument Matching Activities</h3>
+            <h3>Instrument Matching Activity</h3>
             <p>
-              Choose from Common Band Instruments, Orff Mallet
-              Instruments, and General Music Instruments.
+              Choose from Common Band Instruments, Orff Mallet Instruments,
+              and General Music Instruments.
             </p>
-            <span class="launch">Choose a Set →</span>
+            <span class="open-label">Open Activity →</span>
           </div>
         </a>
       </div>
     </section>
 
-    <section class="activity-section science" id="science">
-      <div class="section-heading">
+    <section class="activity-section science" id="historic-science">
+      <div class="section-title">
         <div class="section-icon" aria-hidden="true">🔬</div>
-        <div>
-          <h2>Historic Music &amp; Science Experiments</h2>
-          <p>Explore landmark discoveries involving sound, vibration, pitch, rhythm, and light.</p>
-        </div>
+        <h2>Historic Music &amp; Science Experiments</h2>
       </div>
 
-      <div class="grid">
-        <a class="card" href="./music-science/">
-          <div class="card-top slate" aria-hidden="true">⚗️</div>
+      <div class="activity-grid">
+        <a class="activity-card" href="./music-science/pythagoras-monochord/index.html">
+          <div class="card-icon gold" aria-hidden="true">🎻</div>
           <div class="card-body">
-            <h3>Music &amp; Science Collection</h3>
-            <p>
-              Visit the virtual museum of historic experiments and
-              interactive simulators by Pythagoras, Galileo, Mersenne,
-              Newton, Chladni, Savart, Helmholtz, and others.
-            </p>
-            <span class="launch">Explore Experiments →</span>
+            <h3>Pythagoras Monochord</h3>
+            <p>Explore musical intervals created by simple string-length ratios.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
+
+        <a class="activity-card" href="./music-science/Galileo-Pendulum/index.html">
+          <div class="card-icon purple" aria-hidden="true">⏱️</div>
+          <div class="card-body">
+            <h3>Galileo Pendulum</h3>
+            <p>Investigate the relationship between pendulum length, period, rhythm, and time.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
+
+        <a class="activity-card" href="./music-science/mersenne-echo/index.html">
+          <div class="card-icon coral" aria-hidden="true">💥</div>
+          <div class="card-body">
+            <h3>Mersenne Sound</h3>
+            <p>Recreate an early experiment for measuring the speed of sound.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
+
+        <a class="activity-card" href="./music-science/newton-color-wheel/index.html">
+          <div class="card-icon green" aria-hidden="true">🌈</div>
+          <div class="card-body">
+            <h3>Newton Color Wheel</h3>
+            <p>Spin the visible spectrum and observe how the colors blend together.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
+
+        <a class="activity-card" href="./music-science/chladni-plates/index.html">
+          <div class="card-icon teal" aria-hidden="true">〰️</div>
+          <div class="card-body">
+            <h3>Chladni Plate</h3>
+            <p>Discover how vibration produces patterns along nodal lines.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
+
+        <a class="activity-card" href="./music-science/savart-wheel/index.html">
+          <div class="card-icon slate" aria-hidden="true">⚙️</div>
+          <div class="card-body">
+            <h3>Savart Wheel</h3>
+            <p>Explore how wheel speed and the number of teeth determine pitch.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
+
+        <a class="activity-card" href="./music-science/helmholtz-forks/index.html">
+          <div class="card-icon blue" aria-hidden="true">🔔</div>
+          <div class="card-body">
+            <h3>Helmholtz's Sympathetic Tuning Forks</h3>
+            <p>Explore resonance between two tuning forks of the same frequency.</p>
+            <span class="open-label">Explore Experiment →</span>
           </div>
         </a>
       </div>
     </section>
-
-    <div class="site-note">
-      This homepage is the central collection for your classroom resources.
-      New activities and collections can be added here as the site continues to grow.
-    </div>
 
   </main>
 
