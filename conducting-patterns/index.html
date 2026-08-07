@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -252,10 +253,10 @@ h1{
   <aside class="panel controls">
     <div class="section-title">CHOOSE PATTERN</div>
     <div class="meter-grid">
-      <button class="meter-btn" data-meter="2/4" disabled aria-disabled="true" title="Coming later">2/4</button>
-      <button class="meter-btn" data-meter="3/4" disabled aria-disabled="true" title="Coming later">3/4</button>
+      <button class="meter-btn" data-meter="2/4">2/4</button>
+      <button class="meter-btn" data-meter="3/4">3/4</button>
       <button class="meter-btn active" data-meter="4/4">4/4</button>
-      <button class="meter-btn" data-meter="6/8" disabled aria-disabled="true" title="Coming later">6/8</button>
+      <button class="meter-btn" data-meter="6/8">6/8</button>
     </div>
 
     <div class="control-block">
@@ -305,30 +306,33 @@ const embeddedImage = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAogAAANHCAY
 
 const patterns = {
   "2/4": {
-    crop:[0,82,324,338],
-    start:[126,22],
+    custom:true,
+    crop:[0,0,960,540],
+    start:[382,94],
     beats:[
-      {n:1,p:[208,270]},
-      {n:2,p:[126,22]}
+      {n:1,p:[578,296]},
+      {n:2,p:[382,94]}
     ],
+    guide:"M 382 94 C 378 185 376 282 407 337 C 438 391 520 417 578 296 C 544 344 485 357 444 326 C 405 297 391 223 382 94",
     segments:[
-      {to:[208,270], type:"cubic", c1:[130,140], c2:[150,270], beat:1},
-      {to:[126,22], type:"cubic", c1:[250,270], c2:[185,235], beat:2}
+      {to:[578,296],type:"cubic",c1:[378,220],c2:[395,390],beat:1},
+      {to:[382,94],type:"cubic",c1:[545,360],c2:[402,360],beat:2}
     ]
   },
   "3/4": {
-    crop:[324,82,324,338],
-    start:[118,24],
+    custom:true,
+    crop:[0,0,960,540],
+    start:[515,103],
     beats:[
-      {n:1,p:[120,248]},
-      {n:2,p:[270,272]},
-      {n:3,p:[265,214]}
+      {n:1,p:[515,410]},
+      {n:2,p:[755,360]},
+      {n:3,p:[515,103]}
     ],
+    guide:"M 515 103 L 515 410 C 565 375 610 365 655 377 C 700 389 722 389 755 360 C 690 360 620 310 570 235 C 540 190 522 135 515 103",
     segments:[
-      {to:[120,248],type:"line",beat:1},
-      {to:[270,272],type:"cubic",c1:[165,245],c2:[225,270],beat:2},
-      {to:[265,214],type:"cubic",c1:[300,265],c2:[300,235],beat:3},
-      {to:[118,24],type:"cubic",c1:[210,185],c2:[155,90],beat:null}
+      {to:[515,410],type:"line",beat:1},
+      {to:[755,360],type:"cubic",c1:[575,365],c2:[690,410],beat:2},
+      {to:[515,103],type:"cubic",c1:[700,360],c2:[555,235],beat:3}
     ]
   },
   "4/4": {
@@ -350,24 +354,25 @@ const patterns = {
     ]
   },
   "6/8": {
-    crop:[324,420,324,399],
-    start:[160,126],
+    custom:true,
+    crop:[0,0,960,540],
+    start:[470,134],
     beats:[
-      {n:1,p:[160,322]},
-      {n:2,p:[102,330]},
-      {n:3,p:[55,330]},
-      {n:4,p:[160,126]},
-      {n:5,p:[236,327]},
-      {n:6,p:[292,327]}
+      {n:1,p:[470,435]},
+      {n:2,p:[396,434]},
+      {n:3,p:[300,434]},
+      {n:4,p:[541,435]},
+      {n:5,p:[660,410]},
+      {n:6,p:[470,134]}
     ],
+    guide:"M 470 134 L 470 435 C 447 395 420 390 396 434 C 370 385 330 385 300 434 C 260 365 350 340 420 370 C 465 390 500 445 541 435 C 580 405 610 445 660 410 C 610 405 535 330 505 255 C 485 205 475 160 470 134",
     segments:[
-      {to:[160,322],type:"line",beat:1},
-      {to:[102,330],type:"cubic",c1:[145,300],c2:[120,300],beat:2},
-      {to:[55,330],type:"cubic",c1:[90,350],c2:[65,345],beat:3},
-      {to:[160,126],type:"cubic",c1:[30,250],c2:[100,170],beat:4},
-      {to:[236,327],type:"cubic",c1:[205,225],c2:[210,315],beat:5},
-      {to:[292,327],type:"cubic",c1:[250,350],c2:[275,345],beat:6},
-      {to:[160,126],type:"cubic",c1:[310,240],c2:[225,170],beat:null}
+      {to:[470,435],type:"line",beat:1},
+      {to:[396,434],type:"cubic",c1:[450,390],c2:[420,390],beat:2},
+      {to:[300,434],type:"cubic",c1:[375,385],c2:[330,385],beat:3},
+      {to:[541,435],type:"cubic",c1:[255,350],c2:[440,330],beat:4},
+      {to:[660,410],type:"cubic",c1:[575,395],c2:[615,445],beat:5},
+      {to:[470,134],type:"cubic",c1:[610,405],c2:[505,255],beat:6}
     ]
   }
 };
@@ -585,7 +590,7 @@ async function countIn(){
       [{transform:"scale(.75)",opacity:.4},{transform:"scale(1)",opacity:1}],
       {duration:180,easing:"ease-out"}
     );
-    await sleep(beatMs());
+    if(i > 1) await sleep(beatMs());
   }
   countdown.classList.remove("show");
   return running;
