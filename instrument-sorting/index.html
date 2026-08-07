@@ -1,534 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Instrument Cleanup</title>
 <style>
-  :root{
-    --bg:#f5ead7;
-    --wall:#f6efdF;
-    --wood:#b77442;
-    --rug1:#d95b43;
-    --rug2:#f1bd5e;
-    --rug3:#6fb7a8;
-    --rug4:#5d7fb9;
-    --ink:#263238;
-    --white:#ffffff;
-    --shadow:0 12px 30px rgba(0,0,0,.14);
-  }
-
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0}
-  body{
-    font-family: Arial, Helvetica, sans-serif;
-    color:var(--ink);
-    overflow:hidden;
-    background:linear-gradient(#f7f0e5 0 72%, #d3a16f 72% 100%);
-  }
-
-  .app{
-    height:100vh;
-    display:grid;
-    grid-template-rows:auto 1fr auto;
-  }
-
-  header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:14px 18px 10px;
-    gap:16px;
-  }
-
-  .title-wrap h1{
-    margin:0;
-    font-size:clamp(26px,3vw,44px);
-    letter-spacing:.3px;
-  }
-
-  .title-wrap p{
-    margin:3px 0 0;
-    font-size:clamp(13px,1.35vw,18px);
-    color:#52656c;
-  }
-
-  .status{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-    justify-content:flex-end;
-  }
-
-  .pill{
-    background:white;
-    border:2px solid #d7dfe2;
-    border-radius:999px;
-    padding:8px 13px;
-    font-weight:700;
-    box-shadow:0 4px 10px rgba(0,0,0,.08);
-  }
-
-  button{
-    border:none;
-    border-radius:12px;
-    padding:10px 14px;
-    font-size:15px;
-    font-weight:700;
-    cursor:pointer;
-    box-shadow:0 4px 10px rgba(0,0,0,.11);
-  }
-  .btn-primary{background:#2d7bb0;color:white}
-  .btn-secondary{background:#ffffff;color:#29404b;border:2px solid #d8e1e4}
-
-  .room{
-    position:relative;
-    min-height:0;
-    overflow:hidden;
-    padding:6px 16px 8px;
-  }
-
-  .shelf{
-    position:absolute;
-    top:8px;
-    left:4%;
-    right:4%;
-    height:54px;
-    border-radius:12px;
-    background:linear-gradient(#9f6338,#7f4c2b);
-    box-shadow:0 8px 14px rgba(79,44,19,.18);
-    opacity:.28;
-  }
-
-  .rug{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-46%);
-    width:min(66vw,920px);
-    height:min(55vh,560px);
-    border-radius:44px;
-    background:
-      radial-gradient(circle at 50% 50%, rgba(255,255,255,.14), transparent 55%),
-      repeating-linear-gradient(
-        0deg,
-        rgba(255,255,255,.08) 0 2px,
-        transparent 2px 8px
-      ),
-      linear-gradient(135deg,var(--rug1),var(--rug2) 30%,var(--rug3) 63%,var(--rug4));
-    border:10px solid #f0d49e;
-    box-shadow:var(--shadow);
-  }
-
-  .rug:before{
-    content:"";
-    position:absolute;
-    inset:18px;
-    border:5px dashed rgba(255,255,255,.5);
-    border-radius:32px;
-  }
-
-  .bin{
-    position:absolute;
-    width:190px;
-    min-height:118px;
-    background:linear-gradient(#f9fbfc,#dce9ef);
-    border:5px solid #78909c;
-    border-radius:18px 18px 28px 28px;
-    box-shadow:0 10px 18px rgba(0,0,0,.12);
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-end;
-    align-items:center;
-    padding:12px 10px 14px;
-    transition:.2s ease;
-  }
-
-  .bin:before{
-    content:"";
-    position:absolute;
-    top:-12px;
-    left:12px;
-    right:12px;
-    height:16px;
-    background:#90a4ae;
-    border-radius:10px;
-    box-shadow:0 3px 0 rgba(0,0,0,.08);
-  }
-
-  .bin.dragover{
-    transform:scale(1.05);
-    box-shadow:0 0 0 6px rgba(68,180,115,.25), 0 12px 22px rgba(0,0,0,.14);
-  }
-
-  .bin h3{
-    margin:0;
-    font-size:20px;
-  }
-
-  .bin small{
-    margin-top:4px;
-    color:#607d86;
-    font-weight:700;
-  }
-
-  .woodwinds{left:18px;top:80px;border-color:#6aa1d0}
-  .brass{right:18px;top:80px;border-color:#d6a739}
-  .strings{left:18px;bottom:18px;border-color:#a879b6}
-  .percussion{right:18px;bottom:18px;border-color:#d06e5d}
-
-  .instrument{
-    position:absolute;
-    width:98px;
-    height:98px;
-    border-radius:22px;
-    background:rgba(255,255,255,.92);
-    border:3px solid rgba(38,50,56,.15);
-    box-shadow:0 7px 15px rgba(0,0,0,.17);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:7px;
-    cursor:grab;
-    user-select:none;
-    touch-action:none;
-    transition:transform .12s ease, box-shadow .12s ease, opacity .2s;
-    z-index:10;
-  }
-
-  .instrument:hover{
-    transform:scale(1.04);
-    box-shadow:0 10px 22px rgba(0,0,0,.2);
-  }
-
-  .instrument.dragging{
-    cursor:grabbing;
-    transform:scale(1.08) rotate(2deg);
-    opacity:.92;
-    z-index:1000;
-  }
-
-  .instrument-image{
-    width:72px;
-    height:58px;
-    object-fit:contain;
-    display:block;
-    pointer-events:none;
-  }
-
-  .instrument span{
-    margin-top:2px;
-    font-size:12px;
-    font-weight:800;
-    text-align:center;
-    line-height:1.05;
-  }
-
-  .feedback{
-    position:absolute;
-    left:50%;
-    top:18px;
-    transform:translateX(-50%);
-    min-width:240px;
-    max-width:520px;
-    text-align:center;
-    background:white;
-    border-radius:999px;
-    padding:10px 18px;
-    font-weight:800;
-    box-shadow:0 8px 16px rgba(0,0,0,.11);
-    opacity:0;
-    pointer-events:none;
-    transition:.2s ease;
-    z-index:3000;
-  }
-
-  .feedback.show{opacity:1}
-  .feedback.good{color:#247248}
-  .feedback.bad{color:#b54736}
-
-  footer{
-    padding:8px 14px 12px;
-    text-align:center;
-    font-size:13px;
-    color:#5f6f74;
-  }
-
-  .win{
-    position:absolute;
-    inset:0;
-    background:rgba(28,42,50,.48);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:5000;
-  }
-
-  .win.show{display:flex}
-
-  .win-card{
-    width:min(90vw,520px);
-    background:white;
-    border-radius:28px;
-    padding:28px;
-    text-align:center;
-    box-shadow:0 20px 50px rgba(0,0,0,.25);
-  }
-
-  .win-card h2{
-    margin:0 0 8px;
-    font-size:38px;
-  }
-
-  .win-card p{
-    margin:0 0 18px;
-    font-size:18px;
-  }
-
-  @media (max-width: 900px){
-    .bin{width:155px; min-height:105px}
-    .bin h3{font-size:16px}
-    .instrument{width:84px;height:84px}
-    .instrument-image{width:62px;height:50px}
-  }
-
-  @media (max-width: 680px){
-    body{overflow:auto}
-    .app{min-height:100vh;height:auto}
-    .room{min-height:860px}
-    .rug{
-      width:84vw;
-      height:520px;
-      top:48%;
-    }
-    .woodwinds{left:8px;top:70px}
-    .brass{right:8px;top:70px}
-    .strings{left:8px;bottom:12px}
-    .percussion{right:8px;bottom:12px}
-    .bin{width:42vw;max-width:175px}
-  }
+:root{--ink:#263238;--shadow:0 10px 25px rgba(0,0,0,.16)}
+*{box-sizing:border-box} html,body{height:100%;margin:0}
+body{font-family:Arial,Helvetica,sans-serif;color:var(--ink);overflow:hidden;background:linear-gradient(#f7f0e5 0 72%,#d3a16f 72% 100%)}
+.app{height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 18px 8px;gap:14px;background:rgba(255,255,255,.38)}
+h1{margin:0;font-size:clamp(25px,2.8vw,40px)} .subtitle{margin:2px 0 0;color:#5b6b70;font-size:clamp(12px,1.2vw,17px)}
+.status{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.pill{background:#fff;border:2px solid #d7dfe2;border-radius:999px;padding:7px 12px;font-weight:800;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+button{border:none;border-radius:11px;padding:9px 13px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+.primary{background:#2d7bb0;color:white}.secondary{background:white;color:#29404b;border:2px solid #d8e1e4}
+.room{position:relative;min-height:0;overflow:hidden;padding:0 14px 6px}
+.rug{position:absolute;left:50%;top:50%;transform:translate(-50%,-48%);width:min(72vw,1050px);height:min(64vh,610px);border-radius:42px;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.14),transparent 54%),repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 2px,transparent 2px 8px),linear-gradient(135deg,#d95b43,#f1bd5e 31%,#6fb7a8 64%,#5d7fb9);border:9px solid #f0d49e;box-shadow:var(--shadow)}
+.rug:before{content:"";position:absolute;inset:15px;border:4px dashed rgba(255,255,255,.47);border-radius:29px}
+.bin{position:absolute;width:170px;height:105px;background:linear-gradient(#fbfcfd,#dce9ef);border:5px solid #78909c;border-radius:18px 18px 28px 28px;box-shadow:0 9px 18px rgba(0,0,0,.13);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px;transition:.18s ease;z-index:3}
+.bin:before{content:"";position:absolute;top:-11px;left:10px;right:10px;height:15px;background:#90a4ae;border-radius:9px}
+.bin h3{margin:0;font-size:21px;letter-spacing:.6px}.bin.dragover{transform:scale(1.055);box-shadow:0 0 0 6px rgba(68,180,115,.25),0 12px 22px rgba(0,0,0,.14)}
+.woodwind{left:14px;top:16px;border-color:#6aa1d0}.brass{right:14px;top:16px;border-color:#d6a739}.string{left:14px;bottom:14px;border-color:#a879b6}.percussion{right:14px;bottom:14px;border-color:#d06e5d}
+.instrument{position:absolute;width:76px;height:88px;border-radius:15px;background:rgba(255,255,255,.96);border:2px solid rgba(38,50,56,.14);box-shadow:0 6px 13px rgba(0,0,0,.17);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:5px 5px 6px;cursor:grab;user-select:none;touch-action:none;transition:transform .1s ease,box-shadow .1s ease,opacity .2s;z-index:10}
+.instrument:hover{transform:scale(1.04);box-shadow:0 9px 18px rgba(0,0,0,.2)}.instrument.dragging{cursor:grabbing;transform:scale(1.09) rotate(2deg);opacity:.94;z-index:1000}
+.instrument img{width:100%;height:60px;object-fit:contain;pointer-events:none}.instrument span{height:17px;margin-top:2px;font-size:10.5px;font-weight:800;text-align:center;line-height:1.02;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.feedback{position:absolute;left:50%;top:8px;transform:translateX(-50%);min-width:240px;max-width:520px;text-align:center;background:white;border-radius:999px;padding:9px 17px;font-weight:800;box-shadow:0 8px 16px rgba(0,0,0,.11);opacity:0;pointer-events:none;transition:.18s;z-index:3000}.feedback.show{opacity:1}.good{color:#247248}.bad{color:#b54736}
+.win{position:absolute;inset:0;background:rgba(28,42,50,.5);display:none;align-items:center;justify-content:center;z-index:5000}.win.show{display:flex}.win-card{width:min(90vw,520px);background:white;border-radius:27px;padding:27px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25)}.win-card h2{margin:0 0 8px;font-size:37px}.win-card p{margin:0 0 18px;font-size:18px}
+footer{padding:6px 12px 9px;text-align:center;font-size:12px;color:#5f6f74}
+@media(max-width:1000px){.bin{width:145px;height:92px}.bin h3{font-size:17px}.instrument{width:68px;height:81px}.instrument img{height:54px}.instrument span{font-size:9.5px}.rug{width:70vw}}
+@media(max-width:700px){body{overflow:auto}.app{min-height:100vh;height:auto}.room{min-height:920px}.rug{width:90vw;height:650px;top:50%}.bin{width:40vw;max-width:160px}.woodwind{left:6px}.brass{right:6px}.string{left:6px}.percussion{right:6px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <div class="title-wrap">
-      <h1>Instrument Cleanup</h1>
-      <p>Put each instrument away in the correct family box.</p>
-    </div>
-    <div class="status">
-      <div class="pill">Put Away: <span id="score">0</span>/<span id="total">0</span></div>
-      <button class="btn-secondary" id="reshuffleBtn">Shuffle</button>
-      <button class="btn-primary" id="restartBtn">Restart</button>
-    </div>
-  </header>
-
-  <main class="room" id="room">
-    <div class="shelf"></div>
-    <div class="rug" id="rug"></div>
-
-    <div class="feedback" id="feedback"></div>
-
-    <section class="bin woodwinds" data-family="Woodwinds">
-      <h3>WOODWINDS</h3><small>Flute • Clarinet • Saxophone</small>
-    </section>
-
-    <section class="bin brass" data-family="Brass">
-      <h3>BRASS</h3><small>Trumpet • Horn • Trombone • Tuba</small>
-    </section>
-
-    <section class="bin strings" data-family="Strings">
-      <h3>STRINGS</h3><small>Violin • Cello • Bass</small>
-    </section>
-
-    <section class="bin percussion" data-family="Percussion">
-      <h3>PERCUSSION</h3><small>Drums • Cymbals • Triangle • Xylophone</small>
-    </section>
-
-    <div class="win" id="win">
-      <div class="win-card">
-        <h2>Music Room Clean!</h2>
-        <p>You put every instrument in the correct family.</p>
-        <button class="btn-primary" id="playAgainBtn">Play Again</button>
-      </div>
-    </div>
-  </main>
-
-  <footer>Drag with a mouse or finger. If an instrument goes in the wrong box, it returns to the rug.</footer>
-</div>
-
+<header><div><h1>Instrument Cleanup</h1><p class="subtitle">Put each instrument away in the correct family box.</p></div><div class="status"><div class="pill">Put Away: <span id="score">0</span>/<span id="total">0</span></div><button class="secondary" id="shuffleBtn">Shuffle</button><button class="primary" id="restartBtn">Restart</button></div></header>
+<main class="room" id="room"><div class="rug" id="rug"></div><div class="feedback" id="feedback"></div>
+<section class="bin woodwind" data-family="Woodwind"><h3>WOODWIND</h3></section>
+<section class="bin brass" data-family="Brass"><h3>BRASS</h3></section>
+<section class="bin string" data-family="String"><h3>STRING</h3></section>
+<section class="bin percussion" data-family="Percussion"><h3>PERCUSSION</h3></section>
+<div class="win" id="win"><div class="win-card"><h2>Music Room Clean!</h2><p>You put every instrument in the correct family.</p><button class="primary" id="playAgainBtn">Play Again</button></div></div>
+</main><footer>Drag with a mouse or finger. A wrong choice returns the instrument to the rug.</footer></div>
 <script>
-const instruments = [
-  {name:"Flute", family:"Woodwinds", image:"images/flute.png"},
-  {name:"Clarinet", family:"Woodwinds", image:"images/clarinet.png"},
-  {name:"Saxophone", family:"Woodwinds", image:"images/saxophone.png"},
-  {name:"Trumpet", family:"Brass", image:"images/trumpet.png"},
-  {name:"French Horn", family:"Brass", image:"images/french-horn.png"},
-  {name:"Trombone", family:"Brass", image:"images/trombone.png"},
-  {name:"Tuba", family:"Brass", image:"images/tuba.png"},
-  {name:"Violin", family:"Strings", image:"images/violin.png"},
-  {name:"Cello", family:"Strings", image:"images/cello.png"},
-  {name:"Double Bass", family:"Strings", image:"images/double-bass.png"},
-  {name:"Snare Drum", family:"Percussion", image:"images/snare-drum.png"},
-  {name:"Cymbals", family:"Percussion", image:"images/cymbals.png"},
-  {name:"Triangle", family:"Percussion", image:"images/triangle.png"},
-  {name:"Timpani", family:"Percussion", image:"images/timpani.png"},
-  {name:"Xylophone", family:"Percussion", image:"images/xylophone.png"}
-];
-
-const room = document.getElementById("room");
-const rug = document.getElementById("rug");
-const scoreEl = document.getElementById("score");
-const totalEl = document.getElementById("total");
-const feedback = document.getElementById("feedback");
-const win = document.getElementById("win");
-
-let placed = 0;
-let dragItem = null;
-let offsetX = 0, offsetY = 0;
-let originalPos = null;
-
-totalEl.textContent = instruments.length;
-
-function makeInstrument(inst){
-  const el = document.createElement("div");
-  el.className = "instrument";
-  el.dataset.family = inst.family;
-  el.dataset.name = inst.name;
-  el.innerHTML = `<img class="instrument-image" src="${inst.image}" alt="${inst.name}"><span>${inst.name}</span>`;
-  room.appendChild(el);
-
-  el.addEventListener("pointerdown", startDrag);
-  return el;
-}
-
-function rugBounds(){
-  const rr = rug.getBoundingClientRect();
-  const roomRect = room.getBoundingClientRect();
-  return {
-    left: rr.left - roomRect.left + 34,
-    top: rr.top - roomRect.top + 34,
-    right: rr.right - roomRect.left - 132,
-    bottom: rr.bottom - roomRect.top - 132
-  };
-}
-
-function randomizePositions(){
-  const bounds = rugBounds();
-  const els = [...document.querySelectorAll(".instrument:not(.put-away)")];
-  const positions = [];
-  els.forEach(el=>{
-    let x,y,tries=0;
-    do{
-      x = bounds.left + Math.random() * Math.max(10, bounds.right - bounds.left);
-      y = bounds.top + Math.random() * Math.max(10, bounds.bottom - bounds.top);
-      tries++;
-    }while(positions.some(p => Math.hypot(p.x-x,p.y-y) < 82) && tries < 60);
-    positions.push({x,y});
-    el.style.left = x+"px";
-    el.style.top = y+"px";
-  });
-}
-
-function resetGame(){
-  document.querySelectorAll(".instrument").forEach(el=>el.remove());
-  placed = 0;
-  scoreEl.textContent = placed;
-  win.classList.remove("show");
-  instruments.forEach(makeInstrument);
-  setTimeout(randomizePositions,50);
-}
-
-function showFeedback(text,good){
-  feedback.textContent = text;
-  feedback.className = "feedback show " + (good ? "good" : "bad");
-  clearTimeout(showFeedback.timer);
-  showFeedback.timer = setTimeout(()=>feedback.className="feedback",1100);
-}
-
-function startDrag(e){
-  const el = e.currentTarget;
-  if(el.classList.contains("put-away")) return;
-  dragItem = el;
-  const rect = el.getBoundingClientRect();
-  const roomRect = room.getBoundingClientRect();
-  offsetX = e.clientX - rect.left;
-  offsetY = e.clientY - rect.top;
-  originalPos = {left:el.style.left, top:el.style.top};
-  el.classList.add("dragging");
-  el.setPointerCapture(e.pointerId);
-  el.addEventListener("pointermove", moveDrag);
-  el.addEventListener("pointerup", endDrag);
-  el.addEventListener("pointercancel", endDrag);
-}
-
-function moveDrag(e){
-  if(!dragItem) return;
-  const roomRect = room.getBoundingClientRect();
-  let x = e.clientX - roomRect.left - offsetX;
-  let y = e.clientY - roomRect.top - offsetY;
-  x = Math.max(0, Math.min(roomRect.width - dragItem.offsetWidth, x));
-  y = Math.max(0, Math.min(roomRect.height - dragItem.offsetHeight, y));
-  dragItem.style.left = x+"px";
-  dragItem.style.top = y+"px";
-
-  document.querySelectorAll(".bin").forEach(bin=>{
-    const b = bin.getBoundingClientRect();
-    const inside = e.clientX>=b.left && e.clientX<=b.right && e.clientY>=b.top && e.clientY<=b.bottom;
-    bin.classList.toggle("dragover",inside);
-  });
-}
-
-function endDrag(e){
-  if(!dragItem) return;
-  const el = dragItem;
-  const bins = [...document.querySelectorAll(".bin")];
-  const target = bins.find(bin=>{
-    const b = bin.getBoundingClientRect();
-    return e.clientX>=b.left && e.clientX<=b.right && e.clientY>=b.top && e.clientY<=b.bottom;
-  });
-
-  bins.forEach(b=>b.classList.remove("dragover"));
-
-  if(target){
-    if(target.dataset.family === el.dataset.family){
-      showFeedback(`✓ ${el.dataset.name} belongs in ${el.dataset.family}!`,true);
-      el.classList.add("put-away");
-      el.style.opacity = "0";
-      el.style.transform = "scale(.7)";
-      setTimeout(()=>el.style.display="none",220);
-      placed++;
-      scoreEl.textContent = placed;
-      if(placed === instruments.length){
-        setTimeout(()=>win.classList.add("show"),500);
-      }
-    }else{
-      showFeedback(`Try another box for the ${el.dataset.name}.`,false);
-      el.style.left = originalPos.left;
-      el.style.top = originalPos.top;
-    }
-  }else{
-    el.style.left = originalPos.left;
-    el.style.top = originalPos.top;
-  }
-
-  el.classList.remove("dragging");
-  el.releasePointerCapture?.(e.pointerId);
-  el.removeEventListener("pointermove", moveDrag);
-  el.removeEventListener("pointerup", endDrag);
-  el.removeEventListener("pointercancel", endDrag);
-  dragItem = null;
-}
-
-document.getElementById("restartBtn").addEventListener("click",resetGame);
-document.getElementById("reshuffleBtn").addEventListener("click",randomizePositions);
-document.getElementById("playAgainBtn").addEventListener("click",resetGame);
-
-window.addEventListener("resize",()=>setTimeout(randomizePositions,80));
-
-resetGame();
-</script>
-</body>
-</html>
+const instruments = [{"name": "Cornet", "family": "Brass", "image": "images/Brass_Cornet_Gold.png"}, {"name": "Cornet", "family": "Brass", "image": "images/Brass_Cornet_Silver.png"}, {"name": "French Horn", "family": "Brass", "image": "images/Brass_French_Horn_Gold.png"}, {"name": "French Horn", "family": "Brass", "image": "images/Brass_French_Horn_Silver.png"}, {"name": "Sousaphone", "family": "Brass", "image": "images/Brass_Sousaphone_1.png"}, {"name": "Sousaphone", "family": "Brass", "image": "images/Brass_Sousaphone_2.png"}, {"name": "Trombone", "family": "Brass", "image": "images/Brass_Trombone_Gold.png"}, {"name": "Trombone", "family": "Brass", "image": "images/Brass_Trombone_Silver.png"}, {"name": "Trumpet", "family": "Brass", "image": "images/Brass_Trumpet_Gold.png"}, {"name": "Trumpet", "family": "Brass", "image": "images/Brass_Trumpet_Silver.png"}, {"name": "Tuba", "family": "Brass", "image": "images/Brass_Tuba.png"}, {"name": "Tuba", "family": "Brass", "image": "images/Brass_Tuba_Silver.png"}, {"name": "Bass Clarinet", "family": "Woodwind", "image": "images/Wind_Bass_Clarinet.png"}, {"name": "Bassoon", "family": "Woodwind", "image": "images/Wind_Bassoon.png"}, {"name": "Clarinet", "family": "Woodwind", "image": "images/Wind_Clarinet.png"}, {"name": "Contrabassoon", "family": "Woodwind", "image": "images/Wind_Contrabassoon.png"}, {"name": "English Horn", "family": "Woodwind", "image": "images/Wind_English_Horn.png"}, {"name": "Flute", "family": "Woodwind", "image": "images/Wind_Flute.png"}, {"name": "Oboe", "family": "Woodwind", "image": "images/Wind_Oboe.png"}, {"name": "Piccolo", "family": "Woodwind", "image": "images/Wind_Piccolo_1.png"}, {"name": "Piccolo", "family": "Woodwind", "image": "images/Wind_Piccolo_2.png"}, {"name": "Saxophone", "family": "Woodwind", "image": "images/O_Saxophone.png"}, {"name": "Harp", "family": "String", "image": "images/O_Harp.png"}, {"name": "Cello", "family": "String", "image": "images/Strings_Cello.png"}, {"name": "Viola", "family": "String", "image": "images/Strings_Viola.png"}, {"name": "Violin", "family": "String", "image": "images/Strings_Violin.png"}, {"name": "Violin", "family": "String", "image": "images/Strings_Violin_2.png"}, {"name": "Double Bass", "family": "String", "image": "images/strings_bass.png"}, {"name": "Bass Drum", "family": "Percussion", "image": "images/Percussion_Bass_Drum.png"}, {"name": "Cymbals", "family": "Percussion", "image": "images/Percussion_Cymbals.png"}, {"name": "Gong", "family": "Percussion", "image": "images/Percussion_Gong.png"}, {"name": "Marimba", "family": "Percussion", "image": "images/Percussion_Marimba.png"}, {"name": "Snare Drum", "family": "Percussion", "image": "images/Percussion_Snare_Drum.png"}, {"name": "Tambourine", "family": "Percussion", "image": "images/Percussion_Tambourine.png"}, {"name": "Timpani", "family": "Percussion", "image": "images/Percussion_Timpani_Drum_.png"}, {"name": "Triangle", "family": "Percussion", "image": "images/Percussion_Triangle.png"}, {"name": "Tubular Bells", "family": "Percussion", "image": "images/Percussion_Tubular_Bells.png"}, {"name": "Vibraphone", "family": "Percussion", "image": "images/Percussion_Vibraphone.png"}, {"name": "Xylophone", "family": "Percussion", "image": "images/Percussion_Xylophone.png"}];
+const room=document.getElementById('room'), rug=document.getElementById('rug'), scoreEl=document.getElementById('score'), totalEl=document.getElementById('total'), feedback=document.getElementById('feedback'), win=document.getElementById('win');
+let placed=0,dragItem=null,offsetX=0,offsetY=0,originalPos=null; totalEl.textContent=instruments.length;
+function makeInstrument(inst){const el=document.createElement('div');el.className='instrument';el.dataset.family=inst.family;el.dataset.name=inst.name;el.innerHTML=`<img src="${inst.image}" alt="${inst.name}"><span>${inst.name}</span>`;room.appendChild(el);el.addEventListener('pointerdown',startDrag);return el}
+function rugBounds(){const rr=rug.getBoundingClientRect(),r=room.getBoundingClientRect();return{left:rr.left-r.left+28,top:rr.top-r.top+28,right:rr.right-r.left-104,bottom:rr.bottom-r.top-116}}
+function randomizePositions(){const b=rugBounds(),els=[...document.querySelectorAll('.instrument:not(.put-away)')],pos=[];els.forEach(el=>{let x,y,t=0;do{x=b.left+Math.random()*Math.max(10,b.right-b.left);y=b.top+Math.random()*Math.max(10,b.bottom-b.top);t++}while(pos.some(p=>Math.abs(p.x-x)<66&&Math.abs(p.y-y)<75)&&t<180);pos.push({x,y});el.style.left=x+'px';el.style.top=y+'px'})}
+function resetGame(){document.querySelectorAll('.instrument').forEach(e=>e.remove());placed=0;scoreEl.textContent=0;win.classList.remove('show');instruments.forEach(makeInstrument);setTimeout(randomizePositions,60)}
+function showFeedback(text,good){feedback.textContent=text;feedback.className='feedback show '+(good?'good':'bad');clearTimeout(showFeedback.timer);showFeedback.timer=setTimeout(()=>feedback.className='feedback',1000)}
+function startDrag(e){const el=e.currentTarget;if(el.classList.contains('put-away'))return;dragItem=el;const rect=el.getBoundingClientRect();offsetX=e.clientX-rect.left;offsetY=e.clientY-rect.top;originalPos={left:el.style.left,top:el.style.top};el.classList.add('dragging');el.setPointerCapture(e.pointerId);el.addEventListener('pointermove',moveDrag);el.addEventListener('pointerup',endDrag);el.addEventListener('pointercancel',endDrag)}
+function moveDrag(e){if(!dragItem)return;const r=room.getBoundingClientRect();let x=e.clientX-r.left-offsetX,y=e.clientY-r.top-offsetY;x=Math.max(0,Math.min(r.width-dragItem.offsetWidth,x));y=Math.max(0,Math.min(r.height-dragItem.offsetHeight,y));dragItem.style.left=x+'px';dragItem.style.top=y+'px';document.querySelectorAll('.bin').forEach(bin=>{const b=bin.getBoundingClientRect();bin.classList.toggle('dragover',e.clientX>=b.left&&e.clientX<=b.right&&e.clientY>=b.top&&e.clientY<=b.bottom)})}
+function endDrag(e){if(!dragItem)return;const el=dragItem,bins=[...document.querySelectorAll('.bin')],target=bins.find(bin=>{const b=bin.getBoundingClientRect();return e.clientX>=b.left&&e.clientX<=b.right&&e.clientY>=b.top&&e.clientY<=b.bottom});bins.forEach(b=>b.classList.remove('dragover'));if(target){if(target.dataset.family===el.dataset.family){showFeedback(`✓ ${el.dataset.name} belongs in ${el.dataset.family}!`,true);el.classList.add('put-away');el.style.opacity='0';el.style.transform='scale(.7)';setTimeout(()=>el.style.display='none',210);placed++;scoreEl.textContent=placed;if(placed===instruments.length)setTimeout(()=>win.classList.add('show'),450)}else{showFeedback(`Try another box for the ${el.dataset.name}.`,false);el.style.left=originalPos.left;el.style.top=originalPos.top}}else{el.style.left=originalPos.left;el.style.top=originalPos.top}el.classList.remove('dragging');el.releasePointerCapture?.(e.pointerId);el.removeEventListener('pointermove',moveDrag);el.removeEventListener('pointerup',endDrag);el.removeEventListener('pointercancel',endDrag);dragItem=null}
+document.getElementById('restartBtn').onclick=resetGame;document.getElementById('shuffleBtn').onclick=randomizePositions;document.getElementById('playAgainBtn').onclick=resetGame;window.addEventListener('resize',()=>setTimeout(randomizePositions,90));resetGame();
+</script></body></html>
