@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Milk and Cookie Build-a-Rhythm</title>
+
+<style>
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #222;
+    font-family: Arial, Helvetica, sans-serif;
+    touch-action: none;
+  }
+
+  .stage-wrap {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+  }
+
+  #stage {
+    position: relative;
+    width: min(100vw, calc(100vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    background: url("background.png") center / 100% 100% no-repeat;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Four original white rhythm boxes */
+  .box {
+    position: absolute;
+    top: 33.0%;
+    width: 20.2%;
+    height: 33.7%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  #box1 { left: 5.55%; }
+  #box2 { left: 28.43%; }
+  #box3 { left: 51.35%; }
+  #box4 { left: 74.15%; }
+
+  .box.has-item {
+    cursor: pointer;
+  }
+
+  .box.hover {
+    outline: 5px solid rgba(255, 40, 40, .75);
+    outline-offset: -5px;
+  }
+
+  .placed {
+    max-width: 72%;
+    max-height: 78%;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.16));
+  }
+
+  /* Drag-source zones */
+  .source {
+    position: absolute;
+    z-index: 8;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .source:active {
+    cursor: grabbing;
+  }
+
+  /* Cookie remains part of the background artwork;
+     this invisible zone makes it draggable. */
+  #cookieSource {
+    left: 23.4%;
+    top: 72.5%;
+    width: 14.4%;
+    height: 24.8%;
+  }
+
+  #cookieSource img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Milk is NOT in the background.
+     This is the one and only visible milk artwork. */
+  #milkSource {
+    left: 62.6%;
+    top: 68.0%;
+    width: 13.8%;
+    height: 29.5%;
+  }
+
+  #milkSource img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 1;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.12));
+  }
+
+  #dragGhost {
+    position: absolute;
+    z-index: 50;
+    display: none;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    filter: drop-shadow(0 5px 5px rgba(0,0,0,.24));
+  }
+
+  #dragGhost.cookie { width: 11.2%; }
+  #dragGhost.milk { width: 10.5%; }
+
+  #resetBtn {
+    position: absolute;
+    z-index: 20;
+    right: 1.4%;
+    bottom: 2.3%;
+    border: 3px solid #e31718;
+    background: rgba(255,255,255,.97);
+    color: #e31718;
+    font-size: clamp(14px, 2vw, 25px);
+    font-weight: 800;
+    padding: .45em .85em;
+    border-radius: .55em;
+    cursor: pointer;
+    box-shadow: 0 3px 7px rgba(0,0,0,.22);
+  }
+
+  #resetBtn:hover { transform: scale(1.03); }
+  #resetBtn:active { transform: scale(.98); }
+</style>
+</head>
+
+<body>
+<div class="stage-wrap">
+  <main id="stage" aria-label="If You Give a Mouse a Cookie Milk and Cookie Build-a-Rhythm">
+
+    <div class="box" id="box1"></div>
+    <div class="box" id="box2"></div>
+    <div class="box" id="box3"></div>
+    <div class="box" id="box4"></div>
+
+    <div class="source" id="cookieSource" data-type="cookie" aria-label="Cookie">
+      <img src="cookie.png" alt="">
+    </div>
+
+    <div class="source" id="milkSource" data-type="milk" aria-label="Milk">
+      <img src="milk.png" alt="Milk carton and glass">
+    </div>
+
+    <button id="resetBtn" type="button">RESET</button>
+
+    <img id="dragGhost" alt="">
+  </main>
+</div>
+
+<script>
+(() => {
+  const stage = document.getElementById("stage");
+  const boxes = [...document.querySelectorAll(".box")];
+  const sources = [...document.querySelectorAll(".source")];
+  const ghost = document.getElementById("dragGhost");
+  const resetBtn = document.getElementById("resetBtn");
+
+  let dragging = null;
+
+  function imageFor(type) {
+    return type === "cookie" ? "cookie.png" : "milk.png";
+  }
+
+  function getBoxAt(clientX, clientY) {
+    for (const box of boxes) {
+      const r = box.getBoundingClientRect();
+      if (
+        clientX >= r.left &&
+        clientX <= r.right &&
+        clientY >= r.top &&
+        clientY <= r.bottom
+      ) {
+        return box;
+      }
+    }
+    return null;
+  }
+
+  function moveGhost(e) {
+    if (!dragging) return;
+
+    e.preventDefault();
+
+    const rect = stage.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    ghost.style.left = x + "%";
+    ghost.style.top = y + "%";
+
+    boxes.forEach(box => box.classList.remove("hover"));
+
+    const target = getBoxAt(e.clientX, e.clientY);
+    if (target) target.classList.add("hover");
+  }
+
+  function startDrag(e, type) {
+    e.preventDefault();
+
+    dragging = {
+      type,
+      pointerId: e.pointerId
+    };
+
+    ghost.src = imageFor(type);
+    ghost.className = type;
+    ghost.style.display = "block";
+
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch (_) {}
+
+    moveGhost(e);
+  }
+
+  function endDrag(e) {
+    if (!dragging) return;
+
+    const target = getBoxAt(e.clientX, e.clientY);
+
+    if (target) {
+      target.innerHTML = "";
+
+      const placed = document.createElement("img");
+      placed.src = imageFor(dragging.type);
+      placed.className = "placed";
+      placed.alt = dragging.type === "cookie" ? "Cookie" : "Milk";
+      target.appendChild(placed);
+      target.classList.add("has-item");
+    }
+
+    boxes.forEach(box => box.classList.remove("hover"));
+    ghost.style.display = "none";
+    ghost.removeAttribute("src");
+    ghost.className = "";
+    dragging = null;
+  }
+
+  sources.forEach(source => {
+    source.addEventListener("pointerdown", e => {
+      startDrag(e, source.dataset.type);
+    });
+  });
+
+  window.addEventListener("pointermove", moveGhost, { passive: false });
+  window.addEventListener("pointerup", endDrag, { passive: false });
+  window.addEventListener("pointercancel", endDrag, { passive: false });
+
+  /* Click/tap one occupied box to remove only that item.
+     The blank box can then function as a silent rest. */
+  boxes.forEach(box => {
+    box.addEventListener("click", () => {
+      if (box.querySelector(".placed")) {
+        box.innerHTML = "";
+        box.classList.remove("has-item");
+      }
+    });
+  });
+
+  resetBtn.addEventListener("click", () => {
+    boxes.forEach(box => {
+      box.innerHTML = "";
+      box.classList.remove("hover", "has-item");
+    });
+  });
+})();
+</script>
+</body>
+</html>
