@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>The Very Hungry Caterpillar Rhythm</title>
 
 <style>
@@ -12,36 +12,44 @@
     margin: 0;
     width: 100%;
     height: 100%;
+    min-height: 100%;
     overflow: hidden;
     font-family: Arial, Helvetica, sans-serif;
     background: #ffffff;
+    overscroll-behavior: none;
   }
 
   body {
     user-select: none;
     -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
   }
 
   .stage {
     position: relative;
     width: 100vw;
     height: 100vh;
-    background:
-      #ffffff
-      url("assets/background-polished.png")
-      center center / contain
-      no-repeat;
+    height: 100dvh;
+    background: #ffffff;
     overflow: hidden;
   }
 
-  /* Exact 16:9 coordinate space matching the background artwork */
+  /* The background and all clickable hotspots share the exact same 16:9 box.
+     This keeps everything lined up on iPhone, iPad, Chromebook, and touch displays. */
   .canvas {
     position: absolute;
-    width: min(100vw, calc(100vh * 16 / 9));
-    height: min(100vh, calc(100vw * 9 / 16));
+    width: min(100vw, calc(100dvh * 16 / 9));
+    height: min(100dvh, calc(100vw * 9 / 16));
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    background:
+      #ffffff
+      url("assets/background-polished.png")
+      center center / 100% 100%
+      no-repeat;
+    overflow: hidden;
   }
 
   /* Clickable basket area only */
@@ -258,10 +266,143 @@
     font-size: clamp(11px, .95vw, 16px);
     font-weight: 700;
   }
+
+  @media (hover: none), (pointer: coarse) {
+    .basket-hotspot:hover::after,
+    .plate-slot.has-food:hover::after {
+      content: none;
+    }
+
+    .basket-hotspot,
+    .plate-slot,
+    .food-choice,
+    .reset,
+    .close {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .reset,
+    .close {
+      min-height: 42px;
+      min-width: 64px;
+    }
+  }
+
+  .rotate-message {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: #fffaf0;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 28px;
+  }
+
+  .rotate-card {
+    max-width: 420px;
+    background: #fff;
+    border: 3px solid #111;
+    border-radius: 22px;
+    padding: 28px 24px;
+    box-shadow: 0 14px 32px rgba(0,0,0,.18);
+  }
+
+  .rotate-icon {
+    font-size: 54px;
+    margin-bottom: 12px;
+  }
+
+  .rotate-card h2 {
+    margin: 0 0 10px;
+    font-size: 26px;
+  }
+
+  .rotate-card p {
+    margin: 0;
+    font-size: 17px;
+    line-height: 1.4;
+  }
+
+  /* Phones use landscape so the game board stays large and readable. */
+  @media (orientation: portrait) and (max-width: 600px) {
+    .rotate-message {
+      display: flex;
+    }
+  }
+
+  /* Tablet portrait remains usable, with a taller chooser grid. */
+  @media (orientation: portrait) and (min-width: 601px) {
+    .chooser {
+      width: 96%;
+      max-height: 88%;
+      overflow-y: auto;
+    }
+
+    .food-grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+    }
+  }
+
+  /* Compact landscape phones: keep all choices visible and tappable. */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .chooser {
+      width: 96%;
+      max-height: 94%;
+      overflow-y: auto;
+      padding: 1% 1.2%;
+    }
+
+    .chooser-head {
+      margin-bottom: .5%;
+    }
+
+    .chooser-title {
+      font-size: 18px;
+    }
+
+    .chooser-sub {
+      font-size: 11px;
+    }
+
+    .food-grid {
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .food-choice {
+      padding: 3px;
+    }
+
+    .food-choice span {
+      font-size: 9px;
+    }
+
+    .next-plate {
+      margin-top: 5px;
+      font-size: 11px;
+    }
+
+    .reset {
+      padding: 5px 10px;
+    }
+  }
+
 </style>
 </head>
 
 <body>
+<div class="rotate-message" aria-live="polite">
+  <div class="rotate-card">
+    <div class="rotate-icon" aria-hidden="true">📱↔️</div>
+    <h2>Turn your phone sideways</h2>
+    <p>The Very Hungry Caterpillar activity works best in landscape view.</p>
+  </div>
+</div>
+
 <div class="stage">
   <div class="canvas">
 
