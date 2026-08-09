@@ -123,10 +123,6 @@
     outline: 5px solid rgba(255, 40, 40, .75);
     outline-offset: -5px;
   }
-
-  .box.has-item {
-    cursor: pointer;
-  }
 </style>
 </head>
 <body>
@@ -213,7 +209,6 @@
       placed.className = "placed";
       placed.alt = dragging.type === "cookie" ? "Cookie" : "Milk";
       target.appendChild(placed);
-      target.classList.add("has-item");
     }
 
     boxes.forEach(box => box.classList.remove("hover"));
@@ -233,22 +228,10 @@
   window.addEventListener("pointermove", moveGhost, { passive: false });
   window.addEventListener("pointerup", endDrag, { passive: false });
 
-
-  // Click or tap an occupied box to remove only that cookie or milk.
-  // The empty box then functions visually like a silent rest.
-  boxes.forEach(box => {
-    box.addEventListener("click", () => {
-      if (box.querySelector(".placed")) {
-        box.innerHTML = "";
-        box.classList.remove("has-item");
-      }
-    });
-  });
-
   resetBtn.addEventListener("click", () => {
     boxes.forEach(box => {
       box.innerHTML = "";
-      box.classList.remove("hover", "has-item");
+      box.classList.remove("hover");
     });
   });
 })();
