@@ -4,15 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Very Hungry Caterpillar Rhythm</title>
+
 <style>
   * { box-sizing: border-box; }
+
   html, body {
     margin: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
     font-family: Arial, Helvetica, sans-serif;
-    background: #fff;
+    background: #ffffff;
   }
 
   body {
@@ -24,11 +26,15 @@
     position: relative;
     width: 100vw;
     height: 100vh;
-    background: #fff url("assets/background.png") center center / contain no-repeat;
+    background:
+      #ffffff
+      url("assets/background-polished.png")
+      center center / contain
+      no-repeat;
     overflow: hidden;
   }
 
-  /* This inner canvas always matches the exact 16:9 proportions of the background PNG. */
+  /* Exact 16:9 coordinate space matching the background artwork */
   .canvas {
     position: absolute;
     width: min(100vw, calc(100vh * 16 / 9));
@@ -38,10 +44,11 @@
     transform: translate(-50%, -50%);
   }
 
+  /* Clickable basket area only */
   .basket-hotspot {
     position: absolute;
     left: 1.5%;
-    top: .5%;
+    top: 0.5%;
     width: 33.5%;
     height: 46.5%;
     cursor: pointer;
@@ -52,10 +59,10 @@
     content: "Click to choose a food";
     position: absolute;
     left: 50%;
-    bottom: 8%;
+    bottom: 7%;
     transform: translateX(-50%);
     white-space: nowrap;
-    background: rgba(255,255,255,.94);
+    background: rgba(255,255,255,.96);
     border: 1.5px solid #111;
     border-radius: 999px;
     padding: 5px 11px;
@@ -64,6 +71,7 @@
     pointer-events: none;
   }
 
+  /* Plate targets line up with the four plates already in the background */
   .plate-slot {
     position: absolute;
     width: 20.9%;
@@ -84,7 +92,7 @@
     bottom: 4%;
     transform: translateX(-50%);
     white-space: nowrap;
-    background: rgba(255,255,255,.94);
+    background: rgba(255,255,255,.95);
     border: 1px solid #111;
     border-radius: 999px;
     padding: 4px 8px;
@@ -92,7 +100,7 @@
     z-index: 10;
   }
 
-  /* The selected item appears on a small white vocabulary card on the plate. */
+  /* White card placed on each plate */
   .plate-card {
     position: absolute;
     left: 50%;
@@ -142,11 +150,13 @@
     cursor: pointer;
     box-shadow: 0 3px 0 rgba(0,0,0,.18);
   }
+
   .reset:active {
     transform: translateY(2px);
     box-shadow: 0 1px 0 rgba(0,0,0,.18);
   }
 
+  /* Food chooser appears ONLY after clicking the basket */
   .chooser-backdrop {
     position: absolute;
     inset: 0;
@@ -156,7 +166,10 @@
     align-items: center;
     justify-content: center;
   }
-  .chooser-backdrop.open { display: flex; }
+
+  .chooser-backdrop.open {
+    display: flex;
+  }
 
   .chooser {
     width: 91%;
@@ -195,7 +208,7 @@
     cursor: pointer;
   }
 
-  /* All 14 options visible at once: two rows of seven cards. */
+  /* 14 foods: two rows of seven, all visible at once */
   .food-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -245,18 +258,18 @@
     font-size: clamp(11px, .95vw, 16px);
     font-weight: 700;
   }
-
-  @media (max-aspect-ratio: 4/3) {
-    .chooser { width: 94%; }
-    .food-grid { gap: 6px; }
-    .food-choice span { font-size: clamp(8px, .9vw, 12px); }
-  }
 </style>
 </head>
+
 <body>
 <div class="stage">
   <div class="canvas">
-    <div class="basket-hotspot" id="basketHotspot" aria-label="Open the food basket"></div>
+
+    <div
+      class="basket-hotspot"
+      id="basketHotspot"
+      aria-label="Open the food basket">
+    </div>
 
     <div class="plate-slot" data-i="0"></div>
     <div class="plate-slot" data-i="1"></div>
@@ -266,19 +279,31 @@
     <button class="reset" id="resetBtn" type="button">RESET</button>
 
     <div class="chooser-backdrop" id="chooserBackdrop">
-      <div class="chooser" role="dialog" aria-modal="true" aria-label="Choose a food">
+      <div
+        class="chooser"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Choose a food">
+
         <div class="chooser-head">
           <div>
             <div class="chooser-title">Choose a food</div>
-            <div class="chooser-sub">Click one card. You may choose the same food more than once.</div>
+            <div class="chooser-sub">
+              Click one card. You may choose the same food more than once.
+            </div>
           </div>
-          <button class="close" id="closeChooser" type="button">CLOSE</button>
+
+          <button class="close" id="closeChooser" type="button">
+            CLOSE
+          </button>
         </div>
 
         <div class="food-grid" id="foodGrid"></div>
+
         <div class="next-plate" id="nextPlateText"></div>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -309,16 +334,20 @@ const resetBtn = document.getElementById("resetBtn");
 const nextPlateText = document.getElementById("nextPlateText");
 
 function firstEmptyPlateIndex() {
-  return plates.findIndex(p => !p.querySelector(".plate-card"));
+  return plates.findIndex(
+    plate => !plate.querySelector(".plate-card")
+  );
 }
 
 function updateNextPlateText() {
   const i = firstEmptyPlateIndex();
+
   if (i === -1) {
     nextPlateText.textContent =
       "All four plates are filled. Click a plate to remove its card if you want to change it.";
   } else {
-    nextPlateText.textContent = `This choice will go on plate ${i + 1}.`;
+    nextPlateText.textContent =
+      `This choice will go on plate ${i + 1}.`;
   }
 }
 
@@ -333,29 +362,43 @@ function hideChooser() {
 
 function addCardToPlate(plate, label, src) {
   const existing = plate.querySelector(".plate-card");
-  if (existing) existing.remove();
+
+  if (existing) {
+    existing.remove();
+  }
 
   const card = document.createElement("div");
   card.className = "plate-card";
+
   card.innerHTML = `
     <img src="${src}" alt="${label}">
     <div class="label">${label}</div>
   `;
+
   plate.appendChild(card);
   plate.classList.add("has-food");
 }
 
+/* Basket opens food choices */
 basket.addEventListener("click", openChooser);
+
+/* Close chooser */
 closeChooser.addEventListener("click", hideChooser);
 
-chooserBackdrop.addEventListener("click", e => {
-  if (e.target === chooserBackdrop) hideChooser();
+/* Click outside chooser closes it */
+chooserBackdrop.addEventListener("click", event => {
+  if (event.target === chooserBackdrop) {
+    hideChooser();
+  }
 });
 
+/* Build the 14 food cards */
 foods.forEach(([label, src]) => {
   const card = document.createElement("button");
+
   card.type = "button";
   card.className = "food-choice";
+
   card.innerHTML = `
     <img src="${src}" alt="${label}">
     <span>${label}</span>
@@ -369,16 +412,24 @@ foods.forEach(([label, src]) => {
       return;
     }
 
-    addCardToPlate(plates[targetIndex], label, src);
+    addCardToPlate(
+      plates[targetIndex],
+      label,
+      src
+    );
+
+    /* One choice at a time, like Candy Rondo */
     hideChooser();
   });
 
   foodGrid.appendChild(card);
 });
 
+/* Clicking an occupied plate removes its food card */
 plates.forEach(plate => {
   plate.addEventListener("click", () => {
     const card = plate.querySelector(".plate-card");
+
     if (card) {
       card.remove();
       plate.classList.remove("has-food");
@@ -386,14 +437,21 @@ plates.forEach(plate => {
   });
 });
 
+/* RESET clears all four plates */
 resetBtn.addEventListener("click", () => {
   plates.forEach(plate => {
     const card = plate.querySelector(".plate-card");
-    if (card) card.remove();
+
+    if (card) {
+      card.remove();
+    }
+
     plate.classList.remove("has-food");
   });
+
   hideChooser();
 });
 </script>
+
 </body>
 </html>
