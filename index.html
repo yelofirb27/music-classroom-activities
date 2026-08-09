@@ -87,7 +87,7 @@
     }
 
     .subtitle {
-      max-width: 760px;
+      max-width: 820px;
       margin: 15px auto 0;
       font-size: clamp(1rem, 2.2vw, 1.24rem);
       line-height: 1.55;
@@ -96,9 +96,9 @@
 
     .category-tabs {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 14px;
-      width: min(900px, calc(100% - 30px));
+      width: min(1080px, calc(100% - 30px));
       margin: -22px auto 36px;
       position: relative;
       z-index: 2;
@@ -109,13 +109,13 @@
       align-items: center;
       justify-content: center;
       min-height: 76px;
-      padding: 15px 18px;
+      padding: 15px 14px;
       border: 3px solid transparent;
       border-radius: 18px;
       background: white;
       box-shadow: var(--shadow);
       color: var(--navy);
-      font-size: 1.08rem;
+      font-size: 1.03rem;
       font-weight: 800;
       text-align: center;
       text-decoration: none;
@@ -194,6 +194,10 @@
 
     .science .section-icon {
       background: linear-gradient(135deg, #25a9a2, #14746f);
+    }
+
+    .literature .section-icon {
+      background: linear-gradient(135deg, #dc63a5, #a83f80);
     }
 
     .section-title h2 {
@@ -281,11 +285,13 @@
       font-size: 0.95rem;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 1050px) {
       .category-tabs {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
+    }
 
+    @media (max-width: 900px) {
       .activity-grid {
         grid-template-columns: repeat(2, minmax(235px, 1fr));
       }
@@ -332,8 +338,8 @@
     <div class="header-inner">
       <h1>Music Classroom Activities</h1>
       <p class="subtitle">
-        Interactive classroom resources for music theory, instruments,
-        and historic music-and-science experiments.
+        Interactive classroom resources for music theory, instruments, movement,
+        children’s literature, and music-and-science exploration.
       </p>
     </div>
   </header>
@@ -342,6 +348,7 @@
     <a class="category-tab" href="#music-theory">🎼 Music Theory</a>
     <a class="category-tab" href="#instruments">🎺 Instruments</a>
     <a class="category-tab" href="#movement">🚦 Movement</a>
+    <a class="category-tab" href="#childrens-literature">📚 Children’s Literature</a>
     <a class="category-tab" href="#music-science">🔬 Music &amp; Science</a>
   </nav>
 
@@ -447,37 +454,51 @@
       </div>
     </section>
 
-<section class="activity-section movement" id="movement">
-  <div class="section-title">
-    <div class="section-icon" aria-hidden="true">🚦</div>
-    <h2>Movement</h2>
-  </div>
-
-  <div class="activity-grid">
-
-    <a class="activity-card" href="./move-signals/">
-      <div class="card-icon green" aria-hidden="true">🚦</div>
-
-      <div class="card-body">
-        <h3>Movement Signals</h3>
-        <p>Use large color signals to guide classroom movement activities.</p>
-        <span class="open-label">Open Activity →</span>
+    <section class="activity-section movement" id="movement">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">🚦</div>
+        <h2>Movement</h2>
       </div>
-    </a>
 
-    <a class="activity-card" href="./conducting-patterns/">
-      <div class="card-icon green" aria-hidden="true">🎼</div>
+      <div class="activity-grid">
+        <a class="activity-card" href="./move-signals/">
+          <div class="card-icon green" aria-hidden="true">🚦</div>
+          <div class="card-body">
+            <h3>Movement Signals</h3>
+            <p>Use large color signals to guide classroom movement activities.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-      <div class="card-body">
-        <h3>Conducting Patterns</h3>
-        <p>Practice standard conducting patterns with synchronized visual cues and metronome clicks.</p>
-        <span class="open-label">Open Activity →</span>
+        <a class="activity-card" href="./conducting-patterns/">
+          <div class="card-icon green" aria-hidden="true">🎼</div>
+          <div class="card-body">
+            <h3>Conducting Patterns</h3>
+            <p>Practice standard conducting patterns with synchronized visual cues and metronome clicks.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
       </div>
-    </a>
+    </section>
 
-  </div>
-</section>
-    
+    <section class="activity-section literature" id="childrens-literature">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">📚</div>
+        <h2>Children’s Literature</h2>
+      </div>
+
+      <div class="activity-grid">
+        <a class="activity-card" href="./give-a-mouse/">
+          <div class="card-icon pink" aria-hidden="true">🍪</div>
+          <div class="card-body">
+            <h3>If You Give a Mouse A Cookie Milk and Cookie Build-a-Rhythm</h3>
+            <p>Build four-part rhythm patterns by arranging milk and cookie pictures inspired by the story.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
     <section class="activity-section science" id="music-science">
       <div class="section-title">
         <div class="section-icon" aria-hidden="true">🔬</div>
