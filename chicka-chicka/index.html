@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Chicka Chicka Boom Boom Body and Letters</title>
+  <style>
+    :root {
+      --gold: #f4b733;
+      --pink: #d4498b;
+      --ink: #311326;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #8f6622;
+      font-family: "Arial Rounded MT Bold", "Trebuchet MS", Arial, sans-serif;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      background: linear-gradient(180deg, #b47a1d, #7c5218);
+    }
+
+    .stage-wrap {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 8px;
+    }
+
+    .stage {
+      position: relative;
+      width: min(100%, calc((100vh - 74px) * 16 / 9));
+      aspect-ratio: 16 / 9;
+      max-height: 100%;
+      overflow: hidden;
+      container-type: inline-size;
+      background: #fff url("chicka-background.png") center / 100% 100% no-repeat;
+      box-shadow: 0 10px 36px rgba(49, 19, 38, 0.35);
+      cursor: pointer;
+      outline: none;
+    }
+
+    .stage:focus-visible {
+      box-shadow: 0 0 0 5px #ffffff, 0 0 0 10px var(--pink), 0 10px 36px rgba(49, 19, 38, 0.35);
+    }
+
+    .letter {
+      --start-x: 49%;
+      --landing-x: 49%;
+      --start-y: 26%;
+      --ground-y: 76%;
+      position: absolute;
+      z-index: 4;
+      left: var(--start-x);
+      top: var(--start-y);
+      display: grid;
+      place-items: center;
+      width: 0.82em;
+      height: 1em;
+      color: var(--letter-color, #ef3340);
+      font-family: "Arial Black", "Arial Rounded MT Bold", Arial, sans-serif;
+      font-size: clamp(58px, 12cqw, 132px);
+      font-weight: 900;
+      line-height: 1;
+      -webkit-text-stroke: 0.018em rgba(75, 22, 48, 0.22);
+      text-shadow:
+        0.025em 0.045em 0 rgba(255, 255, 255, 0.7),
+        0.065em 0.09em 0 rgba(70, 28, 24, 0.24);
+      transform: translate(-50%, -50%) rotate(-9deg) scale(0.55);
+      transform-origin: 50% 100%;
+      will-change: left, top, transform;
+      pointer-events: none;
+    }
+
+    .letter.falling {
+      animation: letter-drop 1.25s cubic-bezier(.22, .8, .26, 1) forwards;
+    }
+
+    .letter.leaving {
+      animation: letter-away 0.16s ease-in forwards;
+    }
+
+    @keyframes letter-drop {
+      0% {
+        left: var(--start-x);
+        top: var(--start-y);
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(-12deg) scale(0.42);
+      }
+      7% {
+        opacity: 1;
+      }
+      67% {
+        left: var(--landing-x);
+        top: calc(var(--ground-y) - 5%);
+        transform: translate(-50%, -50%) rotate(7deg) scale(1);
+      }
+      82% {
+        left: var(--landing-x);
+        top: calc(var(--ground-y) + 1.5%);
+        transform: translate(-50%, -100%) rotate(-3deg) scale(1.08, 0.88);
+      }
+      91% {
+        top: calc(var(--ground-y) - 1.5%);
+        transform: translate(-50%, -100%) rotate(1deg) scale(0.98, 1.03);
+      }
+      100% {
+        left: var(--landing-x);
+        top: var(--ground-y);
+        opacity: 1;
+        transform: translate(-50%, -100%) rotate(0deg) scale(1);
+      }
+    }
+
+    @keyframes letter-away {
+      to {
+        opacity: 0;
+        transform: translate(-50%, -100%) scale(0.65);
+      }
+    }
+
+    .controls {
+      min-height: 66px;
+      padding: 8px max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: var(--gold);
+      border-top: 5px dotted var(--pink);
+      color: var(--ink);
+    }
+
+    .instruction {
+      margin: 0;
+      font-size: clamp(14px, 2.4vw, 21px);
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .key {
+      display: inline-block;
+      min-width: 5.8em;
+      margin: 0 0.15em;
+      padding: 0.28em 0.55em;
+      border: 2px solid #ad346d;
+      border-bottom-width: 5px;
+      border-radius: 10px;
+      background: #fff7dd;
+      color: #8a2157;
+      letter-spacing: 0.04em;
+    }
+
+    .drop-button {
+      min-height: 46px;
+      padding: 10px 18px;
+      border: 0;
+      border-bottom: 5px solid #861e56;
+      border-radius: 15px;
+      background: var(--pink);
+      color: #fff;
+      font: 900 17px/1 "Arial Rounded MT Bold", "Trebuchet MS", Arial, sans-serif;
+      cursor: pointer;
+    }
+
+    .drop-button:active {
+      transform: translateY(3px);
+      border-bottom-width: 2px;
+    }
+
+    .status {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 680px), (max-height: 520px) {
+      .app {
+        grid-template-rows: minmax(0, 1fr) auto;
+      }
+
+      .controls {
+        min-height: 54px;
+        padding-top: 5px;
+        padding-bottom: max(5px, env(safe-area-inset-bottom));
+      }
+
+      .instruction .desktop-only {
+        display: none;
+      }
+
+      .drop-button {
+        min-height: 40px;
+        padding: 8px 14px;
+        font-size: 15px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .letter.falling {
+        animation-duration: 0.35s;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="stage-wrap">
+      <section
+        id="stage"
+        class="stage"
+        tabindex="0"
+        role="button"
+        aria-label="Letter tree. Press the space bar or tap to drop the next capital letter."
+      >
+        <p id="status" class="status" aria-live="polite">Ready for letter A.</p>
+      </section>
+    </div>
+
+    <div class="controls">
+      <p class="instruction">
+        <span class="desktop-only">Press <span class="key">SPACE BAR</span> or </span>tap the picture
+      </p>
+      <button id="dropButton" class="drop-button" type="button">DROP LETTER</button>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+      const colors = [
+        "#ef3340", "#ff8c00", "#7b2cff", "#1689e5", "#12a85b",
+        "#e33c9a", "#f2c500", "#00a6a6", "#ff5d2e", "#6247d7",
+        "#0f9d58", "#ed1c24", "#0099e6"
+      ];
+
+      const stage = document.getElementById("stage");
+      const dropButton = document.getElementById("dropButton");
+      const status = document.getElementById("status");
+      let nextIndex = 0;
+      let currentLetter = null;
+      let busy = false;
+
+      function dropNextLetter() {
+        if (busy) return;
+        busy = true;
+
+        if (currentLetter) {
+          currentLetter.remove();
+          currentLetter = null;
+        }
+
+        const character = alphabet[nextIndex];
+        const letter = document.createElement("div");
+        const landingX = 47 + ((nextIndex % 5) - 2) * 1.15;
+
+        letter.className = "letter falling";
+        letter.textContent = character;
+        letter.setAttribute("aria-hidden", "true");
+        letter.style.setProperty("--letter-color", colors[nextIndex % colors.length]);
+        letter.style.setProperty("--landing-x", `${landingX}%`);
+        stage.appendChild(letter);
+        currentLetter = letter;
+
+        status.textContent = `Capital letter ${character} is falling from the tree.`;
+        nextIndex = (nextIndex + 1) % alphabet.length;
+
+        let finished = false;
+        const finishDrop = () => {
+          if (finished || currentLetter !== letter) return;
+          finished = true;
+          status.textContent = `Capital letter ${character} is on the ground. Ready for letter ${alphabet[nextIndex]}.`;
+          busy = false;
+        };
+
+        letter.addEventListener("animationend", finishDrop, { once: true });
+
+        window.setTimeout(() => {
+          finishDrop();
+        }, 1500);
+      }
+
+      window.addEventListener("keydown", (event) => {
+        if (event.code !== "Space" || event.repeat) return;
+        event.preventDefault();
+        dropNextLetter();
+      });
+
+      stage.addEventListener("click", dropNextLetter);
+      dropButton.addEventListener("click", dropNextLetter);
+      stage.focus({ preventScroll: true });
+    })();
+  </script>
+</body>
+</html>
