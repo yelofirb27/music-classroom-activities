@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Harold and the Purple Crayon - Melodic Adventures</title>
+<style>
+  :root{
+    --purple:#7430a6;
+    --purple-dark:#54207e;
+    --paper:#fff;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif}
+  body{display:grid;place-items:center;touch-action:none}
+
+  #stage{
+    position:relative;
+    width:min(100vw, calc(100vh * 16 / 9));
+    height:min(100vh, calc(100vw * 9 / 16));
+    aspect-ratio:16/9;
+    background:#fff url('activity-background.png') center/100% 100% no-repeat;
+    overflow:hidden;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+
+  /* Main white story area from the mockup. */
+  #drawingArea{
+    position:absolute;
+    left:28.4%;
+    top:7.7%;
+    width:68.4%;
+    height:54.4%;
+    overflow:hidden;
+    touch-action:none;
+  }
+
+  #pathSvg,#drawCanvas{position:absolute;inset:0;width:100%;height:100%}
+  #pathSvg{overflow:visible;pointer-events:none}
+  #drawCanvas{display:none;cursor:crosshair;touch-action:none}
+
+  #guidePath{
+    fill:none;
+    stroke:var(--purple);
+    stroke-width:8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    filter:drop-shadow(0 1px 0 rgba(0,0,0,.08));
+  }
+
+  #crayonMarker{
+    position:absolute;
+    width:64px;
+    height:18px;
+    border-radius:10px 4px 4px 10px;
+    background:linear-gradient(90deg,#5e2194 0 12%,#9f69c6 12% 80%,#6f2aa4 80% 100%);
+    transform:translate(-14px,-9px) rotate(-12deg);
+    transform-origin:14px 9px;
+    pointer-events:none;
+    opacity:0;
+    box-shadow:0 2px 4px rgba(0,0,0,.15);
+  }
+  #crayonMarker::before{
+    content:"";position:absolute;left:-15px;top:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:16px solid #54207e;
+  }
+
+  #prompt{
+    position:absolute;
+    left:50%;top:3%;transform:translateX(-50%);
+    max-width:70%;
+    padding:.55em 1em;
+    border:2px solid var(--purple);
+    border-radius:18px;
+    background:rgba(255,255,255,.95);
+    color:var(--purple-dark);
+    font-weight:800;
+    font-size:clamp(14px,1.45vw,26px);
+    text-align:center;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  #prompt.show{opacity:1}
+
+  #controls{
+    position:absolute;
+    right:2%;top:2.4%;
+    display:flex;gap:.45rem;
+    opacity:0;pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  #controls.show{opacity:1;pointer-events:auto}
+  .controlBtn{
+    border:2px solid var(--purple);
+    background:#fff;
+    color:var(--purple-dark);
+    border-radius:999px;
+    padding:.5em .9em;
+    font-weight:800;
+    font-size:clamp(12px,1.05vw,18px);
+    cursor:pointer;
+  }
+  .controlBtn:active{transform:scale(.97)}
+
+  /* Transparent hit zones over the seven printed cards on the background. */
+  .adventure{
+    position:absolute;
+    top:66.9%;
+    height:20.1%;
+    border:0;
+    background:transparent;
+    cursor:pointer;
+    border-radius:14px;
+    touch-action:manipulation;
+  }
+  .adventure:hover,.adventure:focus-visible{outline:4px solid rgba(116,48,166,.28);outline-offset:-4px}
+  #mountainBtn{left:1.7%;width:13.8%}
+  #oceanBtn{left:16.6%;width:13.7%}
+  #rollerBtn{left:31.3%;width:12.2%}
+  #slideBtn{left:44.6%;width:12.2%}
+  #flatBtn{left:57.9%;width:12.5%}
+  #stairsBtn{left:71.5%;width:12.7%}
+  #drawBtn{left:85.1%;width:13.0%}
+
+  #drawingModeBanner{
+    position:absolute;
+    left:29%;bottom:13.4%;
+    padding:.45em .8em;
+    border-radius:999px;
+    color:#fff;
+    background:rgba(84,32,126,.93);
+    font-size:clamp(12px,1vw,17px);
+    font-weight:700;
+    opacity:0;pointer-events:none;
+  }
+  #drawingModeBanner.show{opacity:1}
+
+  @media (max-aspect-ratio: 4/5){
+    body{background:#fff}
+  }
+</style>
+</head>
+<body>
+<div id="stage" aria-label="Harold and the Purple Crayon melodic contour activity">
+  <div id="drawingArea">
+    <svg id="pathSvg" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
+      <path id="guidePath" d=""></path>
+    </svg>
+    <canvas id="drawCanvas"></canvas>
+    <div id="crayonMarker" aria-hidden="true"></div>
+    <div id="prompt"></div>
+    <div id="controls">
+      <button id="playBtn" class="controlBtn" type="button">▶ Play Again</button>
+      <button id="clearBtn" class="controlBtn" type="button">↺ Clear</button>
+    </div>
+  </div>
+
+  <button class="adventure" id="mountainBtn" aria-label="Harold Draws a Mountain"></button>
+  <button class="adventure" id="oceanBtn" aria-label="Harold Draws Ocean Waves"></button>
+  <button class="adventure" id="rollerBtn" aria-label="Harold Draws a Roller Coaster"></button>
+  <button class="adventure" id="slideBtn" aria-label="Harold Draws a Slide"></button>
+  <button class="adventure" id="flatBtn" aria-label="Harold Draws Flat Ground"></button>
+  <button class="adventure" id="stairsBtn" aria-label="Harold Draws Stairs"></button>
+  <button class="adventure" id="drawBtn" aria-label="Draw Your Own Adventure"></button>
+  <div id="drawingModeBanner">Draw your own purple path — then have the class follow it with their voices!</div>
+</div>
+
+<script>
+(() => {
+  const svg = document.getElementById('pathSvg');
+  const path = document.getElementById('guidePath');
+  const crayon = document.getElementById('crayonMarker');
+  const prompt = document.getElementById('prompt');
+  const controls = document.getElementById('controls');
+  const playBtn = document.getElementById('playBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const canvas = document.getElementById('drawCanvas');
+  const area = document.getElementById('drawingArea');
+  const drawingModeBanner = document.getElementById('drawingModeBanner');
+
+  let animationFrame = null;
+  let currentAdventure = null;
+  let drawing = false;
+  let ctx;
+
+  const adventures = {
+    mountain: {
+      label:'Mountain',
+      prompt:'Follow the mountain with your voice: LOW → HIGH → LOW',
+      d:'M 30 420 L 150 420 L 360 90 L 570 420 L 960 420',
+      duration:6500
+    },
+    ocean: {
+      label:'Ocean Waves',
+      prompt:'Let your voice rise and fall smoothly with the ocean waves.',
+      d:'M 20 290 C 90 130,160 130,230 290 S 370 450,440 290 S 580 130,650 290 S 790 450,860 290 S 950 145,985 250',
+      duration:7600
+    },
+    roller: {
+      label:'Roller Coaster',
+      prompt:'Hold on! Follow every hill, drop, and loop with your voice.',
+      d:'M 20 360 C 120 360,120 120,235 120 C 320 120,320 340,395 340 C 470 340,440 180,530 180 C 620 180,635 420,530 420 C 425 420,420 215,540 215 C 675 215,670 345,745 345 C 835 345,850 145,980 145',
+      duration:9000
+    },
+    slide: {
+      label:'Slide',
+      prompt:'Start HIGH and let your voice slide all the way DOWN.',
+      d:'M 70 85 L 240 85 C 390 85,410 390,650 400 C 770 405,880 405,970 405',
+      duration:5600
+    },
+    flat: {
+      label:'Flat Ground',
+      prompt:'Keep your voice on the SAME pitch all the way across.',
+      d:'M 35 300 L 970 300',
+      duration:5000
+    },
+    stairs: {
+      label:'Stairs',
+      prompt:'Move your voice one step at a time: UP, UP, UP!',
+      d:'M 40 410 L 170 410 L 170 350 L 300 350 L 300 290 L 430 290 L 430 230 L 560 230 L 560 170 L 690 170 L 690 110 L 970 110',
+      duration:7200
+    }
+  };
+
+  function stopAnimation(){
+    if(animationFrame) cancelAnimationFrame(animationFrame);
+    animationFrame = null;
+  }
+
+  function resetPremadeVisual(){
+    stopAnimation();
+    path.style.strokeDasharray = '';
+    path.style.strokeDashoffset = '';
+    crayon.style.opacity = '0';
+  }
+
+  function selectAdventure(name){
+    exitDrawingMode();
+    currentAdventure = adventures[name];
+    path.setAttribute('d', currentAdventure.d);
+    prompt.textContent = currentAdventure.prompt;
+    prompt.classList.add('show');
+    controls.classList.add('show');
+    playBtn.style.display='inline-block';
+    clearBtn.textContent='↺ Clear';
+    animateCurrent();
+  }
+
+  function animateCurrent(){
+    if(!currentAdventure) return;
+    stopAnimation();
+    svg.style.display='block';
+    canvas.style.display='none';
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = `${len} ${len}`;
+    path.style.strokeDashoffset = `${len}`;
+    crayon.style.opacity='1';
+    const start = performance.now();
+
+    function tick(now){
+      const p = Math.min(1,(now-start)/currentAdventure.duration);
+      path.style.strokeDashoffset = `${len*(1-p)}`;
+      const pt = path.getPointAtLength(len*p);
+      crayon.style.left = `${pt.x/10}%`;
+      crayon.style.top = `${pt.y/5}%`;
+      if(p < 1){
+        animationFrame = requestAnimationFrame(tick);
+      } else {
+        animationFrame = null;
+        crayon.style.opacity='0';
+      }
+    }
+    animationFrame=requestAnimationFrame(tick);
+  }
+
+  function clearAll(){
+    stopAnimation();
+    if(canvas.style.display==='block'){
+      fitCanvas();
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+    } else {
+      path.setAttribute('d','');
+      crayon.style.opacity='0';
+      prompt.classList.remove('show');
+      controls.classList.remove('show');
+      currentAdventure=null;
+    }
+  }
+
+  function fitCanvas(){
+    const r=canvas.getBoundingClientRect();
+    const dpr=Math.max(1,window.devicePixelRatio||1);
+    canvas.width=Math.round(r.width*dpr);
+    canvas.height=Math.round(r.height*dpr);
+    ctx=canvas.getContext('2d');
+    ctx.scale(dpr,dpr);
+    ctx.lineWidth=Math.max(5,r.width*0.007);
+    ctx.lineCap='round';
+    ctx.lineJoin='round';
+    ctx.strokeStyle='#7430a6';
+  }
+
+  function enterDrawingMode(){
+    stopAnimation();
+    currentAdventure=null;
+    path.setAttribute('d','');
+    svg.style.display='none';
+    canvas.style.display='block';
+    fitCanvas();
+    prompt.textContent='Create your own melodic adventure with the purple crayon!';
+    prompt.classList.add('show');
+    controls.classList.add('show');
+    playBtn.style.display='none';
+    clearBtn.textContent='↺ Clear Drawing';
+    drawingModeBanner.classList.add('show');
+  }
+
+  function exitDrawingMode(){
+    drawing=false;
+    drawingModeBanner.classList.remove('show');
+    canvas.style.display='none';
+    svg.style.display='block';
+  }
+
+  function pointFromEvent(e){
+    const r=canvas.getBoundingClientRect();
+    return {x:e.clientX-r.left,y:e.clientY-r.top};
+  }
+  canvas.addEventListener('pointerdown',e=>{
+    drawing=true;
+    canvas.setPointerCapture(e.pointerId);
+    const p=pointFromEvent(e);
+    ctx.beginPath();ctx.moveTo(p.x,p.y);
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!drawing) return;
+    const p=pointFromEvent(e);
+    ctx.lineTo(p.x,p.y);ctx.stroke();
+  });
+  canvas.addEventListener('pointerup',()=>drawing=false);
+  canvas.addEventListener('pointercancel',()=>drawing=false);
+
+  document.getElementById('mountainBtn').onclick=()=>selectAdventure('mountain');
+  document.getElementById('oceanBtn').onclick=()=>selectAdventure('ocean');
+  document.getElementById('rollerBtn').onclick=()=>selectAdventure('roller');
+  document.getElementById('slideBtn').onclick=()=>selectAdventure('slide');
+  document.getElementById('flatBtn').onclick=()=>selectAdventure('flat');
+  document.getElementById('stairsBtn').onclick=()=>selectAdventure('stairs');
+  document.getElementById('drawBtn').onclick=enterDrawingMode;
+  playBtn.onclick=animateCurrent;
+  clearBtn.onclick=clearAll;
+
+  window.addEventListener('resize',()=>{
+    if(canvas.style.display==='block') fitCanvas();
+  });
+})();
+</script>
+</body>
+</html>
