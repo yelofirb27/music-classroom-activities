@@ -65,29 +65,44 @@
     content:"";position:absolute;left:-15px;top:0;border-top:9px solid transparent;border-bottom:9px solid transparent;border-right:16px solid #54207e;
   }
 
-  #prompt{
+  /* Top action row lives ABOVE the drawing area so the animated crayon never crosses it. */
+  #topActionRow{
     position:absolute;
-    left:50%;top:3%;transform:translateX(-50%);
-    max-width:70%;
-    padding:.55em 1em;
+    left:31.2%;
+    top:1.25%;
+    width:66.3%;
+    height:5.6%;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    align-items:center;
+    gap:clamp(6px,.8vw,14px);
+    z-index:20;
+    pointer-events:none;
+  }
+
+  #prompt{
+    min-width:0;
+    padding:.42em .8em;
     border:2px solid var(--purple);
-    border-radius:18px;
-    background:rgba(255,255,255,.95);
+    border-radius:14px;
+    background:rgba(255,255,255,.98);
     color:var(--purple-dark);
     font-weight:800;
-    font-size:clamp(14px,1.45vw,26px);
+    font-size:clamp(12px,1.12vw,20px);
     text-align:center;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
     opacity:0;
-    pointer-events:none;
     transition:opacity .2s ease;
   }
   #prompt.show{opacity:1}
 
   #controls{
-    position:absolute;
-    right:2%;top:2.4%;
-    display:flex;gap:.45rem;
-    opacity:0;pointer-events:none;
+    display:flex;
+    align-items:center;
+    gap:clamp(6px,.55vw,10px);
+    opacity:0;
     transition:opacity .2s ease;
   }
   #controls.show{opacity:1;pointer-events:auto}
@@ -136,6 +151,18 @@
   }
   #drawingModeBanner.show{opacity:1}
 
+  /* Hide the decorative Instructions and Settings buttons baked into the mockup. */
+  .backgroundCover{
+    position:absolute;
+    bottom:0;
+    height:10.2%;
+    background:#fff;
+    z-index:8;
+    pointer-events:none;
+  }
+  #coverInstructions{left:0;width:16.2%;}
+  #coverSettings{right:0;width:13.2%;}
+
   @media (max-aspect-ratio: 4/5){
     body{background:#fff}
   }
@@ -149,12 +176,18 @@
     </svg>
     <canvas id="drawCanvas"></canvas>
     <div id="crayonMarker" aria-hidden="true"></div>
+  </div>
+
+  <div id="topActionRow">
     <div id="prompt"></div>
     <div id="controls">
       <button id="playBtn" class="controlBtn" type="button">▶ Play Again</button>
       <button id="clearBtn" class="controlBtn" type="button">↺ Clear</button>
     </div>
   </div>
+
+  <div id="coverInstructions" class="backgroundCover" aria-hidden="true"></div>
+  <div id="coverSettings" class="backgroundCover" aria-hidden="true"></div>
 
   <button class="adventure" id="mountainBtn" aria-label="Harold Draws a Mountain"></button>
   <button class="adventure" id="oceanBtn" aria-label="Harold Draws Ocean Waves"></button>
