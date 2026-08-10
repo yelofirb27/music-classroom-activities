@@ -295,39 +295,39 @@
   <h1 class="title">Firefly Rhythms</h1>
   <div class="tempo-note">ta = 1 beat · 80 BPM</div>
 
-  <div class="bug" id="bug1" aria-label="Firefly 1: ta-a ti-ti ta">
+  <div class="bug" id="bug1" aria-label="Firefly 1: ta-a ta-a">
     <div class="halo"></div><div class="wing left"></div><div class="wing right"></div><div class="body"></div><div class="lamp"></div>
-    <div class="label">ta-a &nbsp; ti-ti &nbsp; ta</div>
+    <div class="label">ta-a &nbsp; ta-a</div>
   </div>
 
-  <div class="bug" id="bug2" aria-label="Firefly 2: ta ta rest ta ta ta rest ta">
+  <div class="bug" id="bug2" aria-label="Firefly 2: ti-ti ti-ti ti-ti ta ti-ti ti-ti ta rest">
     <div class="halo"></div><div class="wing left"></div><div class="wing right"></div><div class="body"></div><div class="lamp"></div>
-    <div class="label">ta &nbsp; ta &nbsp; rest &nbsp; ta &nbsp; ta &nbsp; ta &nbsp; rest &nbsp; ta</div>
+    <div class="label">ti-ti &nbsp; ti-ti &nbsp; ti-ti &nbsp; ta &nbsp; ti-ti &nbsp; ti-ti &nbsp; ta &nbsp; rest</div>
   </div>
 
-  <div class="bug" id="bug3" aria-label="Firefly 3: rest rest ta ti-ti">
+  <div class="bug" id="bug3" aria-label="Firefly 3: ti-ti ta ti-ti ta">
     <div class="halo"></div><div class="wing left"></div><div class="wing right"></div><div class="body"></div><div class="lamp"></div>
-    <div class="label">rest &nbsp; rest &nbsp; ta &nbsp; ti-ti</div>
+    <div class="label">ti-ti &nbsp; ta &nbsp; ti-ti &nbsp; ta</div>
   </div>
 
-  <div class="bug" id="bug4" aria-label="Firefly 4: ta-a rest rest">
+  <div class="bug" id="bug4" aria-label="Firefly 4: rest rest rest ta">
     <div class="halo"></div><div class="wing left"></div><div class="wing right"></div><div class="body"></div><div class="lamp"></div>
-    <div class="label">ta-a &nbsp; rest &nbsp; rest</div>
+    <div class="label">rest &nbsp; rest &nbsp; rest &nbsp; ta</div>
   </div>
 
-  <div class="bug" id="bug5" aria-label="Firefly 5: ti-ti ta repeated continuously">
+  <div class="bug" id="bug5" aria-label="Firefly 5: ta ta ta rest">
     <div class="halo"></div><div class="wing left"></div><div class="wing right"></div><div class="body"></div><div class="lamp"></div>
-    <div class="label">ti-ti &nbsp; ta &nbsp; ti-ti &nbsp; ta &nbsp; ti-ti &nbsp; ta &nbsp; ti-ti &nbsp; ta</div>
+    <div class="label">ta &nbsp; ta &nbsp; ta &nbsp; rest</div>
   </div>
 
-  <div class="bug" id="bug6" aria-label="Firefly 6: ta-a ta-a ta-a ta-a">
+  <div class="bug" id="bug6" aria-label="Firefly 6: ta-a ta ti-ti">
     <div class="halo"></div><div class="wing left"></div><div class="wing right"></div><div class="body"></div><div class="lamp"></div>
-    <div class="label">ta-a &nbsp; ta-a &nbsp; ta-a &nbsp; ta-a</div>
+    <div class="label">ta-a &nbsp; ta &nbsp; ti-ti</div>
   </div>
 
-  <div class="bug" id="bug7" aria-label="Firefly 7: ti-ti ti-ti ti-ti ta repeated">
+  <div class="bug" id="bug7" aria-label="Firefly 7: ta rest ta rest">
     <div class="halo"></div><div class="wing left"></div><div class="wing right"></div><div class="body"></div><div class="lamp"></div>
-    <div class="label">ti-ti &nbsp; ti-ti &nbsp; ti-ti &nbsp; ta &nbsp; ti-ti &nbsp; ti-ti &nbsp; ti-ti &nbsp; ta</div>
+    <div class="label">ta &nbsp; rest &nbsp; ta &nbsp; rest</div>
   </div>
 
   <div class="controls">
@@ -351,42 +351,59 @@
 
   const GAP = 0.10;
   const patterns = {
+    // Firefly 1: ta-a ta-a
     b1: [
       ['on',2-GAP],['off',GAP],
-      ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],
-      ['on',1-GAP],['off',GAP]
+      ['on',2-GAP],['off',GAP]
     ],
+
+    // Firefly 2: ti-ti ti-ti ti-ti ta ti-ti ti-ti ta rest
     b2: [
-      ['on',1-GAP],['off',GAP],['on',1-GAP],['off',GAP],['off',1],
-      ['on',1-GAP],['off',GAP],['on',1-GAP],['off',GAP],['on',1-GAP],['off',GAP],['off',1],
-      ['on',1-GAP],['off',GAP]
-    ],
-    b3: [
-      ['off',1],['off',1],['on',1-GAP],['off',GAP],
-      ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP]
-    ],
-    b4: [
-      ['on',2-GAP],['off',GAP],['off',1],['off',1]
-    ],
-    b5: [
-      ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],['on',1-GAP],['off',GAP],
-      ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],['on',1-GAP],['off',GAP],
-      ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],['on',1-GAP],['off',GAP],
-      ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],['on',1-GAP],['off',GAP]
-    ],
-    b6: [
-      ['on',2-GAP],['off',GAP],['on',2-GAP],['off',GAP],
-      ['on',2-GAP],['off',GAP],['on',2-GAP],['off',GAP]
-    ],
-    b7: [
       ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],
       ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],
       ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],
       ['on',1-GAP],['off',GAP],
       ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],
       ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],
+      ['on',1-GAP],['off',GAP],
+      ['off',1]
+    ],
+
+    // Firefly 3: ti-ti ta ti-ti ta
+    b3: [
+      ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],
+      ['on',1-GAP],['off',GAP],
       ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP],
       ['on',1-GAP],['off',GAP]
+    ],
+
+    // Firefly 4: rest rest rest ta
+    b4: [
+      ['off',1],['off',1],['off',1],
+      ['on',1-GAP],['off',GAP]
+    ],
+
+    // Firefly 5: ta ta ta rest
+    b5: [
+      ['on',1-GAP],['off',GAP],
+      ['on',1-GAP],['off',GAP],
+      ['on',1-GAP],['off',GAP],
+      ['off',1]
+    ],
+
+    // Firefly 6: ta-a ta ti-ti
+    b6: [
+      ['on',2-GAP],['off',GAP],
+      ['on',1-GAP],['off',GAP],
+      ['on',.5-GAP],['off',GAP],['on',.5-GAP],['off',GAP]
+    ],
+
+    // Firefly 7: ta rest ta rest
+    b7: [
+      ['on',1-GAP],['off',GAP],
+      ['off',1],
+      ['on',1-GAP],['off',GAP],
+      ['off',1]
     ]
   };
 
