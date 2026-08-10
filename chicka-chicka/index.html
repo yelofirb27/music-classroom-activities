@@ -56,7 +56,11 @@
       max-height: 100%;
       overflow: hidden;
       container-type: inline-size;
-      background: #fff url("chicka-background.png") center / 100% 100% no-repeat;
+      border: 3px solid #ffffff;
+      background-color: var(--gold);
+      background-image: radial-gradient(circle, var(--pink) 0 30%, transparent 33%);
+      background-size: 5.2% 9.2%;
+      background-position: 0.2% 0.4%;
       box-shadow: 0 10px 36px rgba(49, 19, 38, 0.35);
       cursor: pointer;
       outline: none;
@@ -66,11 +70,73 @@
       box-shadow: 0 0 0 5px #ffffff, 0 0 0 10px var(--pink), 0 10px 36px rgba(49, 19, 38, 0.35);
     }
 
+    .picture-field {
+      position: absolute;
+      z-index: 0;
+      inset: 9.1% 6.2% 10.1%;
+      overflow: hidden;
+      border: 3px solid rgba(123, 55, 24, 0.13);
+      background:
+        radial-gradient(circle at 42% 34%, rgba(255, 251, 230, 0.75), transparent 35%),
+        #fffefa;
+      box-shadow:
+        0 3px 10px rgba(100, 48, 12, 0.18),
+        inset 0 0 22px rgba(249, 221, 154, 0.22);
+      pointer-events: none;
+    }
+
+    .tree-art {
+      position: absolute;
+      z-index: 1;
+      left: 13.4%;
+      top: 9.8%;
+      width: 49.5%;
+      height: 84.5%;
+      object-fit: fill;
+      transform: scaleX(1.08);
+      transform-origin: center bottom;
+      filter: drop-shadow(0 2px 1px rgba(75, 45, 10, 0.2));
+      pointer-events: none;
+    }
+
+    .scene-title {
+      position: absolute;
+      z-index: 2;
+      left: 78.2%;
+      top: 48.7%;
+      width: 25%;
+      transform: translate(-50%, -50%);
+      display: grid;
+      justify-items: center;
+      gap: 0.07em;
+      margin: 0;
+      font-family: "Arial Rounded MT Bold", "Trebuchet MS", Arial, sans-serif;
+      font-size: clamp(25px, 4.15cqw, 51px);
+      font-weight: 900;
+      line-height: 0.96;
+      letter-spacing: -0.035em;
+      text-align: center;
+      text-shadow: 0 0.025em 0 rgba(255, 255, 255, 0.9);
+      pointer-events: none;
+    }
+
+    .title-red {
+      color: #f01818;
+    }
+
+    .title-orange {
+      color: #ff9200;
+    }
+
+    .title-purple {
+      color: #821cff;
+    }
+
     .letter {
-      --start-x: 49%;
-      --landing-x: 49%;
-      --start-y: 26%;
-      --ground-y: 76%;
+      --start-x: 48%;
+      --landing-x: 48%;
+      --start-y: 24%;
+      --ground-y: 90.2%;
       position: absolute;
       z-index: 4;
       left: var(--start-x);
@@ -241,6 +307,16 @@
         role="button"
         aria-label="Letter tree. Press the space bar or tap to drop the next capital letter."
       >
+        <div class="picture-field" aria-hidden="true"></div>
+        <img class="tree-art" src="coconut-tree-clear.png" alt="">
+        <h1 class="scene-title" aria-hidden="true">
+          <span class="title-red">Chicka</span>
+          <span class="title-orange">Chicka</span>
+          <span class="title-purple">Boom</span>
+          <span class="title-purple">Boom</span>
+          <span class="title-orange">Body &amp;</span>
+          <span class="title-red">Letters</span>
+        </h1>
         <p id="status" class="status" aria-live="polite">Ready for letter A.</p>
       </section>
     </div>
@@ -280,7 +356,7 @@
 
         const character = alphabet[nextIndex];
         const letter = document.createElement("div");
-        const landingX = 47 + ((nextIndex % 5) - 2) * 1.15;
+        const landingX = 48;
 
         letter.className = "letter falling";
         letter.textContent = character;
