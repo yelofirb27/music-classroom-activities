@@ -4,18 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Coppernickel Goes Mondrian, Music in Art</title>
+
 <style>
 :root{
   --red:#e6322f;
   --blue:#5f8fca;
   --yellow:#fff39b;
   --cream:#f5eee2;
-  --wall:#e8e0d4;
   --ink:#181512;
   --gold:#b48632;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--ink);
+}
 body{
   background:
     radial-gradient(circle at 20% 0%,rgba(255,255,255,.45),transparent 26%),
@@ -23,7 +30,53 @@ body{
     repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 2px,rgba(0,0,0,.012) 2px 4px),
     linear-gradient(#eee7dc,#ded5c8);
 }
+
+/* Four subtle gallery spotlights */
+.gallery-lights{
+  position:fixed;
+  inset:0 0 auto 0;
+  height:120px;
+  pointer-events:none;
+  z-index:0;
+}
+.light{
+  position:absolute;
+  top:0;
+  width:24%;
+  height:120px;
+  transform:translateX(-50%);
+}
+.light::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  width:20px;
+  height:24px;
+  transform:translateX(-50%);
+  background:linear-gradient(#2f2d2a,#111);
+  border-radius:0 0 6px 6px;
+  box-shadow:0 2px 4px rgba(0,0,0,.35);
+}
+.light::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:19px;
+  width:170px;
+  height:90px;
+  transform:translateX(-50%);
+  background:radial-gradient(ellipse at top,rgba(255,246,208,.28),rgba(255,246,208,.10) 44%,transparent 72%);
+  filter:blur(1px);
+}
+.light.l1{left:12.5%}
+.light.l2{left:37.5%}
+.light.l3{left:62.5%}
+.light.l4{left:87.5%}
+
 .museum{
+  position:relative;
+  z-index:1;
   height:100dvh;
   padding:10px 16px 14px;
   display:grid;
@@ -31,10 +84,11 @@ body{
   grid-template-rows:auto 1fr;
   gap:10px 16px;
 }
+
 .title-area{
   grid-column:1/-1;
   text-align:center;
-  padding:2px 0 0;
+  padding:4px 0 0;
 }
 .title-area h1{
   margin:0;
@@ -50,6 +104,7 @@ body{
   color:#9f231e;
   font-weight:800;
 }
+
 .left-panel{
   min-height:0;
   display:flex;
@@ -65,10 +120,17 @@ body{
   position:relative;
 }
 .info-card:before,.info-card:after{
-  content:"";position:absolute;top:10px;width:8px;height:8px;border-radius:50%;
-  background:#8d8175;box-shadow:inset 0 0 0 2px #c8beb2;
+  content:"";
+  position:absolute;
+  top:10px;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:#8d8175;
+  box-shadow:inset 0 0 0 2px #c8beb2;
 }
-.info-card:before{left:10px}.info-card:after{right:10px}
+.info-card:before{left:10px}
+.info-card:after{right:10px}
 .info-card h3{
   margin:0 0 12px;
   font-size:1rem;
@@ -89,7 +151,11 @@ body{
   font-family:"Brush Script MT","Segoe Script",cursive;
   font-size:1.8rem;
 }
-.dates{font-size:.86rem;text-align:center;margin-top:-6px}
+.dates{
+  font-size:.86rem;
+  text-align:center;
+  margin-top:-6px;
+}
 .brass{
   align-self:center;
   width:180px;
@@ -102,55 +168,24 @@ body{
   line-height:1.3;
   box-shadow:0 4px 8px rgba(0,0,0,.25);
 }
+
+/* No legend row now — composition gets the full center height */
 .center{
   min-width:0;
   min-height:0;
-  display:grid;
-  grid-template-rows:165px 1fr;
-  gap:10px;
+  display:flex;
 }
-.legend-frame,.art-frame{
+.art-frame{
+  width:100%;
+  min-height:0;
   background:linear-gradient(145deg,#4a4037,#1d1916 55%,#3a312b);
   padding:8px;
   box-shadow:0 7px 16px rgba(0,0,0,.26);
   border:2px solid #5b4b3e;
 }
-.legend{
-  height:100%;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  background:#000;
-}
-.legend-card{
-  border:0;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  overflow:hidden;
-  min-width:0;
-}
-.legend-card.white{background:#fff}
-.legend-card.yellow{background:var(--yellow)}
-.legend-card.blue{background:var(--blue)}
-.legend-card.red{background:var(--red)}
-.legend-card .note-svg{width:42%;height:45%}
-.legend-card .rest-img{width:20%;height:45%;object-fit:contain}
-.legend-label{
-  margin-top:1px;
-  font-family:"Trebuchet MS",Arial,sans-serif;
-  font-size:clamp(1rem,2vw,1.55rem);
-  font-weight:800;
-  line-height:1;
-}
-.legend-card.red .legend-label{color:#fff}
-.legend-card.blue .legend-label{color:#234f9c}
-.legend-card.yellow .legend-label{color:#656e27}
-.legend-card.white .legend-label{color:#111}
-.art-frame{min-height:0}
 .grid{
-  width:100%;height:100%;
+  width:100%;
+  height:100%;
   display:grid;
   grid-template-columns:repeat(4,1fr);
   grid-template-rows:repeat(4,1fr);
@@ -158,24 +193,42 @@ body{
   background:#000;
 }
 .cell{
-  border:0;padding:0;min-width:0;min-height:0;
+  border:0;
+  padding:0;
+  min-width:0;
+  min-height:0;
   background:#fff;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   overflow:hidden;
 }
 .cell.red{background:var(--red)}
 .cell.blue{background:var(--blue)}
 .cell.yellow{background:var(--yellow)}
 .cell.white{background:#fff}
+
 .mark{
   display:none;
-  width:86%;height:86%;
+  width:86%;
+  height:86%;
   flex-direction:column;
-  align-items:center;justify-content:center;
+  align-items:center;
+  justify-content:center;
 }
 .show-rhythm .mark{display:flex}
-.note-svg{width:56%;height:56%;max-height:85px;overflow:visible}
-.rest-img{width:26%;height:52%;object-fit:contain}
+
+.note-svg{
+  width:56%;
+  height:56%;
+  max-height:92px;
+  overflow:visible;
+}
+.rest-img{
+  width:26%;
+  height:52%;
+  object-fit:contain;
+}
 .rhythm-label{
   margin-top:-3px;
   font-family:"Trebuchet MS",Arial,sans-serif;
@@ -214,9 +267,14 @@ body{
 #hideBtn{display:none}
 
 .backdrop{
-  display:none;position:fixed;inset:0;z-index:20;
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:20;
   background:rgba(25,22,19,.6);
-  align-items:center;justify-content:center;padding:18px;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
 }
 .backdrop.open{display:flex}
 .picker{
@@ -240,40 +298,53 @@ body{
   aspect-ratio:1.2;
   border:2px solid #111;
   padding:8px;
-  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
 }
-.choice.white{background:#fff}.choice.yellow{background:var(--yellow)}.choice.blue{background:var(--blue)}.choice.red{background:var(--red)}
+.choice.white{background:#fff}
+.choice.yellow{background:var(--yellow)}
+.choice.blue{background:var(--blue)}
+.choice.red{background:var(--red)}
 .choice>.note-svg,.choice>.rest-img,.choice>.rhythm-label{display:none}
-.show-rhythm .choice>.note-svg,.show-rhythm .choice>.rest-img,.show-rhythm .choice>.rhythm-label{display:block}
+.show-rhythm .choice>.note-svg,
+.show-rhythm .choice>.rest-img,
+.show-rhythm .choice>.rhythm-label{display:block}
 .cancel{
-  display:block;margin:12px auto 0;padding:9px 18px;
-  background:#e3dacd;border:1px solid #8b7f72;
+  display:block;
+  margin:12px auto 0;
+  padding:9px 18px;
+  background:#e3dacd;
+  border:1px solid #8b7f72;
 }
 
 @media(max-width:1050px){
   .museum{grid-template-columns:200px minmax(0,1fr) 105px}
-  .center{grid-template-rows:140px 1fr}
   .right-panel{gap:10px}
   .exhibit-button{min-height:85px;font-size:.88rem}
 }
 @media(max-width:800px){
   .museum{
     grid-template-columns:1fr;
-    grid-template-rows:auto auto 1fr auto;
+    grid-template-rows:auto 1fr auto;
     overflow:hidden;
     padding:6px;
     gap:6px;
   }
   .title-area{grid-column:1}
   .left-panel{display:none}
-  .center{grid-row:3;grid-template-rows:110px 1fr;min-height:0}
+  .center{grid-row:2;min-height:0}
   .right-panel{
-    grid-row:4;
+    grid-row:3;
     flex-direction:row;
     gap:6px;
   }
   .exhibit-button{
-    min-height:48px;flex:1;font-size:.75rem;padding:5px;
+    min-height:48px;
+    flex:1;
+    font-size:.75rem;
+    padding:5px;
   }
   .exhibit-button .icon{display:none}
   .choices{grid-template-columns:repeat(2,1fr)}
@@ -287,7 +358,6 @@ body{
   }
   .title-area h1{font-size:2rem}
   .title-area h2{font-size:.8rem;margin-top:3px}
-  .center{grid-template-rows:105px 1fr;gap:5px}
   .info-card{padding:10px}
   .info-card h3{font-size:.8rem;margin-bottom:4px}
   .info-card p,.info-card li{font-size:.69rem;line-height:1.25}
@@ -297,12 +367,23 @@ body{
   .right-panel{gap:7px}
   .exhibit-button{min-height:68px;font-size:.72rem}
   .exhibit-button .icon{font-size:1.35rem}
-  .legend-frame,.art-frame{padding:5px}
-  .legend,.grid{gap:5px}
+  .art-frame{padding:5px}
+  .grid{gap:5px}
+  .gallery-lights{height:82px}
+  .light{height:82px}
+  .light::after{height:64px;width:130px}
 }
 </style>
 </head>
+
 <body>
+<div class="gallery-lights" aria-hidden="true">
+  <div class="light l1"></div>
+  <div class="light l2"></div>
+  <div class="light l3"></div>
+  <div class="light l4"></div>
+</div>
+
 <div class="museum">
   <div class="title-area">
     <h1>Coppernickel Goes Mondrian</h1>
@@ -335,40 +416,41 @@ body{
   </aside>
 
   <main class="center">
-    <div class="legend-frame">
-      <div class="legend">
-        <div class="legend-card white">
-          <img class="rest-img" src="quarter-rest.png" alt="">
-          <div class="legend-label">White</div>
-        </div>
-        <div class="legend-card yellow" id="legendYellow"></div>
-        <div class="legend-card blue" id="legendBlue"></div>
-        <div class="legend-card red" id="legendRed"></div>
-      </div>
-    </div>
-
     <div class="art-frame">
       <div class="grid" id="grid"></div>
     </div>
   </main>
 
   <aside class="right-panel">
-    <button class="exhibit-button" id="showBtn"><span class="icon">◉</span>Show<br>Rhythm</button>
-    <button class="exhibit-button" id="hideBtn"><span class="icon">◌</span>Hide<br>Rhythm</button>
-    <button class="exhibit-button" id="clearBtn"><span class="icon">⌫</span>Clear<br>Canvas</button>
-    <button class="exhibit-button" id="fullscreenBtn"><span class="icon">⛶</span>Full<br>Screen</button>
+    <button class="exhibit-button" id="showBtn">
+      <span class="icon">◉</span>Show<br>Rhythm
+    </button>
+
+    <button class="exhibit-button" id="hideBtn">
+      <span class="icon">◌</span>Hide<br>Rhythm
+    </button>
+
+    <button class="exhibit-button" id="clearBtn">
+      <span class="icon">⌫</span>Clear<br>Canvas
+    </button>
+
+    <button class="exhibit-button" id="fullscreenBtn">
+      <span class="icon">⛶</span>Full<br>Screen
+    </button>
   </aside>
 </div>
 
 <div class="backdrop" id="backdrop">
   <div class="picker">
     <h3 id="pickerTitle">Choose a Color</h3>
+
     <div class="choices">
       <button class="choice white" data-color="white"></button>
       <button class="choice yellow" data-color="yellow"></button>
       <button class="choice blue" data-color="blue"></button>
       <button class="choice red" data-color="red"></button>
     </div>
+
     <button class="cancel" id="cancel">Cancel</button>
   </div>
 </div>
@@ -385,16 +467,21 @@ let selected=null;
 let show=false;
 
 function quarterNoteSVG(){
-  return `<svg class="note-svg" viewBox="0 0 120 120" aria-hidden="true">
-    <ellipse cx="48" cy="84" rx="18" ry="12" transform="rotate(-18 48 84)" fill="#111"/>
+  return `
+  <svg class="note-svg" viewBox="0 0 120 120" aria-hidden="true">
+    <ellipse cx="48" cy="84" rx="18" ry="12"
+      transform="rotate(-18 48 84)" fill="#111"/>
     <rect x="64" y="18" width="5" height="67" fill="#111"/>
   </svg>`;
 }
 
 function eighthPairSVG(){
-  return `<svg class="note-svg" viewBox="0 0 140 120" aria-hidden="true">
-    <ellipse cx="34" cy="88" rx="17" ry="11" transform="rotate(-18 34 88)" fill="#111"/>
-    <ellipse cx="98" cy="88" rx="17" ry="11" transform="rotate(-18 98 88)" fill="#111"/>
+  return `
+  <svg class="note-svg" viewBox="0 0 140 120" aria-hidden="true">
+    <ellipse cx="34" cy="88" rx="17" ry="11"
+      transform="rotate(-18 34 88)" fill="#111"/>
+    <ellipse cx="98" cy="88" rx="17" ry="11"
+      transform="rotate(-18 98 88)" fill="#111"/>
     <rect x="49" y="22" width="5" height="64" fill="#111"/>
     <rect x="113" y="22" width="5" height="64" fill="#111"/>
     <rect x="49" y="18" width="69" height="8" fill="#111"/>
@@ -402,7 +489,7 @@ function eighthPairSVG(){
 }
 
 function restPNG(){
-  return `<img class="rest-img" src="quarter-rest.png" alt="">`;
+  return `<img class="rest-img" src="quarter-rest.png" alt="" aria-hidden="true">`;
 }
 
 function label(text){
@@ -417,6 +504,8 @@ function markup(color){
 }
 
 function choiceMarkup(color){
+  /* IMPORTANT: White now uses the rest PNG + ONE HTML label only.
+     No duplicate "White" can appear. */
   if(color==='white') return `${restPNG()}${label('White')}`;
   if(color==='yellow') return `${eighthPairSVG()}${label('Yellow')}`;
   if(color==='blue') return `${quarterNoteSVG()}${label('Blue')}`;
@@ -429,11 +518,15 @@ function build(){
     const cell=document.createElement('button');
     cell.className='cell white';
     cell.type='button';
+    cell.setAttribute('aria-label',`Rectangle ${i+1}, blank`);
+
     cell.onclick=()=>{
       selected=cell;
-      document.getElementById('pickerTitle').textContent=show?'Choose a Color and Rhythm':'Choose a Color';
+      document.getElementById('pickerTitle').textContent=
+        show ? 'Choose a Color and Rhythm' : 'Choose a Color';
       backdrop.classList.add('open');
     };
+
     grid.appendChild(cell);
   }
 }
@@ -446,16 +539,13 @@ function setCell(cell,color){
 document.querySelectorAll('.choice').forEach(btn=>{
   const color=btn.dataset.color;
   btn.innerHTML=choiceMarkup(color);
+
   btn.onclick=()=>{
-    if(selected)setCell(selected,color);
+    if(selected) setCell(selected,color);
     selected=null;
     backdrop.classList.remove('open');
   };
 });
-
-document.getElementById('legendYellow').innerHTML=eighthPairSVG()+`<div class="legend-label">Yellow</div>`;
-document.getElementById('legendBlue').innerHTML=quarterNoteSVG()+`<div class="legend-label">Blue</div>`;
-document.getElementById('legendRed').innerHTML=quarterNoteSVG()+`<div class="legend-label">Red</div>`;
 
 showBtn.onclick=()=>{
   show=true;
@@ -477,6 +567,7 @@ document.getElementById('cancel').onclick=()=>{
   selected=null;
   backdrop.classList.remove('open');
 };
+
 backdrop.onclick=e=>{
   if(e.target===backdrop){
     selected=null;
@@ -486,8 +577,11 @@ backdrop.onclick=e=>{
 
 fullscreenBtn.onclick=async()=>{
   try{
-    if(document.fullscreenElement) await document.exitFullscreen();
-    else await document.documentElement.requestFullscreen();
+    if(document.fullscreenElement){
+      await document.exitFullscreen();
+    }else{
+      await document.documentElement.requestFullscreen();
+    }
   }catch(e){}
 };
 
