@@ -2,235 +2,502 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Coppernickel Goes Mondrian, Music in Art</title>
 <style>
 :root{
-  --red:#e3342f; --blue:#6f95c8; --yellow:#fff59a; --white:#fff; --black:#050505;
-  --wall1:#e8e2d8; --wall2:#d8d0c4; --label:#f7f1e7;
+  --red:#e6322f;
+  --blue:#5f8fca;
+  --yellow:#fff39b;
+  --cream:#f5eee2;
+  --wall:#e8e0d4;
+  --ink:#181512;
+  --gold:#b48632;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:#202020}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
 body{
-  min-height:100dvh;
   background:
-    repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0,rgba(255,255,255,.05) 2px,rgba(0,0,0,.018) 2px,rgba(0,0,0,.018) 4px),
-    linear-gradient(180deg,var(--wall1),var(--wall2));
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.45),transparent 26%),
+    radial-gradient(circle at 80% 0%,rgba(255,255,255,.35),transparent 24%),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0 2px,rgba(0,0,0,.012) 2px 4px),
+    linear-gradient(#eee7dc,#ded5c8);
 }
-.app{
-  height:100dvh;width:100%;display:grid;grid-template-rows:auto 1fr;
-  gap:clamp(6px,1vh,10px);padding:clamp(6px,1vh,11px) clamp(8px,1.5vw,16px)
+.museum{
+  height:100dvh;
+  padding:10px 16px 14px;
+  display:grid;
+  grid-template-columns:250px minmax(0,1fr) 130px;
+  grid-template-rows:auto 1fr;
+  gap:10px 16px;
 }
-.museum-header{
-  width:min(1180px,100%);margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center
+.title-area{
+  grid-column:1/-1;
+  text-align:center;
+  padding:2px 0 0;
 }
-.exhibit-card{
-  background:var(--label);border:1px solid rgba(60,50,40,.28);box-shadow:0 4px 12px rgba(51,43,35,.14);
-  padding:clamp(6px,.9vh,10px) clamp(10px,1.7vw,17px)
+.title-area h1{
+  margin:0;
+  font-size:clamp(2rem,4vw,3.9rem);
+  line-height:.95;
+  font-weight:900;
+  letter-spacing:-.035em;
 }
-.kicker{
-  font-family:Georgia,"Times New Roman",serif;font-size:clamp(.6rem,1.2vw,.74rem);
-  letter-spacing:.18em;text-transform:uppercase;color:#6a6259;margin-bottom:2px
+.title-area h2{
+  margin:8px 0 0;
+  font-size:clamp(1rem,2vw,1.8rem);
+  letter-spacing:.45em;
+  color:#9f231e;
+  font-weight:800;
 }
-h1{
-  margin:0;font-family:Georgia,"Times New Roman",serif;font-weight:500;
-  font-size:clamp(1.25rem,2.9vw,2.25rem);line-height:1.02;color:#1f1b18
+.left-panel{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:12px;
 }
-.subtitle{
-  margin:3px 0 0;font-family:Georgia,"Times New Roman",serif;
-  font-size:clamp(.73rem,1.5vw,.94rem);line-height:1.15;color:#5b554f
+.info-card{
+  background:#f8f3eb;
+  border:1px solid #bdb4a8;
+  box-shadow:0 6px 14px rgba(0,0,0,.14);
+  padding:18px 18px 14px;
+  position:relative;
 }
-.controls{display:grid;grid-template-columns:repeat(3,auto);gap:7px}
-button{font:inherit;font-weight:700;border:0;cursor:pointer;touch-action:manipulation}
-.control{
-  border-radius:4px;padding:8px 11px;min-height:38px;white-space:nowrap;box-shadow:0 3px 8px rgba(0,0,0,.13)
+.info-card:before,.info-card:after{
+  content:"";position:absolute;top:10px;width:8px;height:8px;border-radius:50%;
+  background:#8d8175;box-shadow:inset 0 0 0 2px #c8beb2;
 }
-#rhythmToggle{background:#1f1f1f;color:#fff}
-#resetBtn,#fullscreenBtn{background:var(--label);color:#1f1f1f;border:1px solid #6b655e}
-
-.gallery{min-height:0;display:flex;align-items:center;justify-content:center}
-.frame{
-  height:100%;max-height:100%;aspect-ratio:4/3;padding:clamp(6px,1.1vh,12px);
-  background:linear-gradient(145deg,#4b4037,#211c18 52%,#3a312a);
-  box-shadow:0 12px 24px rgba(0,0,0,.21),inset 0 0 0 2px rgba(255,255,255,.08),inset 0 0 0 7px rgba(0,0,0,.22)
+.info-card:before{left:10px}.info-card:after{right:10px}
+.info-card h3{
+  margin:0 0 12px;
+  font-size:1rem;
+  letter-spacing:.03em;
 }
-.canvas{width:100%;height:100%;background:#fff}
+.info-card p,.info-card li{
+  font-size:.96rem;
+  line-height:1.45;
+}
+.info-card ol{
+  margin:10px 0 0;
+  padding-left:22px;
+}
+.info-card li{margin:8px 0}
+.info-card li::marker{color:#a62822;font-weight:900}
+.signature{
+  margin-top:16px;
+  font-family:"Brush Script MT","Segoe Script",cursive;
+  font-size:1.8rem;
+}
+.dates{font-size:.86rem;text-align:center;margin-top:-6px}
+.brass{
+  align-self:center;
+  width:180px;
+  background:linear-gradient(#c4963d,#a67420);
+  border:1px solid #6c4c19;
+  color:#16110a;
+  text-align:center;
+  padding:8px 10px;
+  font-size:.72rem;
+  line-height:1.3;
+  box-shadow:0 4px 8px rgba(0,0,0,.25);
+}
+.center{
+  min-width:0;
+  min-height:0;
+  display:grid;
+  grid-template-rows:165px 1fr;
+  gap:10px;
+}
+.legend-frame,.art-frame{
+  background:linear-gradient(145deg,#4a4037,#1d1916 55%,#3a312b);
+  padding:8px;
+  box-shadow:0 7px 16px rgba(0,0,0,.26);
+  border:2px solid #5b4b3e;
+}
+.legend{
+  height:100%;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  background:#000;
+}
+.legend-card{
+  border:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  min-width:0;
+}
+.legend-card.white{background:#fff}
+.legend-card.yellow{background:var(--yellow)}
+.legend-card.blue{background:var(--blue)}
+.legend-card.red{background:var(--red)}
+.legend-card .note-svg{width:42%;height:45%}
+.legend-card .rest-img{width:20%;height:45%;object-fit:contain}
+.legend-label{
+  margin-top:1px;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+  font-size:clamp(1rem,2vw,1.55rem);
+  font-weight:800;
+  line-height:1;
+}
+.legend-card.red .legend-label{color:#fff}
+.legend-card.blue .legend-label{color:#234f9c}
+.legend-card.yellow .legend-label{color:#656e27}
+.legend-card.white .legend-label{color:#111}
+.art-frame{min-height:0}
 .grid{
-  width:100%;height:100%;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);
-  gap:clamp(6px,1.25vh,12px);background:#000;border:2px solid #2d2d2d
+  width:100%;height:100%;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:repeat(4,1fr);
+  gap:8px;
+  background:#000;
 }
 .cell{
-  position:relative;border:0;border-radius:0;box-shadow:none;padding:0;min-width:0;min-height:0;
-  background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden
+  border:0;padding:0;min-width:0;min-height:0;
+  background:#fff;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
 }
-.cell.red{background:var(--red)} .cell.blue{background:var(--blue)} .cell.yellow{background:var(--yellow)} .cell.white{background:#fff}
-.rhythm-mark{display:none;width:82%;height:82%;align-items:center;justify-content:center;flex-direction:column;gap:0;pointer-events:none}
-body.show-rhythm .rhythm-mark{display:flex}
-.note-svg{width:56%;height:56%;max-width:88px;max-height:78px}
-.rhythm-label{font-size:clamp(.7rem,1.95vw,1.25rem);line-height:1;font-weight:900;letter-spacing:-.04em}
-.cell.red .rhythm-label{color:#fff}.cell.blue .rhythm-label{color:#3152a0}.cell.yellow .rhythm-label{color:#657028}.cell.white .rhythm-label{display:none}
-.rest-png{object-fit:contain}
+.cell.red{background:var(--red)}
+.cell.blue{background:var(--blue)}
+.cell.yellow{background:var(--yellow)}
+.cell.white{background:#fff}
+.mark{
+  display:none;
+  width:86%;height:86%;
+  flex-direction:column;
+  align-items:center;justify-content:center;
+}
+.show-rhythm .mark{display:flex}
+.note-svg{width:56%;height:56%;max-height:85px;overflow:visible}
+.rest-img{width:26%;height:52%;object-fit:contain}
+.rhythm-label{
+  margin-top:-3px;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+  font-size:clamp(.95rem,2vw,1.45rem);
+  font-weight:800;
+  line-height:1;
+  letter-spacing:-.03em;
+}
+.red .rhythm-label{color:#fff}
+.blue .rhythm-label{color:#234f9c}
+.yellow .rhythm-label{color:#656e27}
+.white .rhythm-label{color:#111}
+
+.right-panel{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:18px;
+}
+.exhibit-button{
+  min-height:105px;
+  border:2px solid #b08a52;
+  background:#faf6ef;
+  box-shadow:0 4px 10px rgba(0,0,0,.16);
+  font-size:1rem;
+  font-weight:800;
+  padding:8px;
+}
+.exhibit-button .icon{
+  display:block;
+  font-size:2rem;
+  margin-bottom:5px;
+}
+#showBtn{display:block}
+#hideBtn{display:none}
 
 .backdrop{
-  position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;
-  background:rgba(25,22,19,.58);padding:16px
+  display:none;position:fixed;inset:0;z-index:20;
+  background:rgba(25,22,19,.6);
+  align-items:center;justify-content:center;padding:18px;
 }
 .backdrop.open{display:flex}
-.picker{width:min(700px,95vw);background:var(--label);border:1px solid rgba(60,50,40,.38);padding:14px;box-shadow:0 18px 60px rgba(0,0,0,.36)}
-.picker h2{margin:0 0 10px;text-align:center;font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:clamp(1.1rem,2.8vw,1.6rem)}
-.choices{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.choice{
-  aspect-ratio:1.2/1;min-height:100px;border-radius:0;border:2px solid #171717;box-shadow:none;
-  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;padding:8px
+.picker{
+  width:min(760px,96vw);
+  background:#f5eee2;
+  border:1px solid #9a8d7f;
+  padding:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);
 }
-.choice.red{background:var(--red);color:#fff}.choice.blue{background:var(--blue);color:#3152a0}.choice.yellow{background:var(--yellow);color:#657028}.choice.white{background:#fff;color:#111}
-.choice .note-svg{width:60%;height:60%}.choice .rhythm-label{font-size:clamp(.85rem,2.4vw,1.35rem)}
-.choice>.note-svg,.choice>.rhythm-label{display:none}
-body.show-rhythm .choice>.note-svg,body.show-rhythm .choice>.rhythm-label{display:block}
-body.show-rhythm .choice.white>.rhythm-label{display:none}
-.cancel{display:block;margin:10px auto 0;background:#e7e1d7;color:#222;border:1px solid #81786f;padding:8px 16px}
+.picker h3{
+  text-align:center;
+  font:500 1.5rem Georgia,serif;
+  margin:0 0 12px;
+}
+.choices{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.choice{
+  aspect-ratio:1.2;
+  border:2px solid #111;
+  padding:8px;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+}
+.choice.white{background:#fff}.choice.yellow{background:var(--yellow)}.choice.blue{background:var(--blue)}.choice.red{background:var(--red)}
+.choice>.note-svg,.choice>.rest-img,.choice>.rhythm-label{display:none}
+.show-rhythm .choice>.note-svg,.show-rhythm .choice>.rest-img,.show-rhythm .choice>.rhythm-label{display:block}
+.cancel{
+  display:block;margin:12px auto 0;padding:9px 18px;
+  background:#e3dacd;border:1px solid #8b7f72;
+}
 
-@media(max-width:760px){
-  .app{padding:6px;gap:5px}.museum-header{grid-template-columns:1fr;gap:5px}.controls{grid-template-columns:repeat(3,1fr)}
-  .control{padding:7px 4px;min-height:34px;font-size:.78rem}.gallery{align-items:flex-start}
-  .frame{width:min(96vw,760px);height:auto;max-height:100%;aspect-ratio:4/3;padding:6px}.grid{gap:6px}
+@media(max-width:1050px){
+  .museum{grid-template-columns:200px minmax(0,1fr) 105px}
+  .center{grid-template-rows:140px 1fr}
+  .right-panel{gap:10px}
+  .exhibit-button{min-height:85px;font-size:.88rem}
+}
+@media(max-width:800px){
+  .museum{
+    grid-template-columns:1fr;
+    grid-template-rows:auto auto 1fr auto;
+    overflow:hidden;
+    padding:6px;
+    gap:6px;
+  }
+  .title-area{grid-column:1}
+  .left-panel{display:none}
+  .center{grid-row:3;grid-template-rows:110px 1fr;min-height:0}
+  .right-panel{
+    grid-row:4;
+    flex-direction:row;
+    gap:6px;
+  }
+  .exhibit-button{
+    min-height:48px;flex:1;font-size:.75rem;padding:5px;
+  }
+  .exhibit-button .icon{display:none}
   .choices{grid-template-columns:repeat(2,1fr)}
 }
 @media(orientation:landscape) and (max-height:700px){
-  .app{padding:4px 7px;gap:4px}.museum-header{grid-template-columns:minmax(0,1fr) auto;gap:6px}
-  .exhibit-card{padding:4px 8px}.kicker{font-size:.54rem}h1{font-size:clamp(.96rem,2.4vw,1.48rem)}
-  .subtitle{font-size:.65rem;margin-top:1px}.control{min-height:30px;padding:4px 6px;font-size:.7rem}
-  .frame{width:auto;height:100%;padding:5px}.grid{gap:5px}.choice{min-height:76px}
+  .museum{
+    grid-template-columns:170px minmax(0,1fr) 92px;
+    grid-template-rows:auto 1fr;
+    padding:4px 8px 6px;
+    gap:5px 8px;
+  }
+  .title-area h1{font-size:2rem}
+  .title-area h2{font-size:.8rem;margin-top:3px}
+  .center{grid-template-rows:105px 1fr;gap:5px}
+  .info-card{padding:10px}
+  .info-card h3{font-size:.8rem;margin-bottom:4px}
+  .info-card p,.info-card li{font-size:.69rem;line-height:1.25}
+  .info-card li{margin:3px 0}
+  .signature{font-size:1.2rem;margin-top:6px}
+  .brass{font-size:.6rem;width:140px}
+  .right-panel{gap:7px}
+  .exhibit-button{min-height:68px;font-size:.72rem}
+  .exhibit-button .icon{font-size:1.35rem}
+  .legend-frame,.art-frame{padding:5px}
+  .legend,.grid{gap:5px}
 }
 </style>
 </head>
 <body>
-<div class="app">
-  <div class="museum-header">
-    <div class="exhibit-card">
-      <div class="kicker">Interactive Gallery</div>
-      <h1>Coppernickel Goes Mondrian, Music in Art</h1>
-      <p class="subtitle">Touch a rectangle to add color. Reveal the rhythms to turn your artwork into music.</p>
-    </div>
-    <div class="controls">
-      <button id="rhythmToggle" class="control" type="button">Show Rhythm</button>
-      <button id="resetBtn" class="control" type="button">Clear Canvas</button>
-      <button id="fullscreenBtn" class="control" type="button">Full Screen</button>
-    </div>
+<div class="museum">
+  <div class="title-area">
+    <h1>Coppernickel Goes Mondrian</h1>
+    <h2>MUSIC IN ART</h2>
   </div>
 
-  <div class="gallery">
-    <div class="frame">
-      <div class="canvas">
-        <div class="grid" id="grid" aria-label="4 by 4 musical Mondrian canvas"></div>
+  <aside class="left-panel">
+    <div class="info-card">
+      <h3>ABOUT THE ART</h3>
+      <p>Piet Mondrian was an artist who used simple shapes and primary colors to create balance and harmony.</p>
+
+      <h3 style="margin-top:24px">YOUR MISSION</h3>
+      <p>Create your own Mondrian masterpiece!</p>
+      <ol>
+        <li>Tap any white rectangle in the artwork.</li>
+        <li>Choose a color.</li>
+        <li>Use “Show Rhythm” to see the music hidden in your art!</li>
+      </ol>
+
+      <div class="signature">P. Mondrian</div>
+      <div class="dates">1872–1944</div>
+    </div>
+
+    <div class="brass">
+      PIET MONDRIAN<br>
+      COMPOSITION WITH RED,<br>
+      BLUE, AND YELLOW<br>
+      1930
+    </div>
+  </aside>
+
+  <main class="center">
+    <div class="legend-frame">
+      <div class="legend">
+        <div class="legend-card white">
+          <img class="rest-img" src="quarter-rest.png" alt="">
+          <div class="legend-label">White</div>
+        </div>
+        <div class="legend-card yellow" id="legendYellow"></div>
+        <div class="legend-card blue" id="legendBlue"></div>
+        <div class="legend-card red" id="legendRed"></div>
       </div>
     </div>
-  </div>
+
+    <div class="art-frame">
+      <div class="grid" id="grid"></div>
+    </div>
+  </main>
+
+  <aside class="right-panel">
+    <button class="exhibit-button" id="showBtn"><span class="icon">◉</span>Show<br>Rhythm</button>
+    <button class="exhibit-button" id="hideBtn"><span class="icon">◌</span>Hide<br>Rhythm</button>
+    <button class="exhibit-button" id="clearBtn"><span class="icon">⌫</span>Clear<br>Canvas</button>
+    <button class="exhibit-button" id="fullscreenBtn"><span class="icon">⛶</span>Full<br>Screen</button>
+  </aside>
 </div>
 
-<div class="backdrop" id="backdrop" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+<div class="backdrop" id="backdrop">
   <div class="picker">
-    <h2 id="pickerTitle">Choose a Color</h2>
+    <h3 id="pickerTitle">Choose a Color</h3>
     <div class="choices">
-      <button class="choice red" data-color="red" type="button"></button>
-      <button class="choice blue" data-color="blue" type="button"></button>
-      <button class="choice yellow" data-color="yellow" type="button"></button>
-      <button class="choice white" data-color="white" type="button"></button>
+      <button class="choice white" data-color="white"></button>
+      <button class="choice yellow" data-color="yellow"></button>
+      <button class="choice blue" data-color="blue"></button>
+      <button class="choice red" data-color="red"></button>
     </div>
-    <button class="cancel" id="closePicker" type="button">Cancel</button>
+    <button class="cancel" id="cancel">Cancel</button>
   </div>
 </div>
 
 <script>
 const grid=document.getElementById('grid');
 const backdrop=document.getElementById('backdrop');
-const rhythmToggle=document.getElementById('rhythmToggle');
-const resetBtn=document.getElementById('resetBtn');
+const showBtn=document.getElementById('showBtn');
+const hideBtn=document.getElementById('hideBtn');
+const clearBtn=document.getElementById('clearBtn');
 const fullscreenBtn=document.getElementById('fullscreenBtn');
-const closePicker=document.getElementById('closePicker');
 
-let selectedCell=null;
-let showRhythm=false;
+let selected=null;
+let show=false;
 
 function quarterNoteSVG(){
-  return `<svg class="note-svg" viewBox="0 0 100 120" aria-hidden="true">
-    <line x1="65" y1="15" x2="65" y2="78" stroke="#111" stroke-width="5"/>
-    <ellipse cx="48" cy="82" rx="17" ry="12" transform="rotate(-18 48 82)" fill="#111"/>
+  return `<svg class="note-svg" viewBox="0 0 120 120" aria-hidden="true">
+    <ellipse cx="48" cy="84" rx="18" ry="12" transform="rotate(-18 48 84)" fill="#111"/>
+    <rect x="64" y="18" width="5" height="67" fill="#111"/>
   </svg>`;
 }
-function eighthPairSVG(){
-  return `<svg class="note-svg" viewBox="0 0 120 110" aria-hidden="true">
-    <line x1="32" y1="22" x2="32" y2="77" stroke="#111" stroke-width="5"/>
-    <line x1="88" y1="22" x2="88" y2="77" stroke="#111" stroke-width="5"/>
-    <line x1="32" y1="22" x2="88" y2="22" stroke="#111" stroke-width="8"/>
-    <ellipse cx="20" cy="82" rx="16" ry="11" transform="rotate(-18 20 82)" fill="#111"/>
-    <ellipse cx="76" cy="82" rx="16" ry="11" transform="rotate(-18 76 82)" fill="#111"/>
-  </svg>`;
-}
-function quarterRestPNG(){return `<img class="note-svg rest-png" src="quarter-rest.png" alt="" aria-hidden="true">`}
 
-function rhythmMarkup(color){
-  if(color==='red') return `<div class="rhythm-mark">${quarterNoteSVG()}<div class="rhythm-label">Red</div></div>`;
-  if(color==='blue') return `<div class="rhythm-mark">${quarterNoteSVG()}<div class="rhythm-label">Blue</div></div>`;
-  if(color==='yellow') return `<div class="rhythm-mark">${eighthPairSVG()}<div class="rhythm-label">Yellow</div></div>`;
-  return `<div class="rhythm-mark">${quarterRestPNG()}</div>`;
+function eighthPairSVG(){
+  return `<svg class="note-svg" viewBox="0 0 140 120" aria-hidden="true">
+    <ellipse cx="34" cy="88" rx="17" ry="11" transform="rotate(-18 34 88)" fill="#111"/>
+    <ellipse cx="98" cy="88" rx="17" ry="11" transform="rotate(-18 98 88)" fill="#111"/>
+    <rect x="49" y="22" width="5" height="64" fill="#111"/>
+    <rect x="113" y="22" width="5" height="64" fill="#111"/>
+    <rect x="49" y="18" width="69" height="8" fill="#111"/>
+  </svg>`;
 }
+
+function restPNG(){
+  return `<img class="rest-img" src="quarter-rest.png" alt="">`;
+}
+
+function label(text){
+  return `<div class="rhythm-label">${text}</div>`;
+}
+
+function markup(color){
+  if(color==='white') return `<div class="mark">${restPNG()}${label('White')}</div>`;
+  if(color==='yellow') return `<div class="mark">${eighthPairSVG()}${label('Yellow')}</div>`;
+  if(color==='blue') return `<div class="mark">${quarterNoteSVG()}${label('Blue')}</div>`;
+  return `<div class="mark">${quarterNoteSVG()}${label('Red')}</div>`;
+}
+
 function choiceMarkup(color){
-  if(color==='red') return `${quarterNoteSVG()}<div class="rhythm-label">Red</div>`;
-  if(color==='blue') return `${quarterNoteSVG()}<div class="rhythm-label">Blue</div>`;
-  if(color==='yellow') return `${eighthPairSVG()}<div class="rhythm-label">Yellow</div>`;
-  return `${quarterRestPNG()}`;
+  if(color==='white') return `${restPNG()}${label('White')}`;
+  if(color==='yellow') return `${eighthPairSVG()}${label('Yellow')}`;
+  if(color==='blue') return `${quarterNoteSVG()}${label('Blue')}`;
+  return `${quarterNoteSVG()}${label('Red')}`;
 }
-function makeGrid(){
+
+function build(){
   grid.innerHTML='';
   for(let i=0;i<16;i++){
     const cell=document.createElement('button');
-    cell.type='button';
     cell.className='cell white';
-    cell.dataset.color='white';
-    cell.setAttribute('aria-label',`Rectangle ${i+1}, blank`);
-    cell.addEventListener('click',()=>{
-      selectedCell=cell;
-      document.getElementById('pickerTitle').textContent=showRhythm?'Choose a Color and Rhythm':'Choose a Color';
+    cell.type='button';
+    cell.onclick=()=>{
+      selected=cell;
+      document.getElementById('pickerTitle').textContent=show?'Choose a Color and Rhythm':'Choose a Color';
       backdrop.classList.add('open');
-    });
+    };
     grid.appendChild(cell);
   }
 }
-function setCellColor(cell,color){
-  cell.classList.remove('red','blue','yellow','white');
-  cell.classList.add(color);
-  cell.dataset.color=color;
-  cell.innerHTML=rhythmMarkup(color);
+
+function setCell(cell,color){
+  cell.className='cell '+color;
+  cell.innerHTML=markup(color);
 }
-document.querySelectorAll('.choice').forEach(choice=>{
-  const color=choice.dataset.color;
-  choice.innerHTML=choiceMarkup(color);
-  choice.addEventListener('click',()=>{
-    if(selectedCell) setCellColor(selectedCell,color);
-    selectedCell=null;
+
+document.querySelectorAll('.choice').forEach(btn=>{
+  const color=btn.dataset.color;
+  btn.innerHTML=choiceMarkup(color);
+  btn.onclick=()=>{
+    if(selected)setCell(selected,color);
+    selected=null;
     backdrop.classList.remove('open');
-  });
+  };
 });
-rhythmToggle.addEventListener('click',()=>{
-  showRhythm=!showRhythm;
-  document.body.classList.toggle('show-rhythm',showRhythm);
-  rhythmToggle.textContent=showRhythm?'Hide Rhythm':'Show Rhythm';
-});
-resetBtn.addEventListener('click',makeGrid);
-fullscreenBtn.addEventListener('click',async()=>{
+
+document.getElementById('legendYellow').innerHTML=eighthPairSVG()+`<div class="legend-label">Yellow</div>`;
+document.getElementById('legendBlue').innerHTML=quarterNoteSVG()+`<div class="legend-label">Blue</div>`;
+document.getElementById('legendRed').innerHTML=quarterNoteSVG()+`<div class="legend-label">Red</div>`;
+
+showBtn.onclick=()=>{
+  show=true;
+  document.body.classList.add('show-rhythm');
+  showBtn.style.display='none';
+  hideBtn.style.display='block';
+};
+
+hideBtn.onclick=()=>{
+  show=false;
+  document.body.classList.remove('show-rhythm');
+  hideBtn.style.display='none';
+  showBtn.style.display='block';
+};
+
+clearBtn.onclick=build;
+
+document.getElementById('cancel').onclick=()=>{
+  selected=null;
+  backdrop.classList.remove('open');
+};
+backdrop.onclick=e=>{
+  if(e.target===backdrop){
+    selected=null;
+    backdrop.classList.remove('open');
+  }
+};
+
+fullscreenBtn.onclick=async()=>{
   try{
-    if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
-    else await document.exitFullscreen();
+    if(document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
   }catch(e){}
-});
+};
+
 document.addEventListener('fullscreenchange',()=>{
-  fullscreenBtn.textContent=document.fullscreenElement?'Exit Full Screen':'Full Screen';
+  fullscreenBtn.innerHTML=document.fullscreenElement
+    ? `<span class="icon">⛶</span>Exit<br>Full Screen`
+    : `<span class="icon">⛶</span>Full<br>Screen`;
 });
-closePicker.addEventListener('click',()=>{selectedCell=null;backdrop.classList.remove('open')});
-backdrop.addEventListener('click',e=>{if(e.target===backdrop){selectedCell=null;backdrop.classList.remove('open')}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){selectedCell=null;backdrop.classList.remove('open')}});
-makeGrid();
+
+build();
 </script>
 </body>
 </html>
