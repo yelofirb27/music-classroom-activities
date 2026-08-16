@@ -48,6 +48,40 @@ button:disabled{opacity:.45;cursor:default}
 .label{pointer-events:none;fill:#27343c;font:800 9.5px Arial,sans-serif;text-anchor:middle;dominant-baseline:central}
 .label.small{font-size:7px}
 
+
+
+.compass-line{
+  stroke:#42515b;
+  stroke-width:3;
+  stroke-linecap:round;
+}
+.compass-fill{
+  fill:#f4ecd8;
+  stroke:#42515b;
+  stroke-width:2;
+}
+.compass-dark{
+  fill:#42515b;
+  stroke:#42515b;
+  stroke-width:1.5;
+}
+.compass-letter{
+  fill:#31444f;
+  font:900 18px Georgia,serif;
+  text-anchor:middle;
+  dominant-baseline:middle;
+}
+
+.chorus-line{
+  fill:#243f50;
+  font:italic 900 23px Georgia,serif;
+  text-anchor:middle;
+  paint-order:stroke;
+  stroke:rgba(185,219,234,.9);
+  stroke-width:3px;
+  stroke-linejoin:round;
+}
+
 .inset-frame{fill:#eef5f0;stroke:#6d6250;stroke-width:2.2}
 .inset-title{fill:#4c5560;font:900 13px Arial,sans-serif;letter-spacing:.08em;text-anchor:middle}
 .inset-state{stroke:#667078;stroke-width:.75;cursor:pointer}
@@ -249,6 +283,44 @@ svg.append("rect").attr("class","inset-frame")
   .attr("x",inset.x).attr("y",inset.y).attr("width",inset.w).attr("height",inset.h).attr("rx",8);
 svg.append("text").attr("class","inset-title")
   .attr("x",inset.x+inset.w/2).attr("y",inset.y+18).text("NORTHEAST");
+
+// 16-beat traveling chorus placed directly on the Atlantic Ocean.
+const chorusX=1085;
+const chorusY=385;
+[
+  ["See the country,", "here we go,"],
+  ["Fifty states to", "see and know."],
+  ["North and south and", "east and west,"],
+  ["Traveling is", "just the best!"]
+].forEach((lines,i)=>{
+  const y=chorusY+i*54;
+  lines.forEach((line,j)=>{
+    svg.append("text").attr("class","chorus-line")
+      .attr("x",chorusX)
+      .attr("y",y+j*25)
+      .text(line);
+  });
+});
+
+// Classic map compass rose in the open Atlantic.
+const compass=svg.append("g").attr("transform","translate(20,58) scale(.68)");
+compass.append("circle").attr("class","compass-fill").attr("r",34);
+
+// Cardinal points
+compass.append("path").attr("class","compass-dark").attr("d","M0,-48 L-8,-10 L0,-18 L8,-10 Z");
+compass.append("path").attr("class","compass-fill").attr("d","M48,0 L10,-8 L18,0 L10,8 Z");
+compass.append("path").attr("class","compass-dark").attr("d","M0,48 L8,10 L0,18 L-8,10 Z");
+compass.append("path").attr("class","compass-fill").attr("d","M-48,0 L-10,8 L-18,0 L-10,-8 Z");
+
+// Inner directional lines
+compass.append("line").attr("class","compass-line").attr("x1",0).attr("y1",-28).attr("x2",0).attr("y2",28);
+compass.append("line").attr("class","compass-line").attr("x1",-28).attr("y1",0).attr("x2",28).attr("y2",0);
+
+// Labels
+compass.append("text").attr("class","compass-letter").attr("x",0).attr("y",-68).text("N");
+compass.append("text").attr("class","compass-letter").attr("x",67).attr("y",0).text("E");
+compass.append("text").attr("class","compass-letter").attr("x",0).attr("y",67).text("S");
+compass.append("text").attr("class","compass-letter").attr("x",-67).attr("y",0).text("W");
 
 const sx=(inset.w-inset.pad*2)/(neBounds[1][0]-neBounds[0][0]);
 const sy=(inset.h-inset.pad*2-18)/(neBounds[1][1]-neBounds[0][1]);
