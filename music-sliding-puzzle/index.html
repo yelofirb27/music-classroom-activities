@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Music Sliding Puzzle</title>
+<style>
+:root{--ink:#123564;--paper:#fffaf0;--gold:#f4b51d;--panel:#fff;--empty:#eee6d8;--gap:2px}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;background:linear-gradient(180deg,#fffaf0,#f4ead8);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+body{overflow:hidden}
+.app{width:100%;height:100svh;display:flex;flex-direction:column;align-items:center;padding:9px 12px 10px;gap:7px}
+.top{width:min(98vw,1160px);display:grid;grid-template-columns:minmax(220px,1fr) auto;align-items:center;gap:10px;flex:0 0 auto}
+.title h1{font-size:clamp(22px,3vw,38px);margin:0;line-height:1}.title p{margin:4px 0 0;font-weight:700;color:#506783;font-size:clamp(12px,1.4vw,15px)}
+.controls{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+button,select{border:0;border-radius:999px;padding:8px 12px;font-weight:800;font-size:13px;cursor:pointer;touch-action:manipulation}
+button{background:var(--ink);color:#fff;box-shadow:0 3px 0 #082243}button.secondary{background:var(--gold);color:#17365f;box-shadow:0 3px 0 #cf8f00}button.level.active{outline:3px solid #79bfe5;outline-offset:1px}
+select{background:#fff;color:var(--ink);border:2px solid #d8cdbd;max-width:230px}
+.stage{flex:1 1 auto;min-height:0;width:100%;display:grid;place-items:center}
+.board-wrap{background:#fff;border-radius:22px;padding:8px;box-shadow:0 12px 34px #6f5c3d2b;max-height:100%;max-width:100%}
+.board{position:relative;width:min(87vw,calc(100svh - 145px),780px);aspect-ratio:1;border-radius:13px;overflow:hidden;background:var(--empty);touch-action:none;user-select:none}
+.tile{position:absolute;background-repeat:no-repeat;cursor:pointer;transition:transform .16s ease;will-change:transform}
+.tile.no-transition{transition:none}.tile.final-piece{z-index:25;animation:finalPop .48s cubic-bezier(.2,.9,.2,1)}
+@keyframes finalPop{0%{transform:scale(.72);opacity:.15}70%{transform:scale(1.05);opacity:1}100%{transform:scale(1);opacity:1}}
+.peek{position:absolute;inset:0;background-repeat:no-repeat;background-size:100% 100%;z-index:50;pointer-events:none;opacity:0;transition:opacity .15s ease}.peek.show{opacity:1}
+.status{min-height:22px;flex:0 0 auto;font-weight:900;font-size:clamp(14px,1.8vw,20px);text-align:center}.hint{flex:0 0 auto;text-align:center;font-size:12px;font-weight:650;color:#60748c;max-width:900px}
+:fullscreen body{background:#efe6d5}:fullscreen .app{padding:7px}:fullscreen .board{width:min(92vw,calc(100svh - 118px),920px)}:fullscreen .hint{display:none}
+@media(max-width:760px){.app{padding:7px;gap:5px}.top{grid-template-columns:1fr}.title{text-align:center}.title p{display:none}.controls{justify-content:center}.board{width:min(96vw,calc(100svh - 190px))}button,select{padding:7px 9px;font-size:12px}select{max-width:190px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="title"><h1>Music Sliding Puzzle</h1><p>Slide the pieces until the whole picture comes together.</p></div>
+    <div class="controls">
+      <select id="imagePicker" aria-label="Choose a puzzle picture"></select>
+      <button class="level active" data-size="3">3×3</button>
+      <button class="level" data-size="4">4×4</button>
+      <button class="level" data-size="5">5×5</button>
+      <button id="shuffle" class="secondary">Shuffle</button>
+      <button id="peek">Peek</button>
+      <button id="fullscreen">Full Screen</button>
+    </div>
+  </div>
+  <div class="stage"><div class="board-wrap"><div id="board" class="board"><div id="peekLayer" class="peek"></div></div></div></div>
+  <div id="status" class="status">Moves: 0</div>
+  <div class="hint">Click/tap a tile beside the open space, or drag it toward the opening.</div>
+</div>
+<script src="images.js"></script>
+<script>
+(() => {
+  const board = document.getElementById('board');
+  const status = document.getElementById('status');
+  const imagePicker = document.getElementById('imagePicker');
+  const peekLayer = document.getElementById('peekLayer');
+  const levelButtons = [...document.querySelectorAll('.level')];
+  const shuffleBtn = document.getElementById('shuffle');
+  const peekBtn = document.getElementById('peek');
+  const fullscreenBtn = document.getElementById('fullscreen');
+
+  let N = 3, state = [], empty = 0, moves = 0, solved = false, imageUrl = '';
+  let drag = null;
+
+  const images = Array.isArray(window.PUZZLE_IMAGES) && window.PUZZLE_IMAGES.length
+    ? window.PUZZLE_IMAGES
+    : [{name:'Puzzle', file:'images/music-is-all-around-us.png'}];
+
+  images.forEach((item, i) => {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = item.name; imagePicker.appendChild(opt);
+  });
+
+  function loadImage(index=0){
+    imageUrl = images[index].file;
+    peekLayer.style.backgroundImage = `url("${imageUrl}")`;
+    newGame();
+  }
+
+  function solvedState(){ return Array.from({length:N*N},(_,i)=>i); }
+  function neighbors(pos){
+    const r=Math.floor(pos/N), c=pos%N, a=[];
+    if(r>0)a.push(pos-N); if(r<N-1)a.push(pos+N); if(c>0)a.push(pos-1); if(c<N-1)a.push(pos+1);
+    return a;
+  }
+  function swap(a,b){ [state[a],state[b]]=[state[b],state[a]]; }
+  function shuffleSolvable(){
+    state=solvedState(); empty=N*N-1;
+    let prev=-1;
+    const steps = N===3 ? 90 : N===4 ? 180 : 300;
+    for(let i=0;i<steps;i++){
+      let opts=neighbors(empty).filter(x=>x!==prev); if(!opts.length) opts=neighbors(empty);
+      const next=opts[Math.floor(Math.random()*opts.length)]; prev=empty; swap(empty,next); empty=next;
+    }
+    if(state.every((v,i)=>v===i)) return shuffleSolvable();
+  }
+  function tileStyle(tile, tileId, pos){
+    const pct=100/N, r=Math.floor(pos/N), c=pos%N, sr=Math.floor(tileId/N), sc=tileId%N;
+    tile.style.width=pct+'%'; tile.style.height=pct+'%';
+    tile.style.left=(c*pct)+'%'; tile.style.top=(r*pct)+'%';
+    tile.style.backgroundImage=`url("${imageUrl}")`;
+    tile.style.backgroundSize=(N*100)+'% '+(N*100)+'%';
+    tile.style.backgroundPosition=(N===1?0:(sc/(N-1))*100)+'% '+(N===1?0:(sr/(N-1))*100)+'%';
+  }
+  function render(){
+    board.querySelectorAll('.tile').forEach(x=>x.remove());
+    for(let pos=0;pos<state.length;pos++){
+      const tileId=state[pos]; if(tileId===N*N-1) continue;
+      const tile=document.createElement('div'); tile.className='tile'; tile.dataset.id=tileId; tile.dataset.pos=pos;
+      tileStyle(tile,tileId,pos); tile.addEventListener('pointerdown',startDrag); board.appendChild(tile);
+    }
+    status.textContent = solved ? `You solved it in ${moves} moves! ♫` : `Moves: ${moves}`;
+  }
+  function isAdjacent(a,b){ return neighbors(a).includes(b); }
+  function moveTile(pos){
+    if(solved || !isAdjacent(pos,empty)) return false;
+    swap(pos,empty); empty=pos; moves++; render(); checkSolved(); return true;
+  }
+  function checkSolved(){
+    if(!state.every((v,i)=>v===i)) return;
+    solved=true;
+    const missingId=N*N-1, pos=N*N-1;
+    const final=document.createElement('div'); final.className='tile final-piece'; tileStyle(final,missingId,pos); board.appendChild(final);
+    status.textContent=`You solved it in ${moves} moves! ♫`;
+  }
+  function startDrag(e){
+    const tile=e.currentTarget, pos=Number(tile.dataset.pos); if(solved || !isAdjacent(pos,empty)) return;
+    e.preventDefault(); tile.setPointerCapture(e.pointerId);
+    drag={tile,pos,startX:e.clientX,startY:e.clientY}; tile.classList.add('no-transition');
+    tile.addEventListener('pointermove',dragMove); tile.addEventListener('pointerup',dragEnd,{once:true}); tile.addEventListener('pointercancel',dragEnd,{once:true});
+  }
+  function dragMove(e){
+    if(!drag) return; const rect=board.getBoundingClientRect(); const max=rect.width/N;
+    const er=Math.floor(empty/N),ec=empty%N,pr=Math.floor(drag.pos/N),pc=drag.pos%N;
+    let dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;
+    if(er===pr){ dy=0; dx=Math.max(-max,Math.min(max,dx)); if(ec<pc)dx=Math.min(0,dx); else dx=Math.max(0,dx); }
+    else { dx=0; dy=Math.max(-max,Math.min(max,dy)); if(er<pr)dy=Math.min(0,dy); else dy=Math.max(0,dy); }
+    drag.tile.style.transform=`translate(${dx}px,${dy}px)`;
+  }
+  function dragEnd(e){
+    if(!drag) return; const d=drag; drag=null; const rect=board.getBoundingClientRect(), threshold=(rect.width/N)*0.28;
+    const dx=e.clientX-d.startX,dy=e.clientY-d.startY; d.tile.style.transform=''; d.tile.classList.remove('no-transition');
+    d.tile.removeEventListener('pointermove',dragMove);
+    if(Math.hypot(dx,dy)>threshold) moveTile(d.pos); else moveTile(d.pos); // tap also slides
+  }
+  function newGame(){ solved=false;moves=0;shuffleSolvable();render(); }
+
+  levelButtons.forEach(btn=>btn.addEventListener('click',()=>{
+    N=Number(btn.dataset.size); levelButtons.forEach(b=>b.classList.toggle('active',b===btn)); newGame();
+  }));
+  imagePicker.addEventListener('change',()=>loadImage(Number(imagePicker.value)));
+  shuffleBtn.addEventListener('click',newGame);
+  peekBtn.addEventListener('pointerdown',()=>peekLayer.classList.add('show'));
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>peekBtn.addEventListener(ev,()=>peekLayer.classList.remove('show')));
+  fullscreenBtn.addEventListener('click',async()=>{
+    try{ if(!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); }catch(e){}
+  });
+  document.addEventListener('fullscreenchange',()=>fullscreenBtn.textContent=document.fullscreenElement?'Exit Full Screen':'Full Screen');
+
+  loadImage(0);
+})();
+</script>
+</body>
+</html>
