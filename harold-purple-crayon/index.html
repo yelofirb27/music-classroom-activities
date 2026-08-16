@@ -216,6 +216,116 @@
   let currentAdventure = null;
   let drawing = false;
   let ctx;
+  let drawPoints = [];
+  let drawPlayback = false;
+
+  /* ------------------------------------------------------------
+     Gentle "OO" vocal model
+     ------------------------------------------------------------
+     No audio file is required. Web Audio builds a soft vowel-like tone
+     from a harmonic source, fixed vocal formants, and a tiny vibrato.
+     Vertical crayon position controls pitch continuously.
+  ------------------------------------------------------------- */
+  let audioCtx = null;
+  let voice = null;
+
+  function ensureAudio(){
+    if(!audioCtx){
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function yToFrequency(y, height){
+    const t = 1 - Math.max(0, Math.min(1, y / height));
+    // Comfortable, useful vocal-exploration range: about F3 to C5.
+    const low = 175;
+    const high = 523.25;
+    return low * Math.pow(high / low, t);
+  }
+
+  function startVoice(y, height){
+    ensureAudio();
+    stopVoice(0.01);
+
+    const now = audioCtx.currentTime;
+    const master = audioCtx.createGain();
+    master.gain.setValueAtTime(0.0001, now);
+    master.gain.exponentialRampToValueAtTime(0.23, now + 0.05);
+    master.connect(audioCtx.destination);
+
+    // Fundamental gives the sound a clear, singable center.
+    const fundamental = audioCtx.createOscillator();
+    fundamental.type = 'sine';
+    const fundamentalGain = audioCtx.createGain();
+    fundamentalGain.gain.value = 0.62;
+    fundamental.connect(fundamentalGain).connect(master);
+
+    // A quiet harmonic source passed through two "oo" formants.
+    const buzz = audioCtx.createOscillator();
+    buzz.type = 'sawtooth';
+    const buzzGain = audioCtx.createGain();
+    buzzGain.gain.value = 0.13;
+    buzz.connect(buzzGain);
+
+    const formant1 = audioCtx.createBiquadFilter();
+    formant1.type = 'bandpass';
+    formant1.frequency.value = 360;
+    formant1.Q.value = 5.5;
+    const f1Gain = audioCtx.createGain();
+    f1Gain.gain.value = 1.15;
+    buzzGain.connect(formant1).connect(f1Gain).connect(master);
+
+    const formant2 = audioCtx.createBiquadFilter();
+    formant2.type = 'bandpass';
+    formant2.frequency.value = 820;
+    formant2.Q.value = 7;
+    const f2Gain = audioCtx.createGain();
+    f2Gain.gain.value = 0.45;
+    buzzGain.connect(formant2).connect(f2Gain).connect(master);
+
+    // Very small vibrato keeps the model from sounding like a plain beep.
+    const vibrato = audioCtx.createOscillator();
+    vibrato.frequency.value = 5.1;
+    const vibratoGain = audioCtx.createGain();
+    vibratoGain.gain.value = 2.0;
+    vibrato.connect(vibratoGain);
+    vibratoGain.connect(fundamental.detune);
+    vibratoGain.connect(buzz.detune);
+
+    const freq = yToFrequency(y, height);
+    fundamental.frequency.setValueAtTime(freq, now);
+    buzz.frequency.setValueAtTime(freq, now);
+
+    fundamental.start(now);
+    buzz.start(now);
+    vibrato.start(now);
+
+    voice = {master, fundamental, buzz, vibrato};
+  }
+
+  function updateVoice(y, height){
+    if(!voice || !audioCtx) return;
+    const now = audioCtx.currentTime;
+    const freq = yToFrequency(y, height);
+    voice.fundamental.frequency.setTargetAtTime(freq, now, 0.015);
+    voice.buzz.frequency.setTargetAtTime(freq, now, 0.015);
+  }
+
+  function stopVoice(release=0.055){
+    if(!voice || !audioCtx) return;
+    const v = voice;
+    voice = null;
+    const now = audioCtx.currentTime;
+    try{
+      v.master.gain.cancelScheduledValues(now);
+      v.master.gain.setValueAtTime(Math.max(0.0001, v.master.gain.value), now);
+      v.master.gain.exponentialRampToValueAtTime(0.0001, now + release);
+      v.fundamental.stop(now + release + 0.03);
+      v.buzz.stop(now + release + 0.03);
+      v.vibrato.stop(now + release + 0.03);
+    }catch(e){}
+  }
 
   const adventures = {
     mountain: {
@@ -259,16 +369,12 @@
   function stopAnimation(){
     if(animationFrame) cancelAnimationFrame(animationFrame);
     animationFrame = null;
-  }
-
-  function resetPremadeVisual(){
-    stopAnimation();
-    path.style.strokeDasharray = '';
-    path.style.strokeDashoffset = '';
-    crayon.style.opacity = '0';
+    drawPlayback = false;
+    stopVoice();
   }
 
   function selectAdventure(name){
+    ensureAudio();
     exitDrawingMode();
     currentAdventure = adventures[name];
     path.setAttribute('d', currentAdventure.d);
@@ -276,12 +382,14 @@
     prompt.classList.add('show');
     controls.classList.add('show');
     playBtn.style.display='inline-block';
+    playBtn.textContent='▶ Play Again';
     clearBtn.textContent='↺ Clear';
     animateCurrent();
   }
 
   function animateCurrent(){
     if(!currentAdventure) return;
+    ensureAudio();
     stopAnimation();
     svg.style.display='block';
     canvas.style.display='none';
@@ -290,6 +398,8 @@
     path.style.strokeDashoffset = `${len}`;
     crayon.style.opacity='1';
     const start = performance.now();
+    const first = path.getPointAtLength(0);
+    startVoice(first.y, 500);
 
     function tick(now){
       const p = Math.min(1,(now-start)/currentAdventure.duration);
@@ -297,11 +407,13 @@
       const pt = path.getPointAtLength(len*p);
       crayon.style.left = `${pt.x/10}%`;
       crayon.style.top = `${pt.y/5}%`;
+      updateVoice(pt.y, 500);
       if(p < 1){
         animationFrame = requestAnimationFrame(tick);
       } else {
         animationFrame = null;
         crayon.style.opacity='0';
+        stopVoice();
       }
     }
     animationFrame=requestAnimationFrame(tick);
@@ -310,8 +422,11 @@
   function clearAll(){
     stopAnimation();
     if(canvas.style.display==='block'){
-      fitCanvas();
+      fitCanvas(false);
       ctx.clearRect(0,0,canvas.width,canvas.height);
+      drawPoints=[];
+      playBtn.style.display='none';
+      crayon.style.opacity='0';
     } else {
       path.setAttribute('d','');
       crayon.style.opacity='0';
@@ -321,13 +436,15 @@
     }
   }
 
-  function fitCanvas(){
+  function fitCanvas(clear=true){
     const r=canvas.getBoundingClientRect();
     const dpr=Math.max(1,window.devicePixelRatio||1);
-    canvas.width=Math.round(r.width*dpr);
-    canvas.height=Math.round(r.height*dpr);
+    if(clear || canvas.width === 0){
+      canvas.width=Math.round(r.width*dpr);
+      canvas.height=Math.round(r.height*dpr);
+    }
     ctx=canvas.getContext('2d');
-    ctx.scale(dpr,dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
     ctx.lineWidth=Math.max(5,r.width*0.007);
     ctx.lineCap='round';
     ctx.lineJoin='round';
@@ -335,22 +452,26 @@
   }
 
   function enterDrawingMode(){
+    ensureAudio();
     stopAnimation();
     currentAdventure=null;
     path.setAttribute('d','');
     svg.style.display='none';
     canvas.style.display='block';
     fitCanvas();
+    drawPoints=[];
     prompt.textContent='Create your own melodic adventure with the purple crayon!';
     prompt.classList.add('show');
     controls.classList.add('show');
     playBtn.style.display='none';
+    playBtn.textContent='▶ Play Drawing';
     clearBtn.textContent='↺ Clear Drawing';
     drawingModeBanner.classList.add('show');
   }
 
   function exitDrawingMode(){
     drawing=false;
+    stopVoice();
     drawingModeBanner.classList.remove('show');
     canvas.style.display='none';
     svg.style.display='block';
@@ -360,19 +481,116 @@
     const r=canvas.getBoundingClientRect();
     return {x:e.clientX-r.left,y:e.clientY-r.top};
   }
+
+  function redrawDrawPath(){
+    const r=canvas.getBoundingClientRect();
+    fitCanvas();
+    ctx.clearRect(0,0,r.width,r.height);
+    if(drawPoints.length<2) return;
+    ctx.beginPath();
+    ctx.moveTo(drawPoints[0].x*r.width, drawPoints[0].y*r.height);
+    for(let i=1;i<drawPoints.length;i++){
+      ctx.lineTo(drawPoints[i].x*r.width, drawPoints[i].y*r.height);
+    }
+    ctx.stroke();
+  }
+
+  function playDrawnPath(){
+    if(drawPoints.length < 2 || drawPlayback) return;
+    ensureAudio();
+    stopAnimation();
+    drawPlayback = true;
+    const r=canvas.getBoundingClientRect();
+
+    // Build cumulative distances so playback travels at a steady visual speed.
+    const dist=[0];
+    let total=0;
+    for(let i=1;i<drawPoints.length;i++){
+      const dx=(drawPoints[i].x-drawPoints[i-1].x)*r.width;
+      const dy=(drawPoints[i].y-drawPoints[i-1].y)*r.height;
+      total += Math.hypot(dx,dy);
+      dist.push(total);
+    }
+    if(total<1){ drawPlayback=false; return; }
+    const duration=Math.max(3000, Math.min(9000, total*7.5));
+    const start=performance.now();
+    crayon.style.opacity='1';
+    startVoice(drawPoints[0].y*r.height, r.height);
+
+    function tick(now){
+      const p=Math.min(1,(now-start)/duration);
+      const target=total*p;
+      let i=1;
+      while(i<dist.length && dist[i]<target) i++;
+      i=Math.min(i,dist.length-1);
+      const d0=dist[i-1], d1=dist[i];
+      const local=d1>d0 ? (target-d0)/(d1-d0) : 0;
+      const a=drawPoints[i-1], b=drawPoints[i];
+      const x=(a.x+(b.x-a.x)*local)*r.width;
+      const y=(a.y+(b.y-a.y)*local)*r.height;
+      crayon.style.left=`${(x/r.width)*100}%`;
+      crayon.style.top=`${(y/r.height)*100}%`;
+      updateVoice(y,r.height);
+      if(p<1 && drawPlayback){
+        animationFrame=requestAnimationFrame(tick);
+      }else{
+        animationFrame=null;
+        drawPlayback=false;
+        crayon.style.opacity='0';
+        stopVoice();
+      }
+    }
+    animationFrame=requestAnimationFrame(tick);
+  }
+
   canvas.addEventListener('pointerdown',e=>{
+    stopAnimation();
+    ensureAudio();
     drawing=true;
     canvas.setPointerCapture(e.pointerId);
+    const r=canvas.getBoundingClientRect();
     const p=pointFromEvent(e);
-    ctx.beginPath();ctx.moveTo(p.x,p.y);
+
+    // A new stroke becomes the new melodic path.
+    drawPoints=[{x:p.x/r.width,y:p.y/r.height}];
+    fitCanvas();
+    ctx.clearRect(0,0,r.width,r.height);
+    ctx.beginPath();
+    ctx.moveTo(p.x,p.y);
+    crayon.style.opacity='1';
+    crayon.style.left=`${(p.x/r.width)*100}%`;
+    crayon.style.top=`${(p.y/r.height)*100}%`;
+    startVoice(p.y,r.height);
   });
+
   canvas.addEventListener('pointermove',e=>{
     if(!drawing) return;
+    const r=canvas.getBoundingClientRect();
     const p=pointFromEvent(e);
-    ctx.lineTo(p.x,p.y);ctx.stroke();
+    const last=drawPoints[drawPoints.length-1];
+    const nx=p.x/r.width, ny=p.y/r.height;
+    if(!last || Math.hypot((nx-last.x)*r.width,(ny-last.y)*r.height)>2){
+      drawPoints.push({x:nx,y:ny});
+    }
+    ctx.lineTo(p.x,p.y);
+    ctx.stroke();
+    crayon.style.left=`${nx*100}%`;
+    crayon.style.top=`${ny*100}%`;
+    updateVoice(p.y,r.height);
   });
-  canvas.addEventListener('pointerup',()=>drawing=false);
-  canvas.addEventListener('pointercancel',()=>drawing=false);
+
+  function finishDrawing(){
+    if(!drawing) return;
+    drawing=false;
+    stopVoice();
+    crayon.style.opacity='0';
+    if(drawPoints.length>1){
+      playBtn.style.display='inline-block';
+      playBtn.textContent='▶ Play Drawing';
+    }
+  }
+  canvas.addEventListener('pointerup',finishDrawing);
+  canvas.addEventListener('pointercancel',finishDrawing);
 
   document.getElementById('mountainBtn').onclick=()=>selectAdventure('mountain');
   document.getElementById('oceanBtn').onclick=()=>selectAdventure('ocean');
@@ -381,11 +599,14 @@
   document.getElementById('flatBtn').onclick=()=>selectAdventure('flat');
   document.getElementById('stairsBtn').onclick=()=>selectAdventure('stairs');
   document.getElementById('drawBtn').onclick=enterDrawingMode;
-  playBtn.onclick=animateCurrent;
+  playBtn.onclick=()=>{
+    if(canvas.style.display==='block') playDrawnPath();
+    else animateCurrent();
+  };
   clearBtn.onclick=clearAll;
 
   window.addEventListener('resize',()=>{
-    if(canvas.style.display==='block') fitCanvas();
+    if(canvas.style.display==='block') redrawDrawPath();
   });
 })();
 </script>
