@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>USA Travel Postcard Rondo</title>
+<style>
+:root{
+  --ink:#2c3540; --navy:#24445c; --red:#bd4b43; --gold:#d4a84f;
+  --paper:#efe4c9; --shadow:0 12px 30px rgba(52,46,35,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+body{
+  background:
+    radial-gradient(circle at 20% 10%,rgba(255,255,255,.55),transparent 24%),
+    linear-gradient(135deg,#8fb8c5,#d5c789 38%,#9ebc8d 70%,#d8ae78);
+}
+.app{width:min(1500px,100%);min-height:100vh;margin:auto;padding:16px}
+.header{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;margin-bottom:12px}
+.title h1{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(26px,3vw,46px);color:#243f50}
+.title p{margin:5px 0 0;color:#56616a;font-weight:600}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+button{border:0;border-radius:12px;padding:10px 15px;font-weight:800;font-size:14px;cursor:pointer;color:#fff;background:var(--navy);box-shadow:0 5px 12px rgba(0,0,0,.14)}
+button.secondary{background:#7f6b4d}
+button:disabled{opacity:.45;cursor:default}
+.board{
+  position:relative;border:10px solid #765a37;border-radius:18px;
+  background:
+    linear-gradient(rgba(255,255,255,.12),rgba(255,255,255,.12)),
+    repeating-linear-gradient(0deg,transparent 0 31px,rgba(70,60,43,.055) 32px),
+    linear-gradient(135deg,#dce9cf 0%,#f2e6ad 36%,#d9e7ef 68%,#ead3b5 100%);
+  box-shadow:var(--shadow),inset 0 0 0 2px rgba(255,255,255,.25);overflow:hidden;
+}
+.decor{position:absolute;z-index:0;width:130px;height:88px;background:#f8f2e4;border:5px solid #fff;box-shadow:0 5px 12px rgba(0,0,0,.16);padding:8px;font:700 11px Georgia,serif;color:#654e3a;pointer-events:none}
+.decor.three{left:30px;bottom:18px;transform:rotate(5deg)}
+.decor .scene{height:45px;border-radius:3px;margin-bottom:5px}
+.scene.park{background:linear-gradient(#8eb7c5 0 45%,#587760 46% 66%,#83a66f 67%)}
+
+.map-shell{position:relative;z-index:2;padding:12px 14px 5px;background:#b9dbea}
+#usMap{display:block;width:100%;height:auto;max-height:64vh;background:#b9dbea;border-radius:10px}
+
+.state{stroke:#667078;stroke-width:1.05;cursor:pointer;transition:filter .12s}
+.state.c0,.inset-state.c0{fill:#f4d58d}.state.c1,.inset-state.c1{fill:#a8d5ba}.state.c2,.inset-state.c2{fill:#9ec5e5}.state.c3,.inset-state.c3{fill:#e9a9a9}
+.state.c4,.inset-state.c4{fill:#c9b5df}.state.c5,.inset-state.c5{fill:#f0c99f}.state.c6,.inset-state.c6{fill:#b9d7a8}.state.c7,.inset-state.c7{fill:#f3e2a9}
+.state:hover{filter:brightness(.9) saturate(1.18);stroke:#34444f;stroke-width:1.5}
+.state.selected{filter:saturate(1.45) brightness(.9);stroke:#a03f35;stroke-width:2.2}
+.label{pointer-events:none;fill:#27343c;font:800 9.5px Arial,sans-serif;text-anchor:middle;dominant-baseline:central}
+.label.small{font-size:7px}
+
+.inset-frame{fill:#eef5f0;stroke:#6d6250;stroke-width:2.2}
+.inset-title{fill:#4c5560;font:900 13px Arial,sans-serif;letter-spacing:.08em;text-anchor:middle}
+.inset-state{stroke:#667078;stroke-width:.75;cursor:pointer}
+.inset-state:hover{filter:brightness(.9) saturate(1.18);stroke:#34444f;stroke-width:1.1}
+.inset-state.selected{filter:saturate(1.45) brightness(.9);stroke:#a03f35;stroke-width:1.5}
+.inset-label{pointer-events:none;fill:#24323a;font:900 11px Arial,sans-serif;text-anchor:middle;dominant-baseline:central}
+.akhi-box{fill:none;stroke:#776c5a;stroke-width:2;stroke-dasharray:6 4}
+.akhi-title{fill:#615a4e;font:900 11px Arial,sans-serif;text-anchor:middle;letter-spacing:.06em}
+
+.pin{pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.pin path{fill:#c94139;stroke:#fff;stroke-width:1.5}.pin circle{fill:#fff}.pin text{fill:#fff;font:900 10px Arial;text-anchor:middle}
+
+.beat-area{position:relative;z-index:4;background:rgba(248,241,223,.9);border-top:2px dashed rgba(85,68,46,.35);padding:12px}
+.beat-head{display:flex;justify-content:space-between;gap:10px;align-items:end;margin-bottom:8px}
+.beat-head h2{margin:0;font:700 clamp(19px,2vw,28px) Georgia,serif;color:#354e59}
+.beat-head span{font-size:13px;color:#6d665a;font-weight:700}
+.beats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.beat{position:relative;min-height:150px;border:2px solid rgba(74,64,49,.3);border-radius:12px;background:rgba(255,255,255,.42);padding:8px}
+.beat-num{position:absolute;left:8px;top:7px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#314f62;color:#fff;font-weight:900;z-index:5}
+.empty{height:100%;min-height:130px;display:grid;place-items:center;text-align:center;color:#8b8170;font-weight:700;font-size:13px}
+.postcard{position:absolute;inset:8px;border:6px solid #fff;border-radius:5px;box-shadow:0 6px 14px rgba(0,0,0,.17);overflow:hidden;cursor:pointer;transform:rotate(var(--tilt));background:#d6c29e}
+.card-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#d7c6a4}
+.card-photo-fallback{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:25px;background:linear-gradient(145deg,#91b4c4,#d6c18c 55%,#78946f);color:white;font:800 17px Georgia,serif}
+.postcard::after{content:"";position:absolute;inset:0;background:linear-gradient(145deg,rgba(255,255,255,.12),transparent 38%,rgba(30,25,20,.17));pointer-events:none}
+.card-copy{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:10px 10px 9px;text-align:center;background:linear-gradient(transparent,rgba(28,33,36,.86) 32%);color:#fff;text-shadow:0 2px 2px rgba(0,0,0,.5)}
+.greeting{display:block;font:italic 700 clamp(15px,2vw,22px) Georgia,serif}
+.landmark-name{display:block;margin-top:2px;font:700 11px Georgia,serif}
+.card-x{position:absolute;left:37px;top:9px;z-index:6;width:23px;height:23px;padding:0;border-radius:50%;background:rgba(39,49,55,.82);font-size:13px;box-shadow:none}
+.play-note{text-align:center;margin-top:8px;color:#6f6659;font-size:12px;font-weight:700}
+
+@media(max-width:850px){.header{grid-template-columns:1fr}.controls{justify-content:flex-start}#usMap{max-height:none}}
+@media(max-width:620px){.app{padding:8px}.board{border-width:6px}.beats{grid-template-columns:repeat(2,minmax(0,1fr))}.beat{min-height:125px}.empty{min-height:105px}.decor{display:none}.label{font-size:7.5px}.label.small{font-size:5.7px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="title">
+      <h1>USA Travel Postcard Rondo</h1>
+      <p>Ask the class where they traveled. Click each state to build a four-beat travel pattern.</p>
+    </div>
+    <div class="controls">
+      <button id="fullscreenBtn">⛶ Full Screen</button>
+      <button id="clearBtn" class="secondary">Reset Trip</button>
+    </div>
+  </div>
+
+  <section class="board">
+    <div class="decor three"><div class="scene park"></div>See America!</div>
+
+    <div class="map-shell">
+      <svg id="usMap" viewBox="0 0 1225 610" aria-label="Clickable United States map">
+        <text id="loading" x="487" y="300" text-anchor="middle" font-size="24" fill="#5f625e">Loading the travel map…</text>
+      </svg>
+    </div>
+
+    <div class="beat-area">
+      <div class="beat-head">
+        <h2>Our Travel Rondo</h2>
+        <span>One state = one beat • four beats total</span>
+      </div>
+      <div id="beats" class="beats"></div>
+      <div class="play-note">Click a postcard to remove that state. Click Reset Trip to begin again.</div>
+    </div>
+  </section>
+</div>
+
+<script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import { feature } from "https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/+esm";
+import us from "https://cdn.jsdelivr.net/npm/us-atlas@3.0.1/states-albers-10m.json/+esm";
+
+const stateInfo={
+"01":["AL","Alabama"],"02":["AK","Alaska"],"04":["AZ","Arizona"],"05":["AR","Arkansas"],"06":["CA","California"],
+"08":["CO","Colorado"],"09":["CT","Connecticut"],"10":["DE","Delaware"],"12":["FL","Florida"],"13":["GA","Georgia"],
+"15":["HI","Hawaii"],"16":["ID","Idaho"],"17":["IL","Illinois"],"18":["IN","Indiana"],"19":["IA","Iowa"],
+"20":["KS","Kansas"],"21":["KY","Kentucky"],"22":["LA","Louisiana"],"23":["ME","Maine"],"24":["MD","Maryland"],
+"25":["MA","Massachusetts"],"26":["MI","Michigan"],"27":["MN","Minnesota"],"28":["MS","Mississippi"],"29":["MO","Missouri"],
+"30":["MT","Montana"],"31":["NE","Nebraska"],"32":["NV","Nevada"],"33":["NH","New Hampshire"],"34":["NJ","New Jersey"],
+"35":["NM","New Mexico"],"36":["NY","New York"],"37":["NC","North Carolina"],"38":["ND","North Dakota"],"39":["OH","Ohio"],
+"40":["OK","Oklahoma"],"41":["OR","Oregon"],"42":["PA","Pennsylvania"],"44":["RI","Rhode Island"],"45":["SC","South Carolina"],
+"46":["SD","South Dakota"],"47":["TN","Tennessee"],"48":["TX","Texas"],"49":["UT","Utah"],"50":["VT","Vermont"],
+"51":["VA","Virginia"],"53":["WA","Washington"],"54":["WV","West Virginia"],"55":["WI","Wisconsin"],"56":["WY","Wyoming"]
+};
+
+const landmark={
+AL:["Little River Canyon","Alabama,canyon,waterfall"],AK:["Denali National Park","Alaska,Denali,mountain"],AZ:["Grand Canyon","Arizona,Grand,Canyon"],
+AR:["Hot Springs National Park","Arkansas,Hot,Springs"],CA:["Yosemite National Park","California,Yosemite"],CO:["Rocky Mountain National Park","Colorado,Rocky,Mountains"],
+CT:["Mystic Seaport","Connecticut,Mystic,Seaport"],DE:["Cape Henlopen Lighthouse","Delaware,lighthouse"],FL:["Everglades National Park","Florida,Everglades"],
+GA:["Savannah","Georgia,Savannah"],HI:["Hawaiʻi Volcanoes National Park","Hawaii,volcano"],ID:["Shoshone Falls","Idaho,Shoshone,Falls"],
+IL:["Chicago Skyline","Illinois,Chicago,skyline"],IN:["Indiana Dunes National Park","Indiana,Dunes"],IA:["Field of Dreams","Iowa,Field,of,Dreams"],
+KS:["Monument Rocks","Kansas,Monument,Rocks"],KY:["Mammoth Cave National Park","Kentucky,Mammoth,Cave"],LA:["New Orleans French Quarter","Louisiana,New,Orleans,French,Quarter"],
+ME:["Acadia National Park","Maine,Acadia"],MD:["Chesapeake Bay","Maryland,Chesapeake,Bay"],MA:["Boston","Massachusetts,Boston"],
+MI:["Pictured Rocks","Michigan,Pictured,Rocks"],MN:["Split Rock Lighthouse","Minnesota,Split,Rock,Lighthouse"],MS:["Natchez Trace","Mississippi,Natchez,Trace"],
+MO:["Gateway Arch","Missouri,Gateway,Arch"],MT:["Glacier National Park","Montana,Glacier"],NE:["Scotts Bluff","Nebraska,Scotts,Bluff"],
+NV:["Valley of Fire","Nevada,Valley,of,Fire"],NH:["White Mountains","New,Hampshire,White,Mountains"],NJ:["Cape May Lighthouse","New,Jersey,Cape,May,Lighthouse"],
+NM:["White Sands National Park","New,Mexico,White,Sands"],NY:["Statue of Liberty","New,York,Statue,of,Liberty"],NC:["Blue Ridge Parkway","North,Carolina,Blue,Ridge,Parkway"],
+ND:["Theodore Roosevelt National Park","North,Dakota,Theodore,Roosevelt,National,Park"],OH:["Hocking Hills","Ohio,Hocking,Hills"],OK:["Wichita Mountains","Oklahoma,Wichita,Mountains"],
+OR:["Crater Lake National Park","Oregon,Crater,Lake"],PA:["Liberty Bell","Pennsylvania,Liberty,Bell"],RI:["Newport Lighthouse","Rhode,Island,Newport,lighthouse"],
+SC:["Charleston","South,Carolina,Charleston"],SD:["Mount Rushmore","South,Dakota,Mount,Rushmore"],TN:["Great Smoky Mountains","Tennessee,Great,Smoky,Mountains"],
+TX:["Big Bend National Park","Texas,Big,Bend"],UT:["Arches National Park","Utah,Arches"],VT:["Stowe","Vermont,Stowe"],
+VA:["Shenandoah National Park","Virginia,Shenandoah"],WA:["Mount Rainier National Park","Washington,Mount,Rainier"],WV:["New River Gorge","West,Virginia,New,River,Gorge"],
+WI:["Apostle Islands","Wisconsin,Apostle,Islands"],WY:["Yellowstone National Park","Wyoming,Yellowstone"]
+};
+
+const tiny=new Set(["RI","DE","CT","NJ","MA","MD","VT","NH","HI"]);
+
+const wikiPage={
+AL:"Little River Canyon National Preserve",AK:"Denali National Park and Preserve",AZ:"Grand Canyon National Park",
+AR:"Hot Springs National Park",CA:"Yosemite National Park",CO:"Rocky Mountain National Park",CT:"Mystic Seaport",
+DE:"Cape Henlopen State Park",FL:"Everglades National Park",GA:"Savannah, Georgia",HI:"Hawaiʻi Volcanoes National Park",
+ID:"Shoshone Falls",IL:"Chicago",IN:"Indiana Dunes National Park",IA:"Field of Dreams",KS:"Monument Rocks (Kansas)",
+KY:"Mammoth Cave National Park",LA:"French Quarter",ME:"Acadia National Park",MD:"Chesapeake Bay",
+MA:"Boston",MI:"Pictured Rocks National Lakeshore",MN:"Split Rock Lighthouse",MS:"Natchez Trace Parkway",
+MO:"Gateway Arch",MT:"Glacier National Park (U.S.)",NE:"Scotts Bluff National Monument",NV:"Valley of Fire State Park",
+NH:"White Mountains (New Hampshire)",NJ:"Cape May Lighthouse",NM:"White Sands National Park",NY:"Statue of Liberty",
+NC:"Blue Ridge Parkway",ND:"Theodore Roosevelt National Park",OH:"Hocking Hills State Park",
+OK:"Wichita Mountains Wildlife Refuge",OR:"Crater Lake National Park",PA:"Liberty Bell",RI:"Castle Hill Light",
+SC:"Charleston, South Carolina",SD:"Mount Rushmore",TN:"Great Smoky Mountains National Park",
+TX:"Big Bend National Park",UT:"Arches National Park",VT:"Stowe, Vermont",VA:"Shenandoah National Park",
+WA:"Mount Rainier National Park",WV:"New River Gorge National Park and Preserve",WI:"Apostle Islands National Lakeshore",
+WY:"Yellowstone National Park"
+};
+
+const northeastIds=new Set(["23","33","50","25","44","09","36","34","10","24"]);
+const mainHiddenLabels=new Set(["RI","DE","CT","NJ","MA","MD","VT","NH"]);
+const labelOffset={
+  FL:[10,-12],
+  ID:[4,3],
+  OK:[4,1],
+  MN:[4,3],
+  MI:[7,8],
+  LA:[-1,0],
+  WI:[2,3],
+  CA:[-2,2],
+  WV:[1,0]
+};
+
+const svg=d3.select("#usMap");
+const allStates=feature(us,us.objects.states).features.filter(d=>stateInfo[String(d.id).padStart(2,"0")]);
+const path=d3.geoPath();
+const chosen=[];
+document.getElementById("loading")?.remove();
+
+const stateLayer=svg.append("g");
+stateLayer.selectAll("path").data(allStates).join("path")
+  .attr("class",(d,i)=>"state c"+(i%8))
+  .attr("d",path)
+  .attr("data-id",d=>String(d.id).padStart(2,"0"))
+  .on("click",(e,d)=>addState(String(d.id).padStart(2,"0")))
+  .append("title")
+  .text(d=>stateInfo[String(d.id).padStart(2,"0")][1]);
+
+function centerOfBounds(d){
+  const b=path.bounds(d);
+  return [(b[0][0]+b[1][0])/2,(b[0][1]+b[1][1])/2];
+}
+
+svg.append("g").selectAll("text").data(allStates).join("text")
+  .attr("class",d=>"label "+(tiny.has(stateInfo[String(d.id).padStart(2,"0")][0])?"small":""))
+  .attr("display",d=>mainHiddenLabels.has(stateInfo[String(d.id).padStart(2,"0")][0])?"none":null)
+  .attr("x",d=>{
+    const ab=stateInfo[String(d.id).padStart(2,"0")][0], c=path.centroid(d), off=labelOffset[ab]||[0,0];
+    return c[0]+off[0];
+  })
+  .attr("y",d=>{
+    const ab=stateInfo[String(d.id).padStart(2,"0")][0], c=path.centroid(d), off=labelOffset[ab]||[0,0];
+    return c[1]+off[1];
+  })
+  .text(d=>stateInfo[String(d.id).padStart(2,"0")][0]);
+
+// Traditional Alaska and Hawaii boxes, including larger visible abbreviations.
+["02","15"].forEach(id=>{
+  const f=allStates.find(d=>String(d.id).padStart(2,"0")===id);
+  const b=path.bounds(f), pad=9, ab=stateInfo[id][0];
+  svg.insert("rect",":first-child").attr("class","akhi-box")
+    .attr("x",b[0][0]-pad).attr("y",b[0][1]-pad)
+    .attr("width",b[1][0]-b[0][0]+pad*2).attr("height",b[1][1]-b[0][1]+pad*2);
+  svg.append("text").attr("class","akhi-title")
+    .attr("x",(b[0][0]+b[1][0])/2).attr("y",b[0][1]-13).text(ab);
+});
+
+// Enlarged Northeast inset.
+const neStates=allStates.filter(d=>northeastIds.has(String(d.id).padStart(2,"0")));
+const neBounds=neStates.reduce((a,d)=>{
+  const b=path.bounds(d);
+  a[0][0]=Math.min(a[0][0],b[0][0]);a[0][1]=Math.min(a[0][1],b[0][1]);
+  a[1][0]=Math.max(a[1][0],b[1][0]);a[1][1]=Math.max(a[1][1],b[1][1]);
+  return a;
+},[[Infinity,Infinity],[-Infinity,-Infinity]]);
+
+const inset={x:995,y:65,w:210,h:265,pad:18};
+svg.append("rect").attr("class","inset-frame")
+  .attr("x",inset.x).attr("y",inset.y).attr("width",inset.w).attr("height",inset.h).attr("rx",8);
+svg.append("text").attr("class","inset-title")
+  .attr("x",inset.x+inset.w/2).attr("y",inset.y+18).text("NORTHEAST");
+
+const sx=(inset.w-inset.pad*2)/(neBounds[1][0]-neBounds[0][0]);
+const sy=(inset.h-inset.pad*2-18)/(neBounds[1][1]-neBounds[0][1]);
+const neScale=Math.min(sx,sy);
+const tx=inset.x+inset.pad-neBounds[0][0]*neScale;
+const ty=inset.y+inset.pad+16-neBounds[0][1]*neScale;
+
+const neGroup=svg.append("g").attr("transform",`translate(${tx},${ty}) scale(${neScale})`);
+neGroup.selectAll("path").data(neStates).join("path")
+  .attr("class",(d,i)=>"inset-state c"+(i%8))
+  .attr("d",path)
+  .on("click",(e,d)=>addState(String(d.id).padStart(2,"0")));
+
+const neAdjust={
+  RI:[7,4],CT:[0,3],MA:[5,0],NJ:[5,3],DE:[6,5],MD:[6,7],
+  VT:[-2,0],NH:[3,0],NY:[-3,1],ME:[3,-1]
+};
+const neLabels=svg.append("g");
+neStates.forEach(d=>{
+  const id=String(d.id).padStart(2,"0"), ab=stateInfo[id][0], c=path.centroid(d);
+  const adj=neAdjust[ab]||[0,0];
+  neLabels.append("text").attr("class","inset-label")
+    .attr("x",c[0]*neScale+tx+adj[0]).attr("y",c[1]*neScale+ty+adj[1]).text(ab);
+});
+
+
+async function loadWikipediaPhoto(img, abbr, landmarkName){
+  const page=wikiPage[abbr];
+  if(!page){ img.style.display="none"; return; }
+  try{
+    const url=`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(page)}`;
+    const response=await fetch(url);
+    if(!response.ok) throw new Error("image lookup failed");
+    const data=await response.json();
+    const src=data.thumbnail?.source || data.originalimage?.source;
+    if(!src) throw new Error("no thumbnail");
+    img.src=src;
+    img.alt=`${landmarkName}, ${stateInfo[Object.keys(stateInfo).find(k=>stateInfo[k][0]===abbr)]?.[1]||abbr}`;
+  }catch(e){
+    img.style.display="none";
+  }
+}
+
+function addState(id){
+  if(chosen.length>=4)return;
+  chosen.push(id);
+  drawPins();
+  drawBeats();
+}
+
+function removeBeat(index){
+
+  chosen.splice(index,1);
+  drawPins();
+  drawBeats();
+}
+
+function drawPins(){
+  stateLayer.selectAll(".state").classed("selected",d=>chosen.includes(String(d.id).padStart(2,"0")));
+  svg.selectAll(".inset-state").classed("selected",d=>chosen.includes(String(d.id).padStart(2,"0")));
+  svg.selectAll(".pin-layer").remove();
+  const layer=svg.append("g").attr("class","pin-layer");
+  chosen.forEach((id,i)=>{
+    const f=allStates.find(d=>String(d.id).padStart(2,"0")===id);
+    if(!f)return;
+    const [x,y]=centerOfBounds(f);
+    const g=layer.append("g").attr("class","pin").attr("transform",`translate(${x},${y-17})`);
+    g.append("path").attr("d","M0,-11C-8,-11-13,-5-13,2C-13,12 0,25 0,25C0,25 13,12 13,2C13,-5 8,-11 0,-11Z");
+    g.append("circle").attr("cx",0).attr("cy",0).attr("r",4);
+    g.append("text").attr("x",0).attr("y",5).text(i+1);
+  });
+}
+
+function drawBeats(){
+  const root=document.getElementById("beats");
+  root.innerHTML="";
+  for(let i=0;i<4;i++){
+    const beat=document.createElement("div");
+    beat.className="beat";
+    beat.innerHTML=`<div class="beat-num">${i+1}</div>`;
+    if(chosen[i]){
+      const [abbr,name]=stateInfo[chosen[i]];
+      const [landmarkName,photoQuery]=landmark[abbr]||[name,name];
+      const card=document.createElement("div");
+      card.className="postcard";
+      card.style.setProperty("--tilt",`${[-1.3,1,-.8,1.4][i]}deg`);
+      card.innerHTML=`
+        <button class="card-x" title="Remove ${name}" aria-label="Remove ${name}">×</button>
+        <div class="card-photo-fallback">${landmarkName}</div>
+        <img class="card-photo" alt="${landmarkName}, ${name}" loading="lazy">
+        <div class="card-copy">
+          <span class="greeting">Greetings from ${name}</span>
+          <span class="landmark-name">${landmarkName}</span>
+        </div>`;
+      card.querySelector(".card-x").onclick=(e)=>{e.stopPropagation();removeBeat(i)};
+      card.onclick=()=>removeBeat(i);
+      beat.appendChild(card);
+      loadWikipediaPhoto(card.querySelector(".card-photo"),abbr,landmarkName);
+    }else{
+      const empty=document.createElement("div");
+      empty.className="empty";
+      empty.innerHTML="Choose a state<br>from the map";
+      beat.appendChild(empty);
+    }
+    root.appendChild(beat);
+  }
+}
+
+document.getElementById("clearBtn").onclick=()=>{
+
+  chosen.length=0;drawPins();drawBeats();
+};
+
+
+document.getElementById("fullscreenBtn").onclick=async()=>{
+  const btn=document.getElementById("fullscreenBtn");
+  try{
+    if(!document.fullscreenElement){
+      await document.documentElement.requestFullscreen();
+    }else{
+      await document.exitFullscreen();
+    }
+  }catch(e){
+    console.warn("Fullscreen is not available in this browser.",e);
+  }
+};
+
+document.addEventListener("fullscreenchange",()=>{
+  const btn=document.getElementById("fullscreenBtn");
+  btn.textContent=document.fullscreenElement ? "⛶ Exit Full Screen" : "⛶ Full Screen";
+});
+
+drawBeats();
+</script>
+</body>
+</html>
