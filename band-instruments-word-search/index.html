@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Band Instruments Word Search</title>
+<style>
+:root{
+  --bg:#f7f1e6;
+  --paper:#fffdf8;
+  --ink:#21304a;
+  --muted:#6f7680;
+  --navy:#173a6b;
+  --navy-deep:#102b50;
+  --blue:#2f67c7;
+  --blue-soft:#e9f1ff;
+  --gold:#d9a441;
+  --gold-soft:#f8edcf;
+  --line:#d9d4c8;
+  --panel:#f8fbff;
+  --panel-edge:#cfdced;
+  --shadow:0 14px 32px rgba(51,54,65,.12);
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255,255,255,.85), transparent 30%),
+    linear-gradient(180deg,#fbf6ed 0%,#f4ecde 100%);
+  color:var(--ink);
+  font-family:Arial,Helvetica,sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+body{padding:10px}
+.app{
+  width:min(1180px,100%);
+  height:100%;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+.topbar{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:12px;
+  flex:0 0 auto;
+  margin-bottom:10px;
+  padding:2px 4px 0;
+}
+h1{
+  margin:0;
+  grid-column:2;
+  text-align:center;
+  font-size:clamp(26px,3.2vw,44px);
+  letter-spacing:.05em;
+  line-height:1;
+  color:var(--navy-deep);
+  text-shadow:0 1px 0 #fff;
+  position:relative;
+}
+h1::before,
+h1::after{
+  content:"♪";
+  display:inline-block;
+  margin:0 .28em;
+  color:var(--gold);
+  font-size:.68em;
+  vertical-align:.13em;
+}
+.counter{
+  justify-self:start;
+  background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);
+  border:2px solid #c7d5e6;
+  color:var(--navy-deep);
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:clamp(13px,1.5vw,17px);
+  font-weight:800;
+  white-space:nowrap;
+  box-shadow:0 4px 12px rgba(23,58,107,.08);
+}
+.controls{
+  justify-self:end;
+  display:flex;
+  gap:8px;
+}
+button{
+  border:0;
+  border-radius:11px;
+  padding:10px 14px;
+  font-weight:800;
+  font-size:clamp(12px,1.4vw,15px);
+  color:white;
+  cursor:pointer;
+  letter-spacing:.02em;
+  box-shadow:0 5px 12px rgba(23,58,107,.14);
+  transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+button:hover{
+  filter:brightness(1.04);
+  box-shadow:0 7px 15px rgba(23,58,107,.18);
+}
+button:active{transform:translateY(1px)}
+#fullscreenBtn{
+  background:linear-gradient(180deg,#1d3557 0%,#102b50 100%);
+}
+#newPuzzleBtn{
+  background:linear-gradient(180deg,#3c78db 0%,#2f67c7 100%);
+}
+.card{
+  flex:1 1 auto;
+  min-height:0;
+  background:var(--paper);
+  border:1px solid rgba(125,105,74,.12);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+  padding:12px 16px 10px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+.card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:22px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);
+}
+.game{
+  flex:1 1 auto;
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(145px,1fr) auto minmax(145px,1fr);
+  gap:clamp(14px,2vw,30px);
+  align-items:center;
+}
+.bank{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:3px;
+  align-content:center;
+  background:linear-gradient(180deg,#f8fbff 0%,#f2f7fc 100%);
+  border:1.5px solid var(--panel-edge);
+  border-radius:18px;
+  padding:34px 10px 12px;
+  position:relative;
+  box-shadow:inset 0 1px 0 #fff, 0 6px 16px rgba(23,58,107,.06);
+}
+.bank::before{
+  content:"INSTRUMENTS";
+  position:absolute;
+  top:-1px;
+  left:50%;
+  transform:translate(-50%,-40%);
+  background:linear-gradient(180deg,#214e8c 0%,#173a6b 100%);
+  color:#fff;
+  border-radius:10px;
+  padding:7px 14px;
+  font-size:clamp(11px,1.15vw,14px);
+  font-weight:800;
+  letter-spacing:.05em;
+  box-shadow:0 4px 10px rgba(23,58,107,.16);
+  white-space:nowrap;
+}
+.word{
+  text-align:center;
+  font-weight:800;
+  font-size:clamp(12px,1.35vw,17px);
+  letter-spacing:.025em;
+  padding:6px 3px;
+  border-radius:8px;
+  white-space:nowrap;
+  color:var(--ink);
+  position:relative;
+}
+.word:not(:last-child)::after{
+  content:"";
+  position:absolute;
+  left:10%;
+  right:10%;
+  bottom:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#dbe4ef,transparent);
+}
+.word.found{
+  color:var(--muted);
+  text-decoration:line-through;
+  text-decoration-thickness:2px;
+  background:#edf1f5;
+}
+.grid-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  min-height:0;
+  position:relative;
+  padding:12px;
+  background:
+    linear-gradient(180deg,#fffefa 0%,#fffaf0 100%);
+  border:3px solid var(--navy);
+  border-radius:18px;
+  box-shadow:
+    inset 0 0 0 4px rgba(217,164,65,.16),
+    0 8px 18px rgba(23,58,107,.08);
+}
+#grid{
+  width:min(63vw,calc(100dvh - 126px),690px);
+  aspect-ratio:1/1;
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  grid-template-rows:repeat(12,1fr);
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+  cursor:pointer;
+}
+.cell{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:700;
+  font-size:clamp(13px,1.75vw,22px);
+  line-height:1;
+  border-radius:5px;
+  color:#202936;
+}
+.cell.preview{
+  background:var(--blue-soft);
+  color:#1d4ed8;
+}
+.cell.found{
+  text-decoration:none;
+}
+#strikeOverlay{
+  position:absolute;
+  inset:12px;
+  width:calc(100% - 24px);
+  height:calc(100% - 24px);
+  pointer-events:none;
+  overflow:visible;
+}
+#strikeOverlay rect{
+  fill:rgba(47,103,199,.035);
+  stroke:#2f67c7;
+  stroke-width:3.4;
+  rx:12;
+  ry:12;
+}
+.message{
+  flex:0 0 auto;
+  min-height:24px;
+  margin-top:5px;
+  text-align:center;
+  font-size:clamp(15px,1.7vw,20px);
+  font-weight:800;
+  color:#2a7b47;
+}
+.message:not(:empty){
+  background:linear-gradient(180deg,#f3fbf5 0%,#e8f6ed 100%);
+  border:1px solid #b9ddc5;
+  border-radius:10px;
+  padding:5px 10px;
+  width:max-content;
+  max-width:100%;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+@media(max-width:700px){
+  body{padding:7px}
+  .topbar{
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+  }
+  h1{
+    grid-column:1/-1;
+    grid-row:1;
+    font-size:clamp(22px,6vw,32px);
+  }
+  .counter{grid-row:2;grid-column:1}
+  .controls{grid-row:2;grid-column:2}
+  .game{
+    grid-template-columns:minmax(105px,1fr) auto minmax(105px,1fr);
+    gap:7px;
+  }
+  .bank{
+    padding:30px 5px 8px;
+  }
+  #grid{
+    width:min(61vw,calc(100dvh - 165px),570px);
+  }
+  .word{
+    font-size:clamp(9px,2vw,13px);
+    padding:4px 0;
+  }
+  .grid-wrap{
+    padding:8px;
+    border-width:2px;
+  }
+  #strikeOverlay{
+    inset:8px;
+    width:calc(100% - 16px);
+    height:calc(100% - 16px);
+  }
+}
+@media(max-width:500px){
+  html,body{overflow:auto;height:auto;min-height:100%}
+  .app{height:auto;min-height:100dvh}
+  .card{overflow:visible}
+  .game{
+    grid-template-columns:1fr 1fr;
+  }
+  .grid-wrap{
+    grid-column:1/-1;
+    grid-row:1;
+  }
+  .bank{grid-row:2}
+  #grid{width:min(92vw,520px)}
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="counter" id="counter">FOUND: 0 / 20</div>
+    <h1>BAND INSTRUMENTS</h1>
+    <div class="controls">
+      <button id="fullscreenBtn">FULL SCREEN</button>
+      <button id="newPuzzleBtn">NEW PUZZLE</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <div class="game">
+      <div class="bank" id="bankLeft"></div>
+      <div class="grid-wrap" id="gridWrap">
+        <div id="grid" aria-label="Band instruments word search"></div>
+        <svg id="strikeOverlay" aria-hidden="true"></svg>
+      </div>
+      <div class="bank" id="bankRight"></div>
+    </div>
+    <div class="message" id="message"></div>
+  </section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const SIZE = 12;
+  const WORDS = [
+    "FLUTE","OBOE","CLARINET","BASSOON","PICCOLO",
+    "SAXOPHONE","TRUMPET","TROMBONE","FRENCHHORN","TUBA",
+    "EUPHONIUM","BARITONE","SNAREDRUM","BASSDRUM","CYMBAL",
+    "MARIMBA","TIMPANI","GONG","TRIANGLE","XYLOPHONE"
+  ];
+
+  const DISPLAY = {
+    FRENCHHORN:"FRENCH HORN",
+    SNAREDRUM:"SNARE DRUM",
+    BASSDRUM:"BASS DRUM"
+  };
+
+  const HORIZONTAL_VERTICAL = [
+    [0,1],[0,-1],[1,0],[-1,0]
+  ];
+  const DIAGONAL = [
+    [1,1],[1,-1],[-1,1],[-1,-1]
+  ];
+  const ALL_DIRS = [...HORIZONTAL_VERTICAL,...DIAGONAL];
+
+  const gridEl = document.getElementById("grid");
+  const gridWrap = document.getElementById("gridWrap");
+  const strikeOverlay = document.getElementById("strikeOverlay");
+  const bankLeft = document.getElementById("bankLeft");
+  const bankRight = document.getElementById("bankRight");
+  const counterEl = document.getElementById("counter");
+  const messageEl = document.getElementById("message");
+  const newBtn = document.getElementById("newPuzzleBtn");
+  const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+  let board = [];
+  let found = new Set();
+  let selecting = false;
+  let start = null;
+  let preview = [];
+
+  const rint = n => Math.floor(Math.random()*n);
+
+  function shuffle(a){
+    const b=[...a];
+    for(let i=b.length-1;i>0;i--){
+      const j=rint(i+1);
+      [b[i],b[j]]=[b[j],b[i]];
+    }
+    return b;
+  }
+
+  function blankBoard(){
+    return Array.from({length:SIZE},()=>Array(SIZE).fill(""));
+  }
+
+  function canPlace(word,row,col,dr,dc,b){
+    const er=row+dr*(word.length-1);
+    const ec=col+dc*(word.length-1);
+    if(er<0||er>=SIZE||ec<0||ec>=SIZE) return false;
+
+    for(let i=0;i<word.length;i++){
+      const r=row+dr*i,c=col+dc*i;
+      if(b[r][c]!=="" && b[r][c]!==word[i]) return false;
+    }
+    return true;
+  }
+
+  function candidates(word,b,dirs){
+    const list=[];
+    for(const [dr,dc] of dirs){
+      for(let row=0;row<SIZE;row++){
+        for(let col=0;col<SIZE;col++){
+          if(!canPlace(word,row,col,dr,dc,b)) continue;
+          let overlap=0;
+          for(let i=0;i<word.length;i++){
+            const r=row+dr*i,c=col+dc*i;
+            if(b[r][c]===word[i]) overlap++;
+          }
+          list.push({row,col,dr,dc,overlap});
+        }
+      }
+    }
+    return list;
+  }
+
+  function put(word,opt,b){
+    for(let i=0;i<word.length;i++){
+      b[opt.row+opt.dr*i][opt.col+opt.dc*i]=word[i];
+    }
+  }
+
+  const VERIFIED_TEMPLATES = [
+    [
+      "BARITONE....",
+      "XEEP.TRUMPET",
+      "MYNUIABMIRAM",
+      "EULOPCYMBALM",
+      "TNROHHCNERFU",
+      "BRODPPOO..IR",
+      "GAIBSHONL.ND",
+      "O.SAMSOXIOAE",
+      "N..SNOANAUPR",
+      "GEOBOGRBESMA",
+      "FLUTEOLTU.IN",
+      ".CLARINETTTS"
+    ],
+    [
+      "ENOTIRABST..",
+      "ABMIRAMNRE.E",
+      "FABUT.AIN.NN",
+      "LS..IRAO.ORT",
+      "US..ENHNHOET",
+      "TD.DGPOPHNIP",
+      "ERRLOOOHIMIG",
+      "PUEXSLCRPC.O",
+      "MMASYNAACU.N",
+      "USAXELNOBOEG",
+      "RB.RCILABMYC",
+      "T.FENOBMORT."
+    ]
+  ];
+
+  function templateToBoard(rows){
+    return rows.map(row => [...row].map(ch => ch === "." ? "" : ch));
+  }
+
+  function rotate90(b){
+    const out = blankBoard();
+    for(let r=0;r<SIZE;r++){
+      for(let c=0;c<SIZE;c++){
+        out[c][SIZE-1-r] = b[r][c];
+      }
+    }
+    return out;
+  }
+
+  function mirrorHorizontal(b){
+    return b.map(row => [...row].reverse());
+  }
+
+  function transformBoard(b, code){
+    let out = b.map(row => [...row]);
+
+    // 0-3 = rotations; 4-7 = mirrored rotations.
+    if(code >= 4){
+      out = mirrorHorizontal(out);
+      code -= 4;
+    }
+    for(let i=0;i<code;i++){
+      out = rotate90(out);
+    }
+    return out;
+  }
+
+  function boardContainsWord(b, word){
+    for(let r=0;r<SIZE;r++){
+      for(let c=0;c<SIZE;c++){
+        for(const [dr,dc] of ALL_DIRS){
+          const er = r + dr*(word.length-1);
+          const ec = c + dc*(word.length-1);
+          if(er<0 || er>=SIZE || ec<0 || ec>=SIZE) continue;
+
+          let good = true;
+          for(let i=0;i<word.length;i++){
+            if(b[r+dr*i][c+dc*i] !== word[i]){
+              good = false;
+              break;
+            }
+          }
+          if(good) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function verifyAllWords(b){
+    return WORDS.every(word => boardContainsWord(b,word));
+  }
+
+  function generate(){
+    /*
+      Every displayed puzzle begins from a layout that has already been
+      verified to contain all 20 instrument names. Random rotations and
+      reflections change the directions/locations, and blank squares receive
+      fresh random letters each time.
+    */
+    const source = VERIFIED_TEMPLATES[rint(VERIFIED_TEMPLATES.length)];
+    let b = templateToBoard(source);
+    b = transformBoard(b, rint(8));
+
+    const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for(let r=0;r<SIZE;r++){
+      for(let c=0;c<SIZE;c++){
+        if(b[r][c]===""){
+          b[r][c]=letters[rint(letters.length)];
+        }
+      }
+    }
+
+    // Hard safety check: never show a puzzle missing even one word.
+    if(!verifyAllWords(b)){
+      console.error("Verified template failed final word check.");
+      return generate();
+    }
+
+    return b;
+  }
+
+  function renderGrid(){
+    gridEl.innerHTML="";
+    const frag=document.createDocumentFragment();
+    for(let r=0;r<SIZE;r++){
+      for(let c=0;c<SIZE;c++){
+        const el=document.createElement("div");
+        el.className="cell";
+        el.textContent=board[r][c];
+        el.dataset.r=r;
+        el.dataset.c=c;
+        frag.appendChild(el);
+      }
+    }
+    gridEl.appendChild(frag);
+  }
+
+  function renderBanks(){
+    bankLeft.innerHTML="";
+    bankRight.innerHTML="";
+    const mixed=shuffle(WORDS);
+
+    mixed.forEach((word,i)=>{
+      const el=document.createElement("div");
+      el.className="word";
+      el.dataset.word=word;
+      el.textContent=DISPLAY[word]||word;
+      (i<10?bankLeft:bankRight).appendChild(el);
+    });
+  }
+
+  function updateCounter(){
+    counterEl.textContent=`FOUND: ${found.size} / ${WORDS.length}`;
+    messageEl.textContent=found.size===WORDS.length
+      ? "Great job! You found all 20 band instruments! 🎵"
+      : "";
+  }
+
+  function newPuzzle(){
+    found.clear();
+    selecting=false;
+    start=null;
+    preview=[];
+    board=generate();
+    strikeOverlay.innerHTML="";
+    renderGrid();
+    renderBanks();
+    updateCounter();
+  }
+
+  function cellEl(r,c){
+    return gridEl.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+  }
+
+  function clearPreview(){
+    for(const [r,c] of preview){
+      const el=cellEl(r,c);
+      if(el) el.classList.remove("preview");
+    }
+    preview=[];
+  }
+
+  function getLine(a,b){
+    const drRaw=b.r-a.r, dcRaw=b.c-a.c;
+    const ar=Math.abs(drRaw), ac=Math.abs(dcRaw);
+
+    if(!(drRaw===0 || dcRaw===0 || ar===ac)) return [];
+
+    const dr=Math.sign(drRaw);
+    const dc=Math.sign(dcRaw);
+    const steps=Math.max(ar,ac);
+    const cells=[];
+
+    for(let i=0;i<=steps;i++){
+      cells.push([a.r+dr*i,a.c+dc*i]);
+    }
+    return cells;
+  }
+
+  function pointCell(x,y){
+    const el=document.elementFromPoint(x,y);
+    if(!el || !el.classList.contains("cell")) return null;
+    return {r:+el.dataset.r,c:+el.dataset.c};
+  }
+
+  function showPreview(end){
+    clearPreview();
+    if(!start||!end) return;
+    preview=getLine(start,end);
+    for(const [r,c] of preview){
+      const el=cellEl(r,c);
+      if(el) el.classList.add("preview");
+    }
+  }
+
+  function lettersFor(cells){
+    return cells.map(([r,c])=>board[r][c]).join("");
+  }
+
+  function drawContinuousOutline(cells){
+    if(!cells.length) return;
+
+    const first = cellEl(cells[0][0], cells[0][1]);
+    const last = cellEl(cells[cells.length-1][0], cells[cells.length-1][1]);
+    if(!first || !last) return;
+
+    const wrapRect = gridWrap.getBoundingClientRect();
+    const firstRect = first.getBoundingClientRect();
+    const lastRect = last.getBoundingClientRect();
+
+    const x1 = firstRect.left + firstRect.width/2 - wrapRect.left;
+    const y1 = firstRect.top + firstRect.height/2 - wrapRect.top;
+    const x2 = lastRect.left + lastRect.width/2 - wrapRect.left;
+    const y2 = lastRect.top + lastRect.height/2 - wrapRect.top;
+
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const distance = Math.hypot(dx,dy);
+    const angle = Math.atan2(dy,dx) * 180 / Math.PI;
+
+    // Keep the outline outside the letters while surrounding the full word.
+    const cellW = firstRect.width;
+    const cellH = firstRect.height;
+    const outlineWidth = distance + cellW * 0.92;
+    const outlineHeight = Math.min(cellW,cellH) * 0.78;
+
+    const cx = (x1+x2)/2;
+    const cy = (y1+y2)/2;
+
+    strikeOverlay.setAttribute("viewBox", `0 0 ${wrapRect.width} ${wrapRect.height}`);
+
+    const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    rect.setAttribute("x", cx - outlineWidth/2);
+    rect.setAttribute("y", cy - outlineHeight/2);
+    rect.setAttribute("width", outlineWidth);
+    rect.setAttribute("height", outlineHeight);
+    rect.setAttribute("rx", outlineHeight/2);
+    rect.setAttribute("ry", outlineHeight/2);
+    rect.setAttribute("transform", `rotate(${angle} ${cx} ${cy})`);
+    strikeOverlay.appendChild(rect);
+  }
+
+  function finish(){
+    if(!selecting) return;
+    selecting=false;
+
+    const cells=[...preview];
+    const text=lettersFor(cells);
+    const reverse=[...text].reverse().join("");
+    let match=null;
+
+    if(WORDS.includes(text)) match=text;
+    else if(WORDS.includes(reverse)) match=reverse;
+
+    if(match && !found.has(match)){
+      found.add(match);
+
+      for(const [r,c] of cells){
+        const el=cellEl(r,c);
+        if(el){
+          el.classList.remove("preview");
+          el.classList.add("found");
+        }
+      }
+
+      drawContinuousOutline(cells);
+
+      document.querySelectorAll(`.word[data-word="${match}"]`)
+        .forEach(el=>el.classList.add("found"));
+
+      preview=[];
+      updateCounter();
+    }else{
+      clearPreview();
+    }
+
+    start=null;
+  }
+
+  gridEl.addEventListener("pointerdown",e=>{
+    const el=e.target.closest(".cell");
+    if(!el) return;
+    e.preventDefault();
+    selecting=true;
+    start={r:+el.dataset.r,c:+el.dataset.c};
+    showPreview(start);
+    try{gridEl.setPointerCapture(e.pointerId)}catch(_){}
+  });
+
+  gridEl.addEventListener("pointermove",e=>{
+    if(!selecting) return;
+    const end=pointCell(e.clientX,e.clientY);
+    if(end) showPreview(end);
+  });
+
+  gridEl.addEventListener("pointerup",e=>{
+    e.preventDefault();
+    finish();
+  });
+
+  gridEl.addEventListener("pointercancel",finish);
+  window.addEventListener("pointerup",finish);
+
+  newBtn.addEventListener("click",newPuzzle);
+
+  fullscreenBtn.addEventListener("click",async()=>{
+    try{
+      if(!document.fullscreenElement){
+        await document.documentElement.requestFullscreen();
+      }else{
+        await document.exitFullscreen();
+      }
+    }catch(_){}
+  });
+
+  document.addEventListener("fullscreenchange",()=>{
+    fullscreenBtn.textContent=document.fullscreenElement
+      ? "EXIT FULL SCREEN"
+      : "FULL SCREEN";
+  });
+
+  newPuzzle();
+})();
+</script>
+</body>
+</html>
