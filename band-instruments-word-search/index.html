@@ -6,20 +6,19 @@
 <title>Band Instruments Word Search</title>
 <style>
 :root{
-  --bg:#f7f1e6;
-  --paper:#fffdf8;
-  --ink:#21304a;
-  --muted:#6f7680;
-  --navy:#173a6b;
-  --navy-deep:#102b50;
-  --blue:#2f67c7;
-  --blue-soft:#e9f1ff;
-  --gold:#d9a441;
-  --gold-soft:#f8edcf;
-  --line:#d9d4c8;
-  --panel:#f8fbff;
-  --panel-edge:#cfdced;
-  --shadow:0 14px 32px rgba(51,54,65,.12);
+  --cream:#fbf4e5;
+  --cream-deep:#f2e6cc;
+  --paper:#fffdf7;
+  --navy:#0e2f55;
+  --navy-2:#153f70;
+  --gold:#d5a13c;
+  --gold-soft:#ecd9a9;
+  --ink:#14243c;
+  --muted:#747b86;
+  --blue:#2867c7;
+  --blue-soft:#eaf2ff;
+  --panel:#fffaf0;
+  --line:#d8c69a;
 }
 *{box-sizing:border-box}
 html,body{
@@ -28,15 +27,15 @@ html,body{
   height:100%;
   overflow:hidden;
   background:
-    radial-gradient(circle at 20% 15%, rgba(255,255,255,.85), transparent 30%),
-    linear-gradient(180deg,#fbf6ed 0%,#f4ecde 100%);
+    radial-gradient(circle at 50% 0%,rgba(255,255,255,.92),transparent 34%),
+    linear-gradient(180deg,#fffaf0 0%,#f8efdc 100%);
   color:var(--ink);
-  font-family:Arial,Helvetica,sans-serif;
+  font-family:Georgia,"Times New Roman",serif;
   -webkit-tap-highlight-color:transparent;
 }
 body{padding:10px}
 .app{
-  width:min(1180px,100%);
+  width:min(1240px,100%);
   height:100%;
   margin:0 auto;
   display:flex;
@@ -47,172 +46,166 @@ body{padding:10px}
   display:grid;
   grid-template-columns:1fr auto 1fr;
   align-items:center;
-  gap:12px;
+  gap:14px;
   flex:0 0 auto;
-  margin-bottom:10px;
-  padding:2px 4px 0;
+  padding:2px 6px 10px;
 }
 h1{
-  margin:0;
   grid-column:2;
+  margin:0;
   text-align:center;
-  font-size:clamp(26px,3.2vw,44px);
-  letter-spacing:.05em;
+  font-size:clamp(28px,3.5vw,48px);
   line-height:1;
-  color:var(--navy-deep);
-  text-shadow:0 1px 0 #fff;
-  position:relative;
+  letter-spacing:.025em;
+  color:var(--navy);
+  font-weight:900;
+  text-transform:uppercase;
+  white-space:nowrap;
 }
-h1::before,
+h1::before{
+  content:"𝄞";
+  color:var(--gold);
+  margin-right:.3em;
+  font-size:.92em;
+  vertical-align:-.04em;
+}
 h1::after{
   content:"♪";
-  display:inline-block;
-  margin:0 .28em;
   color:var(--gold);
-  font-size:.68em;
-  vertical-align:.13em;
+  margin-left:.3em;
+  font-size:.72em;
+  vertical-align:.08em;
 }
 .counter{
   justify-self:start;
-  background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);
-  border:2px solid #c7d5e6;
-  color:var(--navy-deep);
-  border-radius:999px;
-  padding:8px 14px;
+  background:linear-gradient(180deg,#fffdf7,#fff7e6);
+  border:2px solid var(--gold);
+  outline:1px solid rgba(14,47,85,.18);
+  color:var(--navy);
+  border-radius:12px;
+  padding:9px 15px;
+  font-family:Arial,Helvetica,sans-serif;
   font-size:clamp(13px,1.5vw,17px);
-  font-weight:800;
+  font-weight:900;
   white-space:nowrap;
-  box-shadow:0 4px 12px rgba(23,58,107,.08);
+  box-shadow:0 5px 12px rgba(14,47,85,.10);
 }
 .controls{
   justify-self:end;
   display:flex;
-  gap:8px;
+  gap:9px;
 }
 button{
-  border:0;
-  border-radius:11px;
-  padding:10px 14px;
-  font-weight:800;
-  font-size:clamp(12px,1.4vw,15px);
-  color:white;
+  border:2px solid var(--gold);
+  outline:1px solid var(--navy);
+  border-radius:12px;
+  padding:10px 15px;
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:clamp(12px,1.35vw,15px);
+  font-weight:900;
+  color:#fff;
   cursor:pointer;
   letter-spacing:.02em;
-  box-shadow:0 5px 12px rgba(23,58,107,.14);
-  transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  box-shadow:0 5px 12px rgba(14,47,85,.15);
 }
-button:hover{
-  filter:brightness(1.04);
-  box-shadow:0 7px 15px rgba(23,58,107,.18);
-}
+#fullscreenBtn{background:linear-gradient(180deg,#153f70,#0e2f55)}
+#newPuzzleBtn{background:linear-gradient(180deg,#25568f,#173f70)}
 button:active{transform:translateY(1px)}
-#fullscreenBtn{
-  background:linear-gradient(180deg,#1d3557 0%,#102b50 100%);
-}
-#newPuzzleBtn{
-  background:linear-gradient(180deg,#3c78db 0%,#2f67c7 100%);
-}
+
 .card{
   flex:1 1 auto;
   min-height:0;
-  background:var(--paper);
-  border:1px solid rgba(125,105,74,.12);
-  border-radius:22px;
-  box-shadow:var(--shadow);
-  padding:12px 16px 10px;
+  background:rgba(255,253,247,.78);
+  border:1px solid rgba(213,161,60,.25);
+  border-radius:20px;
+  padding:16px 16px 10px;
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  position:relative;
-}
-.card::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  border-radius:22px;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);
+  box-shadow:0 16px 34px rgba(80,61,24,.10);
 }
 .game{
   flex:1 1 auto;
   min-height:0;
   display:grid;
-  grid-template-columns:minmax(145px,1fr) auto minmax(145px,1fr);
-  gap:clamp(14px,2vw,30px);
+  grid-template-columns:minmax(165px,1fr) auto minmax(165px,1fr);
+  gap:clamp(16px,2vw,30px);
   align-items:center;
 }
 .bank{
+  position:relative;
   display:grid;
   grid-template-columns:1fr;
-  gap:3px;
+  gap:0;
   align-content:center;
-  background:linear-gradient(180deg,#f8fbff 0%,#f2f7fc 100%);
-  border:1.5px solid var(--panel-edge);
-  border-radius:18px;
-  padding:34px 10px 12px;
-  position:relative;
-  box-shadow:inset 0 1px 0 #fff, 0 6px 16px rgba(23,58,107,.06);
+  background:linear-gradient(180deg,#fffdf8,#fff8eb);
+  border:2px solid var(--gold);
+  outline:1px solid rgba(14,47,85,.28);
+  border-radius:17px;
+  padding:36px 14px 14px;
+  box-shadow:
+    inset 0 0 0 4px rgba(213,161,60,.08),
+    0 8px 18px rgba(14,47,85,.08);
 }
 .bank::before{
   content:"INSTRUMENTS";
   position:absolute;
-  top:-1px;
+  top:0;
   left:50%;
-  transform:translate(-50%,-40%);
-  background:linear-gradient(180deg,#214e8c 0%,#173a6b 100%);
-  color:#fff;
-  border-radius:10px;
-  padding:7px 14px;
-  font-size:clamp(11px,1.15vw,14px);
-  font-weight:800;
-  letter-spacing:.05em;
-  box-shadow:0 4px 10px rgba(23,58,107,.16);
-  white-space:nowrap;
+  transform:translate(-50%,-48%);
+  min-width:78%;
+  text-align:center;
+  background:linear-gradient(180deg,#153f70,#0e2f55);
+  color:#f7d98a;
+  border:2px solid var(--gold);
+  outline:1px solid var(--navy);
+  border-radius:12px;
+  padding:7px 12px;
+  font-size:clamp(12px,1.2vw,15px);
+  font-weight:900;
+  letter-spacing:.03em;
+  box-shadow:0 4px 10px rgba(14,47,85,.16);
 }
 .word{
   text-align:center;
+  font-family:Arial,Helvetica,sans-serif;
   font-weight:800;
-  font-size:clamp(12px,1.35vw,17px);
-  letter-spacing:.025em;
-  padding:6px 3px;
-  border-radius:8px;
+  font-size:clamp(12px,1.32vw,17px);
+  letter-spacing:.015em;
+  padding:7px 4px;
   white-space:nowrap;
-  color:var(--ink);
-  position:relative;
+  color:var(--navy);
+  border-bottom:1px dashed rgba(213,161,60,.50);
 }
-.word:not(:last-child)::after{
-  content:"";
-  position:absolute;
-  left:10%;
-  right:10%;
-  bottom:0;
-  height:1px;
-  background:linear-gradient(90deg,transparent,#dbe4ef,transparent);
-}
+.word:last-child{border-bottom:none}
 .word.found{
-  color:var(--muted);
+  color:#707783;
   text-decoration:line-through;
   text-decoration-thickness:2px;
-  background:#edf1f5;
+  background:rgba(225,228,232,.45);
+  border-radius:7px;
 }
+
 .grid-wrap{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:center;
   min-width:0;
   min-height:0;
-  position:relative;
   padding:12px;
-  background:
-    linear-gradient(180deg,#fffefa 0%,#fffaf0 100%);
-  border:3px solid var(--navy);
+  background:linear-gradient(180deg,#fffef9,#fff9ec);
+  border:4px solid var(--navy);
   border-radius:18px;
   box-shadow:
-    inset 0 0 0 4px rgba(217,164,65,.16),
-    0 8px 18px rgba(23,58,107,.08);
+    inset 0 0 0 2px var(--gold),
+    inset 0 0 0 6px rgba(255,255,255,.85),
+    0 10px 20px rgba(14,47,85,.10);
 }
 #grid{
-  width:min(63vw,calc(100dvh - 126px),690px);
+  position:relative;
+  z-index:2;
+  width:min(62vw,calc(100dvh - 190px),680px);
   aspect-ratio:1/1;
   display:grid;
   grid-template-columns:repeat(12,1fr);
@@ -224,94 +217,121 @@ button:active{transform:translateY(1px)}
 }
 .cell{
   display:flex;
-  justify-content:center;
   align-items:center;
-  font-weight:700;
-  font-size:clamp(13px,1.75vw,22px);
+  justify-content:center;
+  font-family:Arial,Helvetica,sans-serif;
+  font-weight:800;
+  font-size:clamp(13px,1.7vw,22px);
   line-height:1;
-  border-radius:5px;
-  color:#202936;
+  color:#17243a;
 }
 .cell.preview{
   background:var(--blue-soft);
-  color:#1d4ed8;
+  color:#1f5ebc;
+  border-radius:8px;
 }
-.cell.found{
-  text-decoration:none;
-}
+.cell.found{text-decoration:none}
+
 #strikeOverlay{
   position:absolute;
-  inset:12px;
-  width:calc(100% - 24px);
-  height:calc(100% - 24px);
+  left:0;
+  top:0;
+  width:0;
+  height:0;
   pointer-events:none;
   overflow:visible;
+  z-index:1;
 }
-#strikeOverlay rect{
-  fill:rgba(47,103,199,.035);
-  stroke:#2f67c7;
-  stroke-width:3.4;
-  rx:12;
-  ry:12;
+#strikeOverlay .capsule-outer{
+  stroke:var(--blue);
+  stroke-linecap:round;
+  fill:none;
 }
-.message{
-  flex:0 0 auto;
-  min-height:24px;
-  margin-top:5px;
-  text-align:center;
-  font-size:clamp(15px,1.7vw,20px);
-  font-weight:800;
-  color:#2a7b47;
-}
-.message:not(:empty){
-  background:linear-gradient(180deg,#f3fbf5 0%,#e8f6ed 100%);
-  border:1px solid #b9ddc5;
-  border-radius:10px;
-  padding:5px 10px;
-  width:max-content;
-  max-width:100%;
-  margin-left:auto;
-  margin-right:auto;
+#strikeOverlay .capsule-inner{
+  stroke:#fff9ec;
+  stroke-linecap:round;
+  fill:none;
 }
 
-@media(max-width:700px){
-  body{padding:7px}
+.message{
+  display:none;
+}
+.footer{
+  flex:0 0 auto;
+  margin-top:10px;
+  background:linear-gradient(180deg,#123a66,#0c2a4c);
+  border:2px solid var(--gold);
+  border-radius:14px;
+  color:white;
+  min-height:72px;
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  align-items:center;
+  gap:18px;
+  padding:10px 18px;
+  box-shadow:0 6px 14px rgba(14,47,85,.14);
+}
+.footer-left,
+.footer-right{
+  min-width:0;
+}
+.footer-right{
+  border-left:1px solid rgba(247,217,138,.55);
+  padding-left:20px;
+}
+.footer-title{
+  color:#f7d98a;
+  font-weight:900;
+  font-size:clamp(14px,1.5vw,18px);
+  margin-bottom:3px;
+}
+.footer-text{
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:clamp(11px,1.18vw,14px);
+  line-height:1.35;
+}
+.legend-arrows{
+  color:#f7d98a;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+
+@media(max-width:760px){
+  body{padding:6px}
   .topbar{
     grid-template-columns:1fr 1fr;
     gap:7px;
+    padding-bottom:8px;
   }
   h1{
     grid-column:1/-1;
     grid-row:1;
-    font-size:clamp(22px,6vw,32px);
+    font-size:clamp(23px,6vw,34px);
   }
   .counter{grid-row:2;grid-column:1}
   .controls{grid-row:2;grid-column:2}
+  .card{padding:12px 8px 8px}
   .game{
-    grid-template-columns:minmax(105px,1fr) auto minmax(105px,1fr);
-    gap:7px;
+    grid-template-columns:minmax(112px,1fr) auto minmax(112px,1fr);
+    gap:8px;
   }
   .bank{
-    padding:30px 5px 8px;
-  }
-  #grid{
-    width:min(61vw,calc(100dvh - 165px),570px);
+    padding:32px 6px 9px;
   }
   .word{
     font-size:clamp(9px,2vw,13px);
-    padding:4px 0;
+    padding:5px 0;
   }
-  .grid-wrap{
-    padding:8px;
-    border-width:2px;
+  .grid-wrap{padding:8px}
+  #grid{
+    width:min(60vw,calc(100dvh - 220px),560px);
   }
-  #strikeOverlay{
-    inset:8px;
-    width:calc(100% - 16px);
-    height:calc(100% - 16px);
+  .footer{
+    padding:8px 12px;
+    min-height:64px;
   }
 }
-@media(max-width:500px){
+@media(max-width:520px){
   html,body{overflow:auto;height:auto;min-height:100%}
   .app{height:auto;min-height:100dvh}
   .card{overflow:visible}
@@ -323,7 +343,17 @@ button:active{transform:translateY(1px)}
     grid-row:1;
   }
   .bank{grid-row:2}
-  #grid{width:min(92vw,520px)}
+  #grid{width:min(92vw,510px)}
+  .footer{
+    grid-template-columns:1fr;
+    gap:6px;
+  }
+  .footer-right{
+    border-left:none;
+    border-top:1px solid rgba(247,217,138,.55);
+    padding-left:0;
+    padding-top:6px;
+  }
 }
 </style>
 </head>
@@ -348,6 +378,20 @@ button:active{transform:translateY(1px)}
       <div class="bank" id="bankRight"></div>
     </div>
     <div class="message" id="message"></div>
+
+    <div class="footer">
+      <div class="footer-left">
+        <div class="footer-title">HOW TO PLAY</div>
+        <div class="footer-text">
+          Find and drag your finger or mouse across a hidden instrument.<br>
+          Words can go in any direction: <span class="legend-arrows">→ ← ↑ ↓ ↗ ↘ ↖ ↙</span>
+        </div>
+      </div>
+      <div class="footer-right">
+        <div class="footer-title">GOAL</div>
+        <div class="footer-text">Find all 20 band instruments!</div>
+      </div>
+    </div>
   </section>
 </main>
 
@@ -668,39 +712,51 @@ button:active{transform:translateY(1px)}
     if(!first || !last) return;
 
     const wrapRect = gridWrap.getBoundingClientRect();
+    const gridRect = gridEl.getBoundingClientRect();
     const firstRect = first.getBoundingClientRect();
     const lastRect = last.getBoundingClientRect();
 
-    const x1 = firstRect.left + firstRect.width/2 - wrapRect.left;
-    const y1 = firstRect.top + firstRect.height/2 - wrapRect.top;
-    const x2 = lastRect.left + lastRect.width/2 - wrapRect.left;
-    const y2 = lastRect.top + lastRect.height/2 - wrapRect.top;
+    // Overlay matches the actual 12×12 grid exactly.
+    const overlayLeft = gridRect.left - wrapRect.left;
+    const overlayTop = gridRect.top - wrapRect.top;
 
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const distance = Math.hypot(dx,dy);
-    const angle = Math.atan2(dy,dx) * 180 / Math.PI;
+    strikeOverlay.style.left = `${overlayLeft}px`;
+    strikeOverlay.style.top = `${overlayTop}px`;
+    strikeOverlay.style.width = `${gridRect.width}px`;
+    strikeOverlay.style.height = `${gridRect.height}px`;
+    strikeOverlay.setAttribute("viewBox", `0 0 ${gridRect.width} ${gridRect.height}`);
 
-    // Keep the outline outside the letters while surrounding the full word.
-    const cellW = firstRect.width;
-    const cellH = firstRect.height;
-    const outlineWidth = distance + cellW * 0.92;
-    const outlineHeight = Math.min(cellW,cellH) * 0.78;
+    // Use the exact center point of the first and last selected cells.
+    const x1 = firstRect.left + firstRect.width / 2 - gridRect.left;
+    const y1 = firstRect.top + firstRect.height / 2 - gridRect.top;
+    const x2 = lastRect.left + lastRect.width / 2 - gridRect.left;
+    const y2 = lastRect.top + lastRect.height / 2 - gridRect.top;
 
-    const cx = (x1+x2)/2;
-    const cy = (y1+y2)/2;
+    const cellSize = Math.min(firstRect.width, firstRect.height);
 
-    strikeOverlay.setAttribute("viewBox", `0 0 ${wrapRect.width} ${wrapRect.height}`);
+    // Two round-ended lines create a perfectly centered hollow capsule.
+    // Because the letters are layered above the SVG, the inside never obscures them.
+    const outerWidth = cellSize * 0.78;
+    const innerWidth = Math.max(outerWidth - 6.5, cellSize * 0.61);
 
-    const rect = document.createElementNS("http://www.w3.org/2000/svg","rect");
-    rect.setAttribute("x", cx - outlineWidth/2);
-    rect.setAttribute("y", cy - outlineHeight/2);
-    rect.setAttribute("width", outlineWidth);
-    rect.setAttribute("height", outlineHeight);
-    rect.setAttribute("rx", outlineHeight/2);
-    rect.setAttribute("ry", outlineHeight/2);
-    rect.setAttribute("transform", `rotate(${angle} ${cx} ${cy})`);
-    strikeOverlay.appendChild(rect);
+    const outer = document.createElementNS("http://www.w3.org/2000/svg","line");
+    outer.setAttribute("x1", x1);
+    outer.setAttribute("y1", y1);
+    outer.setAttribute("x2", x2);
+    outer.setAttribute("y2", y2);
+    outer.setAttribute("stroke-width", outerWidth);
+    outer.setAttribute("class", "capsule-outer");
+
+    const inner = document.createElementNS("http://www.w3.org/2000/svg","line");
+    inner.setAttribute("x1", x1);
+    inner.setAttribute("y1", y1);
+    inner.setAttribute("x2", x2);
+    inner.setAttribute("y2", y2);
+    inner.setAttribute("stroke-width", innerWidth);
+    inner.setAttribute("class", "capsule-inner");
+
+    strikeOverlay.appendChild(outer);
+    strikeOverlay.appendChild(inner);
   }
 
   function finish(){
