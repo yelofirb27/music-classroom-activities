@@ -80,36 +80,6 @@ button:disabled{opacity:.45;cursor:default}
 
 @media(max-width:850px){.header{grid-template-columns:1fr}.controls{justify-content:flex-start}#usMap{max-height:none}}
 @media(max-width:620px){.app{padding:8px}.board{border-width:6px}.beats{grid-template-columns:repeat(2,minmax(0,1fr))}.beat{min-height:125px}.empty{min-height:105px}.decor{display:none}.label{font-size:7.5px}.label.small{font-size:5.7px}}
-
-@media (min-width:700px) and (min-height:560px){
-html,body{height:100%;overflow:hidden}
-.app{height:100vh;min-height:0;padding:7px 10px;display:flex;flex-direction:column;overflow:hidden}
-.header{flex:0 0 auto;margin-bottom:5px;gap:8px}
-.title h1{font-size:clamp(24px,2.25vw,35px);line-height:1}.title p{margin-top:3px;font-size:12px;line-height:1.15}
-.controls button{padding:7px 11px;font-size:12px}
-.board{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;border-width:7px;border-radius:14px}
-.map-shell{flex:1 1 auto;min-height:0;padding:3px 8px 2px;display:flex;justify-content:center;align-items:center;overflow:hidden}
-#usMap{width:100%;height:100%;max-height:none;object-fit:contain}
-.beat-area{flex:0 0 158px;padding:7px 8px 8px}
-.beat-head{margin-bottom:6px;align-items:center}
-.beat-head h2{font-size:18px;line-height:1}.beat-head span{font-size:10px}.beats{gap:8px}
-.beat{min-height:118px;height:118px;padding:7px;border-radius:10px}.empty{min-height:102px;font-size:12px}
-.beat-num{left:7px;top:6px;width:25px;height:25px;font-size:12px}
-.postcard{inset:7px;border-width:5px}
-.greeting{font-size:15px}.landmark-name{font-size:10px}.card-copy{padding:8px 8px 7px}
-.card-x{left:33px;top:8px;width:22px;height:22px;font-size:12px}
-.play-note{margin-top:4px;font-size:9px;line-height:1}
-.decor.three{display:none}
-}
-@media (min-width:700px) and (max-height:750px){
-.app{padding:4px 7px}.header{margin-bottom:2px}.title h1{font-size:23px}.title p{font-size:10px}
-.controls button{padding:5px 9px}
-.beat-area{flex-basis:145px;padding:5px 7px 6px}.beat-head{margin-bottom:4px}.beat-head h2{font-size:16px}
-.beat{height:108px;min-height:108px}.empty{min-height:92px}
-.greeting{font-size:14px}.landmark-name{font-size:9px}.play-note{display:none}
-.map-shell{padding-top:1px}
-}
-
 </style>
 </head>
 <body>
