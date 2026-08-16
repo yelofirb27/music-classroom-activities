@@ -54,7 +54,7 @@ button:disabled{opacity:.45;cursor:default}
 .inset-state:hover{filter:brightness(.9) saturate(1.18);stroke:#34444f;stroke-width:1.1}
 .inset-state.selected{filter:saturate(1.45) brightness(.9);stroke:#a03f35;stroke-width:1.5}
 .inset-label{pointer-events:none;fill:#24323a;font:900 11px Arial,sans-serif;text-anchor:middle;dominant-baseline:central}
-.akhi-box{fill:none;stroke:#776c5a;stroke-width:2;stroke-dasharray:6 4}
+.akhi-box{fill:rgba(255,255,255,.12);stroke:#6d7780;stroke-width:1.5}
 .akhi-title{fill:#615a4e;font:900 11px Arial,sans-serif;text-anchor:middle;letter-spacing:.06em}
 
 .pin{pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
@@ -219,15 +219,20 @@ svg.append("g").selectAll("text").data(allStates).join("text")
   })
   .text(d=>stateInfo[String(d.id).padStart(2,"0")][0]);
 
-// Traditional Alaska and Hawaii boxes, including larger visible abbreviations.
-["02","15"].forEach(id=>{
-  const f=allStates.find(d=>String(d.id).padStart(2,"0")===id);
-  const b=path.bounds(f), pad=9, ab=stateInfo[id][0];
+// Tight locator boxes around Alaska and Hawaii in their existing map positions.
+[
+  {id:"02", padX:4, padY:6},
+  {id:"15", padX:5, padY:6}
+].forEach(cfg=>{
+  const f=allStates.find(d=>String(d.id).padStart(2,"0")===cfg.id);
+  const b=path.bounds(f), ab=stateInfo[cfg.id][0];
+  const x=b[0][0]-cfg.padX, y=b[0][1]-cfg.padY;
+  const w=(b[1][0]-b[0][0])+cfg.padX*2;
+  const h=(b[1][1]-b[0][1])+cfg.padY*2;
   svg.insert("rect",":first-child").attr("class","akhi-box")
-    .attr("x",b[0][0]-pad).attr("y",b[0][1]-pad)
-    .attr("width",b[1][0]-b[0][0]+pad*2).attr("height",b[1][1]-b[0][1]+pad*2);
+    .attr("x",x).attr("y",y).attr("width",w).attr("height",h).attr("rx",6);
   svg.append("text").attr("class","akhi-title")
-    .attr("x",(b[0][0]+b[1][0])/2).attr("y",b[0][1]-13).text(ab);
+    .attr("x",x+w/2).attr("y",y+14).text(ab);
 });
 
 // Enlarged Northeast inset.
