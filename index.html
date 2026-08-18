@@ -96,7 +96,7 @@ opacity: 0.95;
 
 .category-tabs {
 display: grid;
-grid-template-columns: repeat(5, minmax(0, 1fr));
+grid-template-columns: repeat(6, minmax(0, 1fr));
 gap: 14px;
 width: min(1080px, calc(100% - 30px));
 margin: -22px auto 36px;
@@ -198,6 +198,10 @@ background: linear-gradient(135deg, #25a9a2, #14746f);
 
 .literature .section-icon {
 background: linear-gradient(135deg, #dc63a5, #a83f80);
+}
+
+.inspiration .section-icon {
+background: linear-gradient(135deg, #f6b73c, #ed8f24);
 }
 
 .section-title h2 {
@@ -339,7 +343,7 @@ font-size: 24px;
 <h1>Music Classroom Activities</h1>
 <p class="subtitle">
 Interactive classroom resources for music theory, instruments, movement,
-children’s literature, and music-and-science exploration.
+children’s literature, inspiration, and music-and-science exploration.
 </p>
 </div>
 </header>
@@ -349,6 +353,7 @@ children’s literature, and music-and-science exploration.
 <a class="category-tab" href="#instruments">🎺 Instruments</a>
 <a class="category-tab" href="#movement">🚦 Movement</a>
 <a class="category-tab" href="#childrens-literature">📚 Children’s Literature</a>
+<a class="category-tab" href="#inspiration">✨ Inspiration</a>
 <a class="category-tab" href="#music-science">🔬 Music &amp; Science</a>
 </nav>
 
@@ -460,15 +465,6 @@ and General Music Instruments.
 <span class="open-label">Open Activity →</span>
 </div>
 </a>
-
-<a class="activity-card" href="./band-instruments-word-search/">
-<div class="card-icon coral" aria-hidden="true">🔎</div>
-<div class="card-body">
-<h3>Band Instruments Word Search</h3>
-<p>Find 20 common band instruments hidden horizontally, vertically, and diagonally in every direction.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
 </div>
 </section>
 
@@ -560,6 +556,24 @@ and General Music Instruments.
 </div>
 </a>
 
+</div>
+</section>
+
+<section class="activity-section inspiration" id="inspiration">
+<div class="section-title">
+<div class="section-icon" aria-hidden="true">✨</div>
+<h2>Inspiration</h2>
+</div>
+
+<div class="activity-grid">
+<a class="activity-card" href="./music-sliding-puzzle/">
+<div class="card-icon gold" aria-hidden="true">🧩</div>
+<div class="card-body">
+<h3>Music Sliding Puzzles</h3>
+<p>Choose a music-themed image and solve it as a 3×3, 4×4, or 5×5 sliding puzzle.</p>
+<span class="open-label">Open Activity →</span>
+</div>
+</a>
 </div>
 </section>
 
