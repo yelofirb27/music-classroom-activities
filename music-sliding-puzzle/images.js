@@ -1,6 +1,3 @@
-// Add new puzzle images here as the year goes on.
-// Put each PNG/JPG inside the "images" folder, then add one entry below.
-
 window.PUZZLE_IMAGES = [
   {
     name: "Music Is All Around Us",
@@ -9,5 +6,9 @@ window.PUZZLE_IMAGES = [
   {
     name: "Music Is Everything",
     file: "images/music-is-everything.png"
+  },
+  {
+    name: "Taylor Swift – Music Always Has",
+    file: "images/taylor-swift-music-quote.png"
   }
 ];
