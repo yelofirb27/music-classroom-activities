@@ -34,6 +34,7 @@ select{background:#fff;color:var(--ink);border:2px solid #d8cdbd;max-width:230px
     <div class="title"><h1>Music Sliding Puzzle</h1><p>Slide the pieces until the whole picture comes together.</p></div>
     <div class="controls">
       <select id="imagePicker" aria-label="Choose a puzzle picture"></select>
+      <button class="level" data-size="2">2×2</button>
       <button class="level active" data-size="3">3×3</button>
       <button class="level" data-size="4">4×4</button>
       <button class="level" data-size="5">5×5</button>
@@ -86,7 +87,7 @@ select{background:#fff;color:var(--ink);border:2px solid #d8cdbd;max-width:230px
   function shuffleSolvable(){
     state=solvedState(); empty=N*N-1;
     let prev=-1;
-    const steps = N===3 ? 90 : N===4 ? 180 : 300;
+    const steps = N===2 ? 35 : N===3 ? 90 : N===4 ? 180 : 300;
     for(let i=0;i<steps;i++){
       let opts=neighbors(empty).filter(x=>x!==prev); if(!opts.length) opts=neighbors(empty);
       const next=opts[Math.floor(Math.random()*opts.length)]; prev=empty; swap(empty,next); empty=next;
