@@ -590,6 +590,13 @@ document.querySelectorAll('.choice').forEach(btn=>{
 });
 
 
+function forceShowRhythm(){
+  show=true;
+  document.body.classList.add('show-rhythm');
+  showBtn.style.display='none';
+  hideBtn.style.display='block';
+}
+
 playBtn.onclick=async()=>{
   if(boogieAudio.paused){
     forceShowRhythm();
