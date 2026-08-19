@@ -403,23 +403,6 @@ body{
   .light::after{height:64px;width:130px}
 }
 
-/* Playback cursor: each rectangle is one beat */
-.cell.playing-beat{
-  position:relative;
-  outline:6px solid rgba(255,215,92,.95);
-  outline-offset:-6px;
-  z-index:4;
-  box-shadow:
-    inset 0 0 0 3px rgba(255,255,255,.88),
-    0 0 20px rgba(255,220,105,.80);
-}
-.cell.playing-beat::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:rgba(255,246,190,.14);
-  pointer-events:none;
-}
 #playBtn.playing{
   background:#8f241f;
   color:#fff;
@@ -462,7 +445,6 @@ body{
       PIET MONDRIAN<br>
       COMPOSITION WITH RED,<br>
       BLUE, AND YELLOW<br>
-      1930
     </div>
   </aside>
 
@@ -608,53 +590,6 @@ document.querySelectorAll('.choice').forEach(btn=>{
 });
 
 
-/* The uploaded boogie is about 92 BPM.
-   Each Mondrian rectangle represents one beat, so the highlight
-   walks through the 12-beat composition while the music plays. */
-const BOOGIE_BPM = 92.3;
-const BEAT_MS = 60000 / BOOGIE_BPM;
-let beatTimer = null;
-let beatIndex = 0;
-
-function clearBeatHighlight(){
-  document.querySelectorAll('.cell.playing-beat').forEach(cell=>{
-    cell.classList.remove('playing-beat');
-  });
-}
-
-function showBeat(index){
-  const cells=[...document.querySelectorAll('.cell')];
-  clearBeatHighlight();
-  if(cells.length){
-    cells[index % cells.length].classList.add('playing-beat');
-  }
-}
-
-function startBeatCursor(){
-  stopBeatCursor(false);
-  beatIndex=0;
-  showBeat(beatIndex);
-  beatTimer=setInterval(()=>{
-    beatIndex=(beatIndex+1)%12;
-    showBeat(beatIndex);
-  },BEAT_MS);
-}
-
-function stopBeatCursor(clear=true){
-  if(beatTimer){
-    clearInterval(beatTimer);
-    beatTimer=null;
-  }
-  if(clear) clearBeatHighlight();
-}
-
-function forceShowRhythm(){
-  show=true;
-  document.body.classList.add('show-rhythm');
-  showBtn.style.display='none';
-  hideBtn.style.display='block';
-}
-
 playBtn.onclick=async()=>{
   if(boogieAudio.paused){
     forceShowRhythm();
@@ -663,21 +598,18 @@ playBtn.onclick=async()=>{
       await boogieAudio.play();
       playBtn.classList.add('playing');
       playBtn.innerHTML='<span class="icon">■</span>Stop<br>Boogie';
-      startBeatCursor();
     }catch(e){}
   }else{
     boogieAudio.pause();
     boogieAudio.currentTime=0;
     playBtn.classList.remove('playing');
     playBtn.innerHTML='<span class="icon">▶</span>Play<br>Boogie';
-    stopBeatCursor();
   }
 };
 
 boogieAudio.addEventListener('ended',()=>{
   playBtn.classList.remove('playing');
   playBtn.innerHTML='<span class="icon">▶</span>Play<br>Boogie';
-  stopBeatCursor();
 });
 
 
@@ -695,13 +627,7 @@ hideBtn.onclick=()=>{
   showBtn.style.display='block';
 };
 
-clearBtn.onclick=()=>{
-  build();
-  if(!boogieAudio.paused){
-    beatIndex=0;
-    showBeat(beatIndex);
-  }
-};
+clearBtn.onclick=build;
 
 document.getElementById('cancel').onclick=()=>{
   selected=null;
