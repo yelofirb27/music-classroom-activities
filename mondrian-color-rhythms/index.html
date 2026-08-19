@@ -54,11 +54,11 @@ body{
   position:absolute;
   left:50%;
   top:0;
-  width:26px;
-  height:29px;
+  width:34px;
+  height:34px;
   transform:translateX(-50%);
   background:linear-gradient(90deg,#151412,#45413b 45%,#111 100%);
-  border-radius:2px 2px 8px 8px;
+  border-radius:3px 3px 12px 12px;
   box-shadow:0 3px 5px rgba(0,0,0,.45), inset 0 -4px 5px rgba(0,0,0,.45);
 }
 /* The actual visible cone of warm gallery light */
@@ -67,7 +67,7 @@ body{
   position:absolute;
   left:50%;
   top:22px;
-  width:245px;
+  width:285px;
   height:42vh;
   min-height:235px;
   transform:translateX(-50%);
@@ -75,13 +75,13 @@ body{
   background:
     linear-gradient(
       180deg,
-      rgba(255,249,218,.40) 0%,
-      rgba(255,246,205,.25) 28%,
-      rgba(255,243,195,.14) 64%,
+      rgba(255,250,220,.58) 0%,
+      rgba(255,247,208,.36) 28%,
+      rgba(255,244,198,.20) 64%,
       rgba(255,243,195,.04) 100%
     );
   filter:blur(5px);
-  opacity:.95;
+  opacity:1;
 }
 /* Soft pool of light where each beam reaches the exhibit */
 .light .glow{
@@ -100,10 +100,8 @@ body{
   );
   filter:blur(7px);
 }
-.light.l1{left:12.5%}
-.light.l2{left:37.5%}
-.light.l3{left:62.5%}
-.light.l4{left:87.5%}
+.light.l1{left:10%}
+.light.l4{left:90%}
 
 .museum{
   position:relative;
@@ -219,7 +217,7 @@ body{
   height:100%;
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  grid-template-rows:repeat(4,1fr);
+  grid-template-rows:repeat(3,1fr);
   gap:8px;
   background:#000;
 }
@@ -410,8 +408,6 @@ body{
 <body>
 <div class="gallery-lights" aria-hidden="true">
   <div class="light l1"><span class="glow"></span></div>
-  <div class="light l2"><span class="glow"></span></div>
-  <div class="light l3"><span class="glow"></span></div>
   <div class="light l4"><span class="glow"></span></div>
 </div>
 
@@ -545,7 +541,7 @@ function choiceMarkup(color){
 
 function build(){
   grid.innerHTML='';
-  for(let i=0;i<16;i++){
+  for(let i=0;i<12;i++){
     const cell=document.createElement('button');
     cell.className='cell white';
     cell.type='button';
