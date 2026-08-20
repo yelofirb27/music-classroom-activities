@@ -68,50 +68,49 @@
   }
 
   /* Foods visually sit inside the basket. */
-  /* Main-screen basket display:
-     large food illustrations packed across the WOODEN BASE only.
-     The clip keeps every food inside the inner basket border so none
-     appears to float on the wicker sidewalls. */
+  /* Basket-only polish:
+     larger foods, shifted down, pulled toward the center, and overlapped
+     so they read as filling the wooden bottom rather than sitting on sidewalls. */
   .basket-food-layer {
     position: absolute;
-    left: 16.2%;
-    top: 23.5%;
-    width: 67.8%;
-    height: 58.5%;
+    left: 18.4%;
+    top: 28.4%;
+    width: 63.2%;
+    height: 51.5%;
     z-index: 3;
     overflow: hidden;
-    clip-path: polygon(2% 3%, 98% 3%, 96% 95%, 4% 95%);
+    clip-path: polygon(8% 0%, 92% 0%, 88% 97%, 12% 97%);
     pointer-events: none;
   }
 
   .basket-food {
     position: absolute;
-    width: 29%;
-    height: 37%;
+    width: 34%;
+    height: 40%;
     object-fit: contain;
     transform-origin: center;
     filter: drop-shadow(0 2px 2px rgba(0,0,0,.20));
   }
 
-  /* Back row — deliberately overlaps like a genuinely full picnic basket */
-  .basket-food:nth-child(1) {left:-1%; top:0%;  transform:rotate(-10deg) scale(1.08)}
-  .basket-food:nth-child(2) {left:16%; top:1%;  transform:rotate(6deg)  scale(1.02)}
-  .basket-food:nth-child(3) {left:34%; top:-1%; transform:rotate(-4deg) scale(1.00)}
-  .basket-food:nth-child(4) {left:52%; top:1%;  transform:rotate(7deg)  scale(1.00)}
-  .basket-food:nth-child(5) {left:70%; top:0%;  transform:rotate(-5deg) scale(1.03)}
+  /* Back row: kept low and well inside the wicker sidewalls */
+  .basket-food:nth-child(1) {left: 5%; top: 7%; transform:rotate(-8deg) scale(1.08)}
+  .basket-food:nth-child(2) {left:20%; top: 5%; transform:rotate( 5deg) scale(1.07)}
+  .basket-food:nth-child(3) {left:35%; top: 7%; transform:rotate(-4deg) scale(1.06)}
+  .basket-food:nth-child(4) {left:50%; top: 5%; transform:rotate( 5deg) scale(1.06)}
+  .basket-food:nth-child(5) {left:64%; top: 8%; transform:rotate(-5deg) scale(1.08)}
 
-  /* Middle row */
-  .basket-food:nth-child(6) {left:2%;  top:30%; transform:rotate(7deg)  scale(1.02)}
-  .basket-food:nth-child(7) {left:20%; top:28%; transform:rotate(-7deg) scale(1.03)}
-  .basket-food:nth-child(8) {left:38%; top:30%; transform:rotate(5deg)  scale(1.02)}
-  .basket-food:nth-child(9) {left:56%; top:28%; transform:rotate(-6deg) scale(1.03)}
-  .basket-food:nth-child(10){left:72%; top:31%; transform:rotate(6deg)  scale(.98)}
+  /* Middle row: tighter overlap through the center */
+  .basket-food:nth-child(6) {left: 9%; top:32%; transform:rotate( 6deg) scale(1.10)}
+  .basket-food:nth-child(7) {left:24%; top:30%; transform:rotate(-6deg) scale(1.11)}
+  .basket-food:nth-child(8) {left:39%; top:32%; transform:rotate( 4deg) scale(1.10)}
+  .basket-food:nth-child(9) {left:54%; top:30%; transform:rotate(-5deg) scale(1.11)}
+  .basket-food:nth-child(10){left:66%; top:33%; transform:rotate( 5deg) scale(1.08)}
 
-  /* Front row — largest, visually sitting deepest in the basket */
-  .basket-food:nth-child(11){left:4%;  top:58%; transform:rotate(-6deg) scale(1.08)}
-  .basket-food:nth-child(12){left:27%; top:57%; transform:rotate(4deg)  scale(1.08)}
-  .basket-food:nth-child(13){left:50%; top:57%; transform:rotate(-4deg) scale(1.08)}
-  .basket-food:nth-child(14){left:72%; top:58%; transform:rotate(5deg)  scale(1.04)}
+  /* Front row: deepest in the basket; overlap may cover the wooden bottom */
+  .basket-food:nth-child(11){left:14%; top:59%; transform:rotate(-5deg) scale(1.15)}
+  .basket-food:nth-child(12){left:31%; top:57%; transform:rotate( 4deg) scale(1.16)}
+  .basket-food:nth-child(13){left:48%; top:57%; transform:rotate(-4deg) scale(1.16)}
+  .basket-food:nth-child(14){left:63%; top:60%; transform:rotate( 4deg) scale(1.13)}
 
   .basket-zone:hover .basket-tip {
     opacity: 1;
