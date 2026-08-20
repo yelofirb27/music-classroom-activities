@@ -29,7 +29,18 @@
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
-    background: #fff;
+
+    /* Only the unused space OUTSIDE the 16:9 picnic blanket becomes grass.
+       The picnic blanket canvas itself is unchanged. */
+    background:
+      radial-gradient(ellipse at 18% 28%, rgba(255,255,255,.10) 0 1px, transparent 2px),
+      radial-gradient(ellipse at 72% 62%, rgba(0,0,0,.08) 0 1px, transparent 2px),
+      repeating-linear-gradient(
+        78deg,
+        #4f9232 0 3px,
+        #5ea541 3px 6px,
+        #3d7f2a 6px 9px
+      );
   }
 
   .canvas {
