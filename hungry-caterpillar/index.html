@@ -391,6 +391,114 @@
     }
   }
 
+
+  .rhythm-toggle {
+    position: absolute;
+    right: 13.5%;
+    top: 50.6%;
+    z-index: 20;
+    border: 2px solid #111;
+    border-radius: 10px;
+    background: rgba(183,207,242,.97);
+    padding: 7px 14px;
+    font-size: clamp(12px, 1.05vw, 18px);
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,.18);
+  }
+
+  .rhythm-toggle:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(0,0,0,.18);
+  }
+
+  .plate-card {
+    perspective: 900px;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .card-flipper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform .48s ease;
+  }
+
+  body.show-rhythm .card-flipper {
+    transform: rotateY(180deg);
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: #fff;
+    border: 2px solid #222;
+    border-radius: 10px;
+    box-shadow: 0 5px 11px rgba(0,0,0,.22);
+    padding: 5% 5% 4%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+
+  .card-front img {
+    width: 100%;
+    height: 77%;
+    object-fit: contain;
+  }
+
+  .card-front .label {
+    width: 100%;
+    text-align: center;
+    font-size: clamp(10px, 1.05vw, 18px);
+    line-height: 1.02;
+    font-weight: 700;
+    color: #111;
+    padding-top: 2px;
+  }
+
+  .card-back {
+    transform: rotateY(180deg);
+    justify-content: center;
+    padding: 8%;
+  }
+
+  .card-back img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .rhythm-toggle {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 42px;
+    }
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .rhythm-toggle {
+      padding: 5px 8px;
+      right: 14.5%;
+      font-size: 11px;
+    }
+
+    .reset {
+      padding: 5px 8px;
+      right: 1.7%;
+      font-size: 11px;
+    }
+  }
+
 </style>
 </head>
 
@@ -417,6 +525,7 @@
     <div class="plate-slot" data-i="2"></div>
     <div class="plate-slot" data-i="3"></div>
 
+    <button class="rhythm-toggle" id="rhythmToggle" type="button">SHOW RHYTHM</button>
     <button class="reset" id="resetBtn" type="button">RESET</button>
 
     <div class="chooser-backdrop" id="chooserBackdrop">
@@ -450,20 +559,20 @@
 
 <script>
 const foods = [
-  ["Apple", "assets/apple.png"],
-  ["Cherry Pie", "assets/cherry-pie.png"],
-  ["Chocolate Cake", "assets/chocolate-cake.png"],
-  ["Cupcake", "assets/cupcake.png"],
-  ["Ice Cream Cone", "assets/ice-cream-cone.png"],
-  ["Leaf", "assets/leaf.png"],
-  ["Lollipop", "assets/lollipop.png"],
-  ["Orange", "assets/orange.png"],
-  ["Pear", "assets/pear.png"],
-  ["Pickle", "assets/pickle.png"],
-  ["Plum", "assets/plum.png"],
-  ["Sausage", "assets/sausage.png"],
-  ["Swiss Cheese", "assets/swiss-cheese.png"],
-  ["Watermelon", "assets/watermelon.png"]
+  ["Apple", "assets/apple.png", "assets/rhythm-two-beat.png"],
+  ["Cherry Pie", "assets/cherry-pie.png", "assets/rhythm-four-syllable.png"],
+  ["Chocolate Cake", "assets/chocolate-cake.png", "assets/rhythm-four-syllable.png"],
+  ["Cupcake", "assets/cupcake.png", "assets/rhythm-two-beat.png"],
+  ["Ice Cream Cone", "assets/ice-cream-cone.png", "assets/rhythm-four-syllable.png"],
+  ["Leaf", "assets/leaf.png", "assets/rhythm-leaf-pear-plum.png"],
+  ["Lollipop", "assets/lollipop.png", "assets/rhythm-four-syllable.png"],
+  ["Orange", "assets/orange.png", "assets/rhythm-two-beat.png"],
+  ["Pear", "assets/pear.png", "assets/rhythm-leaf-pear-plum.png"],
+  ["Pickle", "assets/pickle.png", "assets/rhythm-two-beat.png"],
+  ["Plum", "assets/plum.png", "assets/rhythm-leaf-pear-plum.png"],
+  ["Sausage", "assets/sausage.png", "assets/rhythm-two-beat.png"],
+  ["Swiss Cheese", "assets/swiss-cheese.png", "assets/rhythm-two-beat.png"],
+  ["Watermelon", "assets/watermelon.png", "assets/rhythm-watermelon.png"]
 ];
 
 const basket = document.getElementById("basketHotspot");
@@ -472,6 +581,7 @@ const closeChooser = document.getElementById("closeChooser");
 const foodGrid = document.getElementById("foodGrid");
 const plates = [...document.querySelectorAll(".plate-slot")];
 const resetBtn = document.getElementById("resetBtn");
+const rhythmToggle = document.getElementById("rhythmToggle");
 const nextPlateText = document.getElementById("nextPlateText");
 
 function firstEmptyPlateIndex() {
@@ -501,7 +611,7 @@ function hideChooser() {
   chooserBackdrop.classList.remove("open");
 }
 
-function addCardToPlate(plate, label, src) {
+function addCardToPlate(plate, label, src, rhythmSrc) {
   const existing = plate.querySelector(".plate-card");
 
   if (existing) {
@@ -512,8 +622,15 @@ function addCardToPlate(plate, label, src) {
   card.className = "plate-card";
 
   card.innerHTML = `
-    <img src="${src}" alt="${label}">
-    <div class="label">${label}</div>
+    <div class="card-flipper">
+      <div class="card-face card-front">
+        <img src="${src}" alt="${label}">
+        <div class="label">${label}</div>
+      </div>
+      <div class="card-face card-back">
+        <img src="${rhythmSrc}" alt="${label} rhythm">
+      </div>
+    </div>
   `;
 
   plate.appendChild(card);
@@ -534,7 +651,7 @@ chooserBackdrop.addEventListener("click", event => {
 });
 
 /* Build the 14 food cards */
-foods.forEach(([label, src]) => {
+foods.forEach(([label, src, rhythmSrc]) => {
   const card = document.createElement("button");
 
   card.type = "button";
@@ -556,7 +673,8 @@ foods.forEach(([label, src]) => {
     addCardToPlate(
       plates[targetIndex],
       label,
-      src
+      src,
+      rhythmSrc
     );
 
     /* One choice at a time, like Candy Rondo */
@@ -578,6 +696,13 @@ plates.forEach(plate => {
   });
 });
 
+
+/* Flip every selected food card between food/name and rhythm notation. */
+rhythmToggle.addEventListener("click", () => {
+  const showingRhythm = document.body.classList.toggle("show-rhythm");
+  rhythmToggle.textContent = showingRhythm ? "SHOW FOOD" : "SHOW RHYTHM";
+});
+
 /* RESET clears all four plates */
 resetBtn.addEventListener("click", () => {
   plates.forEach(plate => {
@@ -591,6 +716,8 @@ resetBtn.addEventListener("click", () => {
   });
 
   hideChooser();
+  document.body.classList.remove("show-rhythm");
+  rhythmToggle.textContent = "SHOW RHYTHM";
 });
 </script>
 
