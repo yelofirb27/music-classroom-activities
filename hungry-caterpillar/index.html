@@ -531,6 +531,147 @@
     }
   }
 
+
+  /* --- Final polish: crisp napkin text + unified control strip --- */
+
+  .napkin-live {
+    position: absolute;
+    left: 35.35%;
+    top: 15.55%;
+    width: 14.55%;
+    height: 20.8%;
+    z-index: 16;
+    background: #b7cff2;
+    border: 2px solid #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.0% 1.05%;
+    color: #111;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(14px, 1.62vw, 27px);
+    line-height: 1.12;
+    text-align: left;
+    letter-spacing: .01em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Covers the baked yellow reminder in the PNG and replaces it with one clean row. */
+  .control-strip-bg {
+    position: absolute;
+    left: 1.55%;
+    top: 49.75%;
+    width: 97%;
+    height: 8.2%;
+    z-index: 17;
+    background: rgba(255,255,255,0);
+    pointer-events: none;
+  }
+
+  .control-strip {
+    position: absolute;
+    left: 1.65%;
+    top: 49.95%;
+    width: 96.7%;
+    height: 7.5%;
+    z-index: 24;
+    display: flex;
+    align-items: center;
+    gap: .65%;
+    pointer-events: none;
+  }
+
+  .instruction-live {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 1.05%;
+    background: rgba(255,242,198,.98);
+    border: 2px solid #111;
+    border-radius: 8px;
+    color: #111;
+    font-size: clamp(12px, 1.2vw, 20px);
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: auto;
+  }
+
+  .control-strip button {
+    position: static !important;
+    right: auto !important;
+    top: auto !important;
+    flex: 0 0 auto;
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 0 13px;
+    border: 2px solid #111;
+    border-radius: 8px;
+    font-size: clamp(11px, 1.02vw, 17px);
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 2px 0 rgba(0,0,0,.18);
+    pointer-events: auto;
+    white-space: nowrap;
+  }
+
+  .control-strip .rhythm-toggle {
+    background: rgba(183,207,242,.98);
+  }
+
+  .control-strip .reset,
+  .control-strip .fullscreen-btn {
+    background: rgba(255,255,255,.97);
+  }
+
+  .control-strip button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 rgba(0,0,0,.18);
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    .control-strip {
+      top: 49.7%;
+      height: 7.9%;
+      gap: .45%;
+    }
+
+    .instruction-live {
+      font-size: 10px;
+      padding: 0 .7%;
+    }
+
+    .control-strip button {
+      padding: 0 7px;
+      font-size: 9px;
+    }
+
+    .napkin-live {
+      font-size: clamp(12px, 1.55vw, 20px);
+    }
+  }
+
+  @media (orientation: portrait) and (min-width: 601px) {
+    .control-strip {
+      gap: .45%;
+    }
+
+    .instruction-live {
+      font-size: clamp(10px, 1.1vw, 15px);
+    }
+
+    .control-strip button {
+      padding: 0 8px;
+      font-size: clamp(9px, .9vw, 13px);
+    }
+  }
+
 </style>
 </head>
 
@@ -546,8 +687,6 @@
 <div class="stage">
   <div class="canvas">
 
-    <button class="fullscreen-btn" id="fullscreenBtn" type="button">FULL SCREEN</button>
-
     <div
       class="basket-hotspot"
       id="basketHotspot"
@@ -558,9 +697,6 @@
     <div class="plate-slot" data-i="1"></div>
     <div class="plate-slot" data-i="2"></div>
     <div class="plate-slot" data-i="3"></div>
-
-    <button class="rhythm-toggle" id="rhythmToggle" type="button">SHOW RHYTHM</button>
-    <button class="reset" id="resetBtn" type="button">RESET</button>
 
     <div class="chooser-backdrop" id="chooserBackdrop">
       <div
