@@ -1,659 +1,687 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Music Classroom Activities | Brian Foley</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102e55">
+  <title>Music Classroom Activities | Brian Foley</title>
 
-<style>
-:root {
---navy: #102e55;
---navy-dark: #071a33;
---blue: #2878b5;
---gold: #f6b73c;
---coral: #ef6f6c;
---green: #4caf78;
---purple: #7559b7;
---teal: #25a9a2;
---cream: #fffaf0;
---text: #203040;
---muted: #5d6b78;
---white: #ffffff;
---shadow: 0 10px 28px rgba(22, 50, 79, 0.14);
-}
+  <!--
+    CANVA MIGRATION NOTE
+    This file is ready for Canva Code 2.0 HTML import.
+    The activity cards currently use the full URLs of the existing GitHub versions.
+    As each activity is published in Canva, replace only that card's href with its
+    new public Canva website URL. Category links beginning with # stay unchanged.
+  -->
 
-* {
-box-sizing: border-box;
-}
+  <style>
+    :root {
+      --navy: #102e55;
+      --navy-dark: #071a33;
+      --blue: #2878b5;
+      --gold: #f6b73c;
+      --coral: #ef6f6c;
+      --green: #4caf78;
+      --purple: #7559b7;
+      --teal: #25a9a2;
+      --text: #203040;
+      --muted: #5d6b78;
+      --white: #ffffff;
+      --shadow: 0 10px 28px rgba(22, 50, 79, 0.14);
+    }
 
-html {
-scroll-behavior: smooth;
-}
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-margin: 0;
-min-height: 100vh;
-font-family: Arial, Helvetica, sans-serif;
-color: var(--text);
-background:
-radial-gradient(circle at 10% 8%, rgba(246, 183, 60, 0.19), transparent 25%),
-radial-gradient(circle at 92% 12%, rgba(40, 120, 181, 0.16), transparent 24%),
-linear-gradient(180deg, #eef9ff 0%, #fffaf0 100%);
-}
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 18px;
+    }
 
-header {
-position: relative;
-overflow: hidden;
-padding: 40px 20px 34px;
-text-align: center;
-color: white;
-background: linear-gradient(135deg, var(--navy-dark), var(--navy));
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(246, 183, 60, 0.19), transparent 25%),
+        radial-gradient(circle at 92% 12%, rgba(40, 120, 181, 0.16), transparent 24%),
+        linear-gradient(180deg, #eef9ff 0%, #fffaf0 100%);
+    }
 
-header::before,
-header::after {
-content: "♪ ♫ ♩";
-position: absolute;
-opacity: 0.11;
-font-size: clamp(58px, 8vw, 92px);
-letter-spacing: 18px;
-white-space: nowrap;
-pointer-events: none;
-}
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 40px 20px 34px;
+      text-align: center;
+      color: var(--white);
+      background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+    }
 
-header::before {
-top: -5px;
-left: 2%;
-transform: rotate(-8deg);
-}
+    header::before,
+    header::after {
+      content: "♪ ♫ ♩";
+      position: absolute;
+      opacity: 0.11;
+      font-size: clamp(58px, 8vw, 92px);
+      letter-spacing: 18px;
+      white-space: nowrap;
+      pointer-events: none;
+    }
 
-header::after {
-right: 1%;
-bottom: -18px;
-transform: rotate(8deg);
-}
+    header::before {
+      top: -5px;
+      left: 2%;
+      transform: rotate(-8deg);
+    }
 
-.header-inner {
-position: relative;
-z-index: 1;
-width: min(900px, 100%);
-margin: 0 auto;
-}
+    header::after {
+      right: 1%;
+      bottom: -18px;
+      transform: rotate(8deg);
+    }
 
-h1 {
-margin: 0;
-font-size: clamp(2.2rem, 6vw, 4.2rem);
-line-height: 1;
-}
+    .header-inner {
+      position: relative;
+      z-index: 1;
+      width: min(900px, 100%);
+      margin: 0 auto;
+    }
 
-.subtitle {
-max-width: 820px;
-margin: 15px auto 0;
-font-size: clamp(1rem, 2.2vw, 1.24rem);
-line-height: 1.55;
-opacity: 0.95;
-}
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 6vw, 4.2rem);
+      line-height: 1;
+    }
 
-.category-tabs {
-display: grid;
-grid-template-columns: repeat(6, minmax(0, 1fr));
-gap: 14px;
-width: min(1080px, calc(100% - 30px));
-margin: -22px auto 36px;
-position: relative;
-z-index: 2;
-}
+    .subtitle {
+      max-width: 820px;
+      margin: 15px auto 0;
+      font-size: clamp(1rem, 2.2vw, 1.24rem);
+      line-height: 1.55;
+      opacity: 0.95;
+    }
 
-.category-tab {
-display: flex;
-align-items: center;
-justify-content: center;
-min-height: 76px;
-padding: 15px 14px;
-border: 3px solid transparent;
-border-radius: 18px;
-background: white;
-box-shadow: var(--shadow);
-color: var(--navy);
-font-size: 1.03rem;
-font-weight: 800;
-text-align: center;
-text-decoration: none;
-transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
-}
+    .category-tabs {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      width: min(1080px, calc(100% - 30px));
+      margin: -22px auto 36px;
+    }
 
-.category-tab:hover,
-.category-tab:focus-visible {
-transform: translateY(-4px);
-border-color: var(--gold);
-box-shadow: 0 15px 34px rgba(22, 50, 79, 0.20);
-outline: none;
-}
+    .category-tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 76px;
+      padding: 15px 14px;
+      border: 3px solid transparent;
+      border-radius: 18px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      color: var(--navy);
+      font-size: 1.03rem;
+      font-weight: 800;
+      text-align: center;
+      text-decoration: none;
+      touch-action: manipulation;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
 
-main {
-width: min(1180px, calc(100% - 30px));
-margin: 0 auto 52px;
-}
+    .category-tab:hover,
+    .category-tab:focus-visible {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 15px 34px rgba(22, 50, 79, 0.20);
+      outline: none;
+    }
 
-.choose {
-max-width: 820px;
-margin: 0 auto 35px;
-text-align: center;
-}
+    main {
+      width: min(1180px, calc(100% - 30px));
+      margin: 0 auto 52px;
+    }
 
-.choose h2 {
-margin: 0 0 9px;
-color: var(--navy);
-font-size: clamp(1.75rem, 3.5vw, 2.45rem);
-}
+    .choose {
+      max-width: 820px;
+      margin: 0 auto 35px;
+      text-align: center;
+    }
 
-.choose p {
-margin: 0;
-color: var(--muted);
-font-size: 1.08rem;
-line-height: 1.6;
-}
+    .choose h2 {
+      margin: 0 0 9px;
+      color: var(--navy);
+      font-size: clamp(1.75rem, 3.5vw, 2.45rem);
+    }
 
-.activity-section {
-margin-top: 44px;
-scroll-margin-top: 18px;
-}
+    .choose p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.6;
+    }
 
-.section-title {
-display: flex;
-align-items: center;
-gap: 13px;
-margin-bottom: 19px;
-padding-bottom: 12px;
-border-bottom: 3px solid rgba(22, 50, 79, 0.10);
-}
+    .activity-section {
+      margin-top: 44px;
+      scroll-margin-top: 18px;
+    }
 
-.section-icon {
-display: grid;
-flex: 0 0 54px;
-width: 54px;
-height: 54px;
-place-items: center;
-border-radius: 15px;
-color: white;
-font-size: 28px;
-box-shadow: 0 7px 18px rgba(22, 50, 79, 0.16);
-}
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 19px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid rgba(22, 50, 79, 0.10);
+    }
 
-.theory .section-icon {
-background: linear-gradient(135deg, #7559b7, #573a99);
-}
+    .section-icon {
+      display: grid;
+      flex: 0 0 54px;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      border-radius: 15px;
+      color: var(--white);
+      font-size: 28px;
+      box-shadow: 0 7px 18px rgba(22, 50, 79, 0.16);
+    }
 
-.instruments .section-icon {
-background: linear-gradient(135deg, #2878b5, #18598d);
-}
+    .theory .section-icon {
+      background: linear-gradient(135deg, #7559b7, #573a99);
+    }
 
-.movement .section-icon {
-background: linear-gradient(135deg, #4caf78, #268c59);
-}
+    .instruments .section-icon {
+      background: linear-gradient(135deg, #2878b5, #18598d);
+    }
 
-.science .section-icon {
-background: linear-gradient(135deg, #25a9a2, #14746f);
-}
+    .movement .section-icon {
+      background: linear-gradient(135deg, #4caf78, #268c59);
+    }
 
-.literature .section-icon {
-background: linear-gradient(135deg, #dc63a5, #a83f80);
-}
+    .literature .section-icon {
+      background: linear-gradient(135deg, #dc63a5, #a83f80);
+    }
 
-.inspiration .section-icon {
-background: linear-gradient(135deg, #f6b73c, #ed8f24);
-}
+    .inspiration .section-icon {
+      background: linear-gradient(135deg, #f6b73c, #ed8f24);
+    }
 
-.section-title h2 {
-margin: 0;
-color: var(--navy);
-font-size: clamp(1.55rem, 3vw, 2.1rem);
-}
+    .science .section-icon {
+      background: linear-gradient(135deg, #25a9a2, #14746f);
+    }
 
-.activity-grid {
-display: grid;
-grid-template-columns: repeat(3, minmax(235px, 1fr));
-gap: 18px;
-}
+    .section-title h2 {
+      margin: 0;
+      color: var(--navy);
+      font-size: clamp(1.55rem, 3vw, 2.1rem);
+    }
 
-.activity-card {
-display: flex;
-min-height: 205px;
-flex-direction: column;
-overflow: hidden;
-border: 3px solid transparent;
-border-radius: 19px;
-background: white;
-box-shadow: var(--shadow);
-color: var(--text);
-text-decoration: none;
-transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-}
+    .activity-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(235px, 1fr));
+      gap: 18px;
+    }
 
-.activity-card:hover,
-.activity-card:focus-visible {
-transform: translateY(-6px);
-border-color: var(--gold);
-box-shadow: 0 17px 38px rgba(22, 50, 79, 0.22);
-outline: none;
-}
+    .activity-card {
+      display: flex;
+      min-height: 205px;
+      flex-direction: column;
+      overflow: hidden;
+      border: 3px solid transparent;
+      border-radius: 19px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      text-decoration: none;
+      touch-action: manipulation;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
 
-.card-icon {
-display: grid;
-min-height: 82px;
-place-items: center;
-color: white;
-font-size: 45px;
-}
+    .activity-card:hover,
+    .activity-card:focus-visible {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: 0 17px 38px rgba(22, 50, 79, 0.22);
+      outline: none;
+    }
 
-.purple { background: linear-gradient(135deg, #7559b7, #573a99); }
-.pink { background: linear-gradient(135deg, #dc63a5, #a83f80); }
-.teal { background: linear-gradient(135deg, #25a9a2, #14746f); }
-.coral { background: linear-gradient(135deg, #ef6f6c, #d8495b); }
-.gold { background: linear-gradient(135deg, #f6b73c, #ed8f24); }
-.blue { background: linear-gradient(135deg, #2878b5, #18598d); }
-.green { background: linear-gradient(135deg, #4caf78, #268c59); }
-.slate { background: linear-gradient(135deg, #6d7a8a, #44515f); }
+    .card-icon {
+      display: grid;
+      min-height: 82px;
+      place-items: center;
+      color: var(--white);
+      font-size: 45px;
+    }
 
-.card-body {
-display: flex;
-flex: 1;
-flex-direction: column;
-padding: 17px 18px 16px;
-}
+    .purple { background: linear-gradient(135deg, #7559b7, #573a99); }
+    .pink { background: linear-gradient(135deg, #dc63a5, #a83f80); }
+    .teal { background: linear-gradient(135deg, #25a9a2, #14746f); }
+    .coral { background: linear-gradient(135deg, #ef6f6c, #d8495b); }
+    .gold { background: linear-gradient(135deg, #f6b73c, #ed8f24); }
+    .blue { background: linear-gradient(135deg, #2878b5, #18598d); }
+    .green { background: linear-gradient(135deg, #4caf78, #268c59); }
+    .slate { background: linear-gradient(135deg, #6d7a8a, #44515f); }
 
-.activity-card h3 {
-margin: 0 0 8px;
-color: var(--navy);
-font-size: 1.22rem;
-line-height: 1.25;
-}
+    .card-body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      padding: 17px 18px 16px;
+    }
 
-.activity-card p {
-flex: 1;
-margin: 0 0 14px;
-color: #465565;
-line-height: 1.45;
-}
+    .activity-card h3 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 1.22rem;
+      line-height: 1.25;
+    }
 
-.open-label {
-align-self: flex-start;
-color: var(--blue);
-font-weight: 800;
-}
+    .activity-card p {
+      flex: 1;
+      margin: 0 0 14px;
+      color: #465565;
+      line-height: 1.45;
+    }
 
-footer {
-padding: 0 20px 32px;
-color: #536475;
-text-align: center;
-font-size: 0.95rem;
-}
+    .open-label {
+      align-self: flex-start;
+      color: var(--blue);
+      font-weight: 800;
+    }
 
-@media (max-width: 1050px) {
-.category-tabs {
-grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-}
+    footer {
+      padding: 0 20px 32px;
+      color: #536475;
+      text-align: center;
+      font-size: 0.95rem;
+    }
 
-@media (max-width: 900px) {
-.activity-grid {
-grid-template-columns: repeat(2, minmax(235px, 1fr));
-}
-}
+    @media (max-width: 1050px) {
+      .category-tabs {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
 
-@media (max-width: 760px) {
-.category-tabs {
-grid-template-columns: 1fr;
-width: min(600px, calc(100% - 24px));
-margin-top: -15px;
-}
+    @media (max-width: 900px) {
+      .activity-grid {
+        grid-template-columns: repeat(2, minmax(235px, 1fr));
+      }
+    }
 
-.category-tab {
-min-height: 58px;
-}
-}
+    @media (max-width: 760px) {
+      .category-tabs {
+        grid-template-columns: 1fr;
+        width: min(600px, calc(100% - 24px));
+        margin-top: -15px;
+      }
 
-@media (max-width: 520px) {
-header {
-padding-top: 30px;
-}
+      .category-tab {
+        min-height: 58px;
+      }
+    }
 
-main {
-width: min(100% - 20px, 1180px);
-}
+    @media (max-width: 520px) {
+      header {
+        padding-top: 30px;
+      }
 
-.activity-grid {
-grid-template-columns: 1fr;
-}
+      main {
+        width: min(100% - 20px, 1180px);
+      }
 
-.section-icon {
-flex-basis: 48px;
-width: 48px;
-height: 48px;
-font-size: 24px;
-}
-}
-</style>
+      .activity-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-icon {
+        flex-basis: 48px;
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      .category-tab,
+      .activity-card {
+        transition: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <header>
+    <div class="header-inner">
+      <h1>Music Classroom Activities</h1>
+      <p class="subtitle">
+        Interactive classroom resources for music theory, instruments, movement,
+        children’s literature, inspiration, and music-and-science exploration.
+      </p>
+    </div>
+  </header>
 
-<header>
-<div class="header-inner">
-<h1>Music Classroom Activities</h1>
-<p class="subtitle">
-Interactive classroom resources for music theory, instruments, movement,
-children’s literature, inspiration, and music-and-science exploration.
-</p>
-</div>
-</header>
+  <nav class="category-tabs" aria-label="Main categories">
+    <a class="category-tab" href="#music-theory">🎼 Music Theory</a>
+    <a class="category-tab" href="#instruments">🎺 Instruments</a>
+    <a class="category-tab" href="#movement">🚦 Movement</a>
+    <a class="category-tab" href="#childrens-literature">📚 Children’s Literature</a>
+    <a class="category-tab" href="#inspiration">✨ Inspiration</a>
+    <a class="category-tab" href="#music-science">🔬 Music &amp; Science</a>
+  </nav>
 
-<nav class="category-tabs" aria-label="Main categories">
-<a class="category-tab" href="#music-theory">🎼 Music Theory</a>
-<a class="category-tab" href="#instruments">🎺 Instruments</a>
-<a class="category-tab" href="#movement">🚦 Movement</a>
-<a class="category-tab" href="#childrens-literature">📚 Children’s Literature</a>
-<a class="category-tab" href="#inspiration">✨ Inspiration</a>
-<a class="category-tab" href="#music-science">🔬 Music &amp; Science</a>
-</nav>
+  <main>
+    <section class="choose">
+      <h2>Choose an Activity</h2>
+      <p>Select a category above or choose an individual activity below.</p>
+    </section>
 
-<main>
+    <section class="activity-section theory" id="music-theory">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">🎼</div>
+        <h2>Music Theory</h2>
+      </div>
 
-<section class="choose">
-<h2>Choose an Activity</h2>
-<p>
-Select a category above or choose an individual activity below.
-</p>
-</section>
+      <div class="activity-grid">
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/melodic-reading/">
+          <div class="card-icon pink" aria-hidden="true">🎵</div>
+          <div class="card-body">
+            <h3>Melodic Reading</h3>
+            <p>Practice solfège and melodic reading on three-line and five-line staffs.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<section class="activity-section theory" id="music-theory">
-<div class="section-title">
-<div class="section-icon" aria-hidden="true">🎼</div>
-<h2>Music Theory</h2>
-</div>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/melodic-mystery/">
+          <div class="card-icon teal" aria-hidden="true">🔤</div>
+          <div class="card-body">
+            <h3>Melodic Mystery</h3>
+            <p>Read notes in treble or bass clef to spell mystery words.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<div class="activity-grid">
-<a class="activity-card" href="./melodic-reading/">
-<div class="card-icon pink" aria-hidden="true">🎵</div>
-<div class="card-body">
-<h3>Melodic Reading</h3>
-<p>Practice solfège and melodic reading on three-line and five-line staffs.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/recall/">
+          <div class="card-icon purple" aria-hidden="true">🎶</div>
+          <div class="card-body">
+            <h3>Recall</h3>
+            <p>Listen to an expanding melody and repeat the notes in the correct order.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./melodic-mystery/">
-<div class="card-icon teal" aria-hidden="true">🔤</div>
-<div class="card-body">
-<h3>Melodic Mystery</h3>
-<p>Read notes in treble or bass clef to spell mystery words.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/body-percussion/">
+          <div class="card-icon coral" aria-hidden="true">👏</div>
+          <div class="card-body">
+            <h3>Body Percussion Staff</h3>
+            <p>Create four-beat patterns using snap, clap, pat, and stamp.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./recall/">
-<div class="card-icon purple" aria-hidden="true">🎶</div>
-<div class="card-body">
-<h3>Recall</h3>
-<p>Listen to an expanding melody and repeat the notes in the correct order.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/candy-bar-rondo/">
+          <div class="card-icon gold" aria-hidden="true">🍫</div>
+          <div class="card-body">
+            <h3>Candy Bar Rondo</h3>
+            <p>Build and display an ABACA rondo using candy-bar rhythm sections.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./body-percussion/">
-<div class="card-icon coral" aria-hidden="true">👏</div>
-<div class="card-body">
-<h3>Body Percussion Staff</h3>
-<p>Create four-beat patterns using snap, clap, pat, and stamp.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/state-rhythms/">
+          <div class="card-icon teal" aria-hidden="true">🗺️</div>
+          <div class="card-body">
+            <h3>Travel USA Postcard Rhythms</h3>
+            <p>Choose states on a colorful U.S. travel map to create four postcard rhythm selections with state landmarks.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./candy-bar-rondo/">
-<div class="card-icon gold" aria-hidden="true">🍫</div>
-<div class="card-body">
-<h3>Candy Bar Rondo</h3>
-<p>Build and display an ABACA rondo using candy-bar rhythm sections.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/rhythm-cards/">
+          <div class="card-icon blue" aria-hidden="true">🥁</div>
+          <div class="card-body">
+            <h3>Rhythm Cards</h3>
+            <p>Use interactive rhythm cards for reading, practice, and performance.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-<a class="activity-card" href="./state-rhythms/">
-<div class="card-icon teal" aria-hidden="true">🗺️</div>
-<div class="card-body">
-<h3>Travel USA Postcard Rhythms</h3>
-<p>Choose states on a colorful U.S. travel map to create four postcard rhythm selections with state landmarks.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+    <section class="activity-section instruments" id="instruments">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">🎺</div>
+        <h2>Instruments</h2>
+      </div>
 
-<a class="activity-card" href="./rhythm-cards/">
-<div class="card-icon blue" aria-hidden="true">🥁</div>
-<div class="card-body">
-<h3>Rhythm Cards</h3>
-<p>Use interactive rhythm cards for reading, practice, and performance.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
-</div>
-</section>
+      <div class="activity-grid">
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/instrument-matching/">
+          <div class="card-icon blue" aria-hidden="true">🎻</div>
+          <div class="card-body">
+            <h3>Instrument Matching Activity</h3>
+            <p>Choose from Common Band Instruments, Orff Mallet Instruments, and General Music Instruments.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<section class="activity-section instruments" id="instruments">
-<div class="section-title">
-<div class="section-icon" aria-hidden="true">🎺</div>
-<h2>Instruments</h2>
-</div>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/instrument-sorting/">
+          <div class="card-icon gold" aria-hidden="true">🧺</div>
+          <div class="card-body">
+            <h3>Instrument Sorting</h3>
+            <p>Sort instruments into the Woodwind, Brass, String, and Percussion families.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<div class="activity-grid">
-<a class="activity-card" href="./instrument-matching/">
-<div class="card-icon blue" aria-hidden="true">🎻</div>
-<div class="card-body">
-<h3>Instrument Matching Activity</h3>
-<p>
-Choose from Common Band Instruments, Orff Mallet Instruments,
-and General Music Instruments.
-</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/band-instruments-word-search/">
+          <div class="card-icon coral" aria-hidden="true">🔎</div>
+          <div class="card-body">
+            <h3>Band Instruments Word Search</h3>
+            <p>Find 20 common band instruments hidden horizontally, vertically, and diagonally in every direction.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-<a class="activity-card" href="./instrument-sorting/">
-<div class="card-icon gold" aria-hidden="true">🧺</div>
-<div class="card-body">
-<h3>Instrument Sorting</h3>
-<p>Sort instruments into the Woodwind, Brass, String, and Percussion families.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
-</div>
-</section>
+    <section class="activity-section movement" id="movement">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">🚦</div>
+        <h2>Movement</h2>
+      </div>
 
-<section class="activity-section movement" id="movement">
-<div class="section-title">
-<div class="section-icon" aria-hidden="true">🚦</div>
-<h2>Movement</h2>
-</div>
+      <div class="activity-grid">
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/move-signals/">
+          <div class="card-icon green" aria-hidden="true">🚦</div>
+          <div class="card-body">
+            <h3>Movement Signals</h3>
+            <p>Use large color signals to guide classroom movement activities.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<div class="activity-grid">
-<a class="activity-card" href="./move-signals/">
-<div class="card-icon green" aria-hidden="true">🚦</div>
-<div class="card-body">
-<h3>Movement Signals</h3>
-<p>Use large color signals to guide classroom movement activities.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/conducting-patterns/">
+          <div class="card-icon green" aria-hidden="true">🎼</div>
+          <div class="card-body">
+            <h3>Conducting Patterns</h3>
+            <p>Practice standard conducting patterns with synchronized visual cues and metronome clicks.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-<a class="activity-card" href="./conducting-patterns/">
-<div class="card-icon green" aria-hidden="true">🎼</div>
-<div class="card-body">
-<h3>Conducting Patterns</h3>
-<p>Practice standard conducting patterns with synchronized visual cues and metronome clicks.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
-</div>
-</section>
+    <section class="activity-section literature" id="childrens-literature">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">📚</div>
+        <h2>Children’s Literature</h2>
+      </div>
 
-<section class="activity-section literature" id="childrens-literature">
-<div class="section-title">
-<div class="section-icon" aria-hidden="true">📚</div>
-<h2>Children’s Literature</h2>
-</div>
+      <div class="activity-grid">
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/give-a-mouse/">
+          <div class="card-icon pink" aria-hidden="true">🍪</div>
+          <div class="card-body">
+            <h3>If You Give a Mouse A Cookie Milk and Cookie Build-a-Rhythm</h3>
+            <p>Build four-part rhythm patterns by arranging milk and cookie pictures inspired by the story.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<div class="activity-grid">
-<a class="activity-card" href="./give-a-mouse/">
-<div class="card-icon pink" aria-hidden="true">🍪</div>
-<div class="card-body">
-<h3>If You Give a Mouse A Cookie Milk and Cookie Build-a-Rhythm</h3>
-<p>Build four-part rhythm patterns by arranging milk and cookie pictures inspired by the story.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/hungry-caterpillar/">
+          <div class="card-icon green" aria-hidden="true">🐛</div>
+          <div class="card-body">
+            <h3>The Very Hungry Caterpillar Picnic Build-A-Rhythm</h3>
+            <p>Choose four labeled food cards from the picnic basket to create a four-part rhythm pattern inspired by the story.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./hungry-caterpillar/">
-<div class="card-icon green" aria-hidden="true">🐛</div>
-<div class="card-body">
-<h3>The Very Hungry Caterpillar Picnic Build-A-Rhythm</h3>
-<p>Choose four labeled food cards from the picnic basket to create a four-part rhythm pattern inspired by the story.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/chicka-chicka/">
+          <div class="card-icon purple" aria-hidden="true">🌴</div>
+          <div class="card-body">
+            <h3>Chicka Chicka Boom Boom Letters &amp; Shapes</h3>
+            <p>Drop colorful capital letters from the coconut tree in A–Z order or switch to random play.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./chicka-chicka/">
-<div class="card-icon purple" aria-hidden="true">🌴</div>
-<div class="card-body">
-<h3>Chicka Chicka Boom Boom Letters &amp; Shapes</h3>
-<p>Drop colorful capital letters from the coconut tree in A–Z order or switch to random play.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/harold-purple-crayon/">
+          <div class="card-icon gold" aria-hidden="true">🖍️</div>
+          <div class="card-body">
+            <h3>Harold and the Purple Crayon Melodic Adventures</h3>
+            <p>Follow Harold’s purple crayon with your voice through mountains, waves, loops, slides, stairs, and your own melodic drawings.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./harold-purple-crayon/">
-<div class="card-icon gold" aria-hidden="true">🖍️</div>
-<div class="card-body">
-<h3>Harold and the Purple Crayon Melodic Adventures</h3>
-<p>Follow Harold’s purple crayon with your voice through mountains, waves, loops, slides, stairs, and your own melodic drawings.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/very-lonely-firefly/">
+          <div class="card-icon blue" aria-hidden="true">✨</div>
+          <div class="card-body">
+            <h3>The Very Lonely Firefly</h3>
+            <p>Watch seven fireflies flash repeating rhythm patterns inspired by the story and identify the rhythms they perform.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./very-lonely-firefly/">
-<div class="card-icon blue" aria-hidden="true">✨</div>
-<div class="card-body">
-<h3>The Very Lonely Firefly</h3>
-<p>Watch seven fireflies flash repeating rhythm patterns inspired by the story and identify the rhythms they perform.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/mondrian-color-rhythms/">
+          <div class="card-icon coral" aria-hidden="true">🎨</div>
+          <div class="card-body">
+            <h3>Coppernickel Goes Mondrian, Music in Art</h3>
+            <p>Create a Mondrian-inspired composition by choosing colors for each rectangle, then reveal the musical rhythms hidden in the artwork.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
+      
+        <a class="activity-card" href="./little-engine-that-could/">
+          <div class="card-icon gold" aria-hidden="true">🚂</div>
+          <div class="card-body">
+            <h3>The Little Engine That Could – Tempos</h3>
+            <p>Explore Largo, Adagio, Andante, Allegro, and Presto as the little engine changes tempo around the track and over Tempo Mountain.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-<a class="activity-card" href="./mondrian-color-rhythms/">
-<div class="card-icon coral" aria-hidden="true">🎨</div>
-<div class="card-body">
-<h3>Coppernickel Goes Mondrian, Music in Art</h3>
-<p>Create a Mondrian-inspired composition by choosing colors for each rectangle, then reveal the musical rhythms hidden in the artwork.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
+    <section class="activity-section inspiration" id="inspiration">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">✨</div>
+        <h2>Inspiration</h2>
+      </div>
 
-</div>
-</section>
+      <div class="activity-grid">
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/music-sliding-puzzle/">
+          <div class="card-icon gold" aria-hidden="true">🧩</div>
+          <div class="card-body">
+            <h3>Music Sliding Puzzles</h3>
+            <p>Choose a music-themed image and solve it as a 3×3, 4×4, or 5×5 sliding puzzle.</p>
+            <span class="open-label">Open Activity →</span>
+          </div>
+        </a>
+      </div>
+    </section>
 
-<section class="activity-section inspiration" id="inspiration">
-<div class="section-title">
-<div class="section-icon" aria-hidden="true">✨</div>
-<h2>Inspiration</h2>
-</div>
+    <section class="activity-section science" id="music-science">
+      <div class="section-title">
+        <div class="section-icon" aria-hidden="true">🔬</div>
+        <h2>Music &amp; Science</h2>
+      </div>
 
-<div class="activity-grid">
-<a class="activity-card" href="./music-sliding-puzzle/">
-<div class="card-icon gold" aria-hidden="true">🧩</div>
-<div class="card-body">
-<h3>Music Sliding Puzzles</h3>
-<p>Choose a music-themed image and solve it as a 3×3, 4×4, or 5×5 sliding puzzle.</p>
-<span class="open-label">Open Activity →</span>
-</div>
-</a>
-</div>
-</section>
+      <div class="activity-grid">
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/music-science/pythagoras-monochord/index.html">
+          <div class="card-icon gold" aria-hidden="true">🎻</div>
+          <div class="card-body">
+            <h3>Pythagoras Monochord</h3>
+            <p>Explore musical intervals created by simple string-length ratios.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
 
-<section class="activity-section science" id="music-science">
-<div class="section-title">
-<div class="section-icon" aria-hidden="true">🔬</div>
-<h2>Music &amp; Science</h2>
-</div>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/music-science/Galileo-Pendulum/index.html">
+          <div class="card-icon purple" aria-hidden="true">⏱️</div>
+          <div class="card-body">
+            <h3>Galileo Pendulum</h3>
+            <p>Investigate the relationship between pendulum length, period, rhythm, and time.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
 
-<div class="activity-grid">
-<a class="activity-card" href="./music-science/pythagoras-monochord/index.html">
-<div class="card-icon gold" aria-hidden="true">🎻</div>
-<div class="card-body">
-<h3>Pythagoras Monochord</h3>
-<p>Explore musical intervals created by simple string-length ratios.</p>
-<span class="open-label">Explore Experiment →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/music-science/mersenne-echo/index.html">
+          <div class="card-icon coral" aria-hidden="true">💥</div>
+          <div class="card-body">
+            <h3>Mersenne Sound</h3>
+            <p>Recreate an early experiment for measuring the speed of sound.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./music-science/Galileo-Pendulum/index.html">
-<div class="card-icon purple" aria-hidden="true">⏱️</div>
-<div class="card-body">
-<h3>Galileo Pendulum</h3>
-<p>Investigate the relationship between pendulum length, period, rhythm, and time.</p>
-<span class="open-label">Explore Experiment →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/music-science/newton-color-wheel/index.html">
+          <div class="card-icon green" aria-hidden="true">🌈</div>
+          <div class="card-body">
+            <h3>Newton Color Wheel</h3>
+            <p>Spin the visible spectrum and observe how the colors blend together.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./music-science/mersenne-echo/index.html">
-<div class="card-icon coral" aria-hidden="true">💥</div>
-<div class="card-body">
-<h3>Mersenne Sound</h3>
-<p>Recreate an early experiment for measuring the speed of sound.</p>
-<span class="open-label">Explore Experiment →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/music-science/chladni-plates/index.html">
+          <div class="card-icon teal" aria-hidden="true">〰️</div>
+          <div class="card-body">
+            <h3>Chladni Plate</h3>
+            <p>Discover how vibration produces patterns along nodal lines.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./music-science/newton-color-wheel/index.html">
-<div class="card-icon green" aria-hidden="true">🌈</div>
-<div class="card-body">
-<h3>Newton Color Wheel</h3>
-<p>Spin the visible spectrum and observe how the colors blend together.</p>
-<span class="open-label">Explore Experiment →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/music-science/savart-wheel/index.html">
+          <div class="card-icon slate" aria-hidden="true">⚙️</div>
+          <div class="card-body">
+            <h3>Savart Wheel</h3>
+            <p>Explore how wheel speed and the number of teeth determine pitch.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
 
-<a class="activity-card" href="./music-science/chladni-plates/index.html">
-<div class="card-icon teal" aria-hidden="true">〰️</div>
-<div class="card-body">
-<h3>Chladni Plate</h3>
-<p>Discover how vibration produces patterns along nodal lines.</p>
-<span class="open-label">Explore Experiment →</span>
-</div>
-</a>
+        <a class="activity-card" href="https://yelofirb27.github.io/music-classroom-activities/music-science/helmholtz-forks/index.html">
+          <div class="card-icon blue" aria-hidden="true">🔔</div>
+          <div class="card-body">
+            <h3>Helmholtz's Sympathetic Tuning Forks</h3>
+            <p>Explore resonance between two tuning forks of the same frequency.</p>
+            <span class="open-label">Explore Experiment →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </main>
 
-<a class="activity-card" href="./music-science/savart-wheel/index.html">
-<div class="card-icon slate" aria-hidden="true">⚙️</div>
-<div class="card-body">
-<h3>Savart Wheel</h3>
-<p>Explore how wheel speed and the number of teeth determine pitch.</p>
-<span class="open-label">Explore Experiment →</span>
-</div>
-</a>
-
-<a class="activity-card" href="./music-science/helmholtz-forks/index.html">
-<div class="card-icon blue" aria-hidden="true">🔔</div>
-<div class="card-body">
-<h3>Helmholtz's Sympathetic Tuning Forks</h3>
-<p>Explore resonance between two tuning forks of the same frequency.</p>
-<span class="open-label">Explore Experiment →</span>
-</div>
-</a>
-</div>
-</section>
-
-</main>
-
-<footer>
-© 2026 Brian Foley · Music Classroom Activities
-</footer>
-
+  <footer>© 2026 Brian Foley · Music Classroom Activities</footer>
 </body>
 </html>
