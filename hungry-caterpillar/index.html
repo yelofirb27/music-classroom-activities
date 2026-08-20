@@ -70,37 +70,46 @@
   /* Foods visually sit inside the basket. */
   .basket-food-layer {
     position: absolute;
-    left: 11.3%;
-    top: 20.8%;
-    width: 77%;
-    height: 48%;
+    left: 12.8%;
+    top: 25.8%;
+    width: 74.5%;
+    height: 40.5%;
     z-index: 3;
     overflow: hidden;
-    border-radius: 15% 15% 20% 20%;
+    border-radius: 14% 14% 22% 22%;
     pointer-events: none;
   }
 
+  /* Packed tightly so every food reads as being INSIDE the basket.
+     A little overlap is intentional, like a real full picnic basket. */
   .basket-food {
     position: absolute;
-    width: 19%;
-    height: 34%;
+    width: 21%;
+    height: 31%;
     object-fit: contain;
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,.18));
+    transform-origin: center;
+    filter: drop-shadow(0 1.5px 1.5px rgba(0,0,0,.16));
   }
-  .basket-food:nth-child(1){left:0%;top:2%;transform:rotate(-11deg)}
-  .basket-food:nth-child(2){left:15%;top:0%;transform:rotate(7deg)}
-  .basket-food:nth-child(3){left:31%;top:4%;transform:rotate(-5deg)}
-  .basket-food:nth-child(4){left:48%;top:0%;transform:rotate(8deg)}
-  .basket-food:nth-child(5){left:66%;top:4%;transform:rotate(-4deg)}
-  .basket-food:nth-child(6){left:81%;top:2%;transform:rotate(8deg)}
-  .basket-food:nth-child(7){left:4%;top:31%;transform:rotate(10deg)}
-  .basket-food:nth-child(8){left:20%;top:30%;transform:rotate(-8deg)}
-  .basket-food:nth-child(9){left:37%;top:33%;transform:rotate(5deg)}
-  .basket-food:nth-child(10){left:54%;top:29%;transform:rotate(-7deg)}
-  .basket-food:nth-child(11){left:70%;top:31%;transform:rotate(6deg)}
-  .basket-food:nth-child(12){left:10%;top:58%;transform:rotate(-7deg)}
-  .basket-food:nth-child(13){left:36%;top:58%;transform:rotate(5deg)}
-  .basket-food:nth-child(14){left:66%;top:57%;transform:rotate(-5deg)}
+
+  /* Top row */
+  .basket-food:nth-child(1){left:1%;top:4%;transform:rotate(-10deg) scale(1.02)}
+  .basket-food:nth-child(2){left:15%;top:1%;transform:rotate(7deg) scale(.98)}
+  .basket-food:nth-child(3){left:30%;top:5%;transform:rotate(-5deg) scale(.96)}
+  .basket-food:nth-child(4){left:45%;top:1%;transform:rotate(7deg) scale(.96)}
+  .basket-food:nth-child(5){left:60%;top:5%;transform:rotate(-5deg) scale(.98)}
+  .basket-food:nth-child(6){left:75%;top:2%;transform:rotate(8deg) scale(.95)}
+
+  /* Middle row */
+  .basket-food:nth-child(7){left:4%;top:31%;transform:rotate(8deg) scale(.98)}
+  .basket-food:nth-child(8){left:19%;top:28%;transform:rotate(-7deg) scale(.95)}
+  .basket-food:nth-child(9){left:34%;top:32%;transform:rotate(5deg) scale(.98)}
+  .basket-food:nth-child(10){left:49%;top:28%;transform:rotate(-6deg) scale(.96)}
+  .basket-food:nth-child(11){left:65%;top:31%;transform:rotate(6deg) scale(.97)}
+
+  /* Bottom row */
+  .basket-food:nth-child(12){left:12%;top:57%;transform:rotate(-6deg) scale(.95)}
+  .basket-food:nth-child(13){left:37%;top:56%;transform:rotate(4deg) scale(.96)}
+  .basket-food:nth-child(14){left:62%;top:56%;transform:rotate(-5deg) scale(.95)}
 
   .basket-zone:hover .basket-tip {
     opacity: 1;
