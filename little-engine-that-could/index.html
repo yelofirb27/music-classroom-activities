@@ -134,11 +134,33 @@ h1{margin:0;color:#3b2a1d;font-size:clamp(24px,3vw,40px);line-height:1.05}
   transform:translateX(-50%);
   background:#161616;border:4px solid #5c554a;border-radius:18px
 }
-.throttle{
-  position:absolute;left:50%;top:50%;width:165px;
-  transform:translate(-50%,-50%) rotate(-90deg);
-  accent-color:#252525
+
+.throttle-input{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  cursor:pointer;
+  z-index:4;
+  margin:0;
 }
+.throttle-handle{
+  position:absolute;
+  left:49%;
+  top:50%;
+  width:64px;
+  height:24px;
+  transform:translate(-12%,-50%);
+  background:linear-gradient(#4b4b49,#171717);
+  border:3px solid #090909;
+  border-radius:8px 14px 14px 8px;
+  box-shadow:0 3px 5px rgba(0,0,0,.38),inset 0 1px 2px rgba(255,255,255,.18);
+  z-index:3;
+  pointer-events:none;
+  transition:top .18s ease;
+}
+
 .marks{
   position:absolute;left:8px;top:18px;bottom:18px;
   display:flex;flex-direction:column;justify-content:space-between;
@@ -196,8 +218,34 @@ h1{margin:0;color:#3b2a1d;font-size:clamp(24px,3vw,40px);line-height:1.05}
   .glabel{font-size:8px}
   .knob{width:38px;height:38px}
   .throttle-box{height:145px;width:105px}
-  .throttle{width:112px}
-  .marks{font-size:9px}
+    
+.throttle-input{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  opacity:0;
+  cursor:pointer;
+  z-index:4;
+  margin:0;
+}
+.throttle-handle{
+  position:absolute;
+  left:49%;
+  top:50%;
+  width:64px;
+  height:24px;
+  transform:translate(-12%,-50%);
+  background:linear-gradient(#4b4b49,#171717);
+  border:3px solid #090909;
+  border-radius:8px 14px 14px 8px;
+  box-shadow:0 3px 5px rgba(0,0,0,.38),inset 0 1px 2px rgba(255,255,255,.18);
+  z-index:3;
+  pointer-events:none;
+  transition:top .18s ease;
+}
+
+.marks{font-size:9px}
   .buttons{max-width:260px;margin:auto}
   .bigbtn{font-size:12px}
   .whistlebtn,.fullbtn{font-size:11px;padding:7px 6px}
@@ -219,6 +267,66 @@ h1{margin:0;color:#3b2a1d;font-size:clamp(24px,3vw,40px);line-height:1.05}
 :fullscreen .scene{
   height:100%;width:auto;max-width:100%;justify-self:center
 }
+
+@media(min-width:701px){
+  html,body{height:100%;overflow:hidden}
+  body{padding:5px}
+  .app{
+    height:calc(100vh - 10px);
+    max-width:1600px;
+    display:grid;
+    grid-template-rows:auto minmax(0,1fr);
+  }
+  header{margin-bottom:4px}
+  h1{font-size:clamp(24px,3.1vh,38px)}
+  .subtitle{font-size:12px;line-height:1}
+  .main-layout{
+    min-height:0;
+    height:100%;
+    grid-template-columns:minmax(0,1fr) 320px;
+    gap:8px;
+    align-items:stretch;
+  }
+  .scene{
+    height:100%;
+    width:auto;
+    max-width:100%;
+    justify-self:center;
+    align-self:center;
+    border-width:9px;
+  }
+  .controller-wrap{
+    height:100%;
+    min-height:0;
+    position:static;
+    padding:6px;
+    overflow:hidden;
+  }
+  .controller{
+    height:100%;
+    min-height:0;
+    padding:7px;
+    gap:6px;
+    grid-template-rows:auto minmax(0,1fr) auto;
+  }
+  .controller section{padding-bottom:6px}
+  .plate{padding:3px 5px;margin-bottom:4px;font-size:11px}
+  .gauge{width:min(190px,100%)}
+  .glabel{font-size:9px}
+  .knob{width:42px;height:42px}
+  .throttle-box{
+    height:100%;
+    min-height:145px;
+    max-height:220px;
+    width:125px;
+  }
+  .marks{font-size:9px}
+  .buttons{gap:7px;max-width:240px;margin:auto}
+  .bigbtn{font-size:12px}
+  .readout{margin-top:4px;font-size:11px;min-height:16px}
+  .whistlebtn,.fullbtn{margin-top:5px;padding:6px 7px;font-size:10px}
+}
+
 </style>
 </head>
 <body>
@@ -290,7 +398,8 @@ h1{margin:0;color:#3b2a1d;font-size:clamp(24px,3vw,40px);line-height:1.05}
             <div class="marks">
               <span>PRESTO</span><span>ALLEGRO</span><span>ANDANTE</span><span>ADAGIO</span><span>LARGO</span>
             </div>
-            <input id="throttle" class="throttle" type="range" min="0" max="4" step="1" value="2" aria-label="Tempo throttle">
+            <div id="throttleHandle" class="throttle-handle" aria-hidden="true"></div>
+            <input id="throttle" class="throttle-input" type="range" min="0" max="4" step="1" value="2" aria-label="Tempo throttle">
           </div>
         </section>
 
@@ -325,6 +434,7 @@ h1{margin:0;color:#3b2a1d;font-size:clamp(24px,3vw,40px);line-height:1.05}
   const cars = [0,1,2,3].map(i => document.getElementById('car'+i));
   const throttle = document.getElementById('throttle');
   const needle = document.getElementById('needle');
+  const throttleHandle = document.getElementById('throttleHandle');
   const status = document.getElementById('status');
   const readout = document.getElementById('readout');
   const whistleBtn = document.getElementById('whistleBtn');
@@ -385,6 +495,12 @@ h1{margin:0;color:#3b2a1d;font-size:clamp(24px,3vw,40px);line-height:1.05}
   function updateControls(){
     throttle.value=tempoIndex;
     needle.style.transform=`translateX(-50%) rotate(${needleAngles[tempoIndex]}deg)`;
+
+    // Range value runs Largo=0 to Presto=4, while the visual lever runs
+    // bottom (Largo) to top (Presto).
+    const handlePositions = [88,69,50,31,12];
+    throttleHandle.style.top = handlePositions[tempoIndex] + '%';
+
     if(motionState==='stopped') readout.textContent=base().name;
   }
 
