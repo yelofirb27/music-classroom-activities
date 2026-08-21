@@ -64,11 +64,15 @@ h1{
     0 5px 14px rgba(40,28,18,.20)
 }
 .scene-bg{
-  position:absolute;inset:0;width:100%;height:100%;
+  position:absolute;
+  z-index:0;
+  display:block;
+  width:107.53%;
+  height:109.89%;
+  left:-3.76%;
+  top:-4.95%;
   object-fit:cover;
   object-position:center;
-  display:block;
-  z-index:0
 }
 .train-layer{position:absolute;inset:0;z-index:2;pointer-events:none}
 .car{
@@ -449,7 +453,7 @@ h1{
 
   <div class="main-layout">
     <div class="scene">
-      <img class="scene-bg" src="assets/train-table-flat.png" alt="Realistic model railway table">
+      <img class="scene-bg" src="assets/train-table-background.png" alt="Realistic model railway table">
       <div class="grade-label rall-label">RALLENTANDO<small>up the mountain</small></div>
       <div class="grade-label accel-label">ACCELERANDO<small>down the mountain</small></div>
       <div id="status" class="status">Andante</div>
