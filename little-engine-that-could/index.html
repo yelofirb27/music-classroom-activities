@@ -80,10 +80,10 @@ h1{
   filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));
   will-change:left,top,transform;
 }
-.car.engine{width:6.35%}
-.car.coal{width:3.55%}
-.car.logs{width:4.55%}
-.car.boxcar{width:5.10%}
+.car.engine{width:6.55%}
+.car.coal{width:3.70%}
+.car.logs{width:4.75%}
+.car.boxcar{width:5.30%}
 
 .grade-label{
   position:absolute;z-index:4;top:3.5%;
@@ -537,21 +537,98 @@ h1{
     {name:'Presto', speed:420}
   ];
 
-  const path = document.getElementById('motionPath');
-  const cars = [0,1,2,3].map(i => document.getElementById('car'+i));
-  const throttle = document.getElementById('throttle');
-  const needle = document.getElementById('needle');
-  const throttleHandle = document.getElementById('throttleHandle');
-  const throttleBox = document.querySelector('.throttle-box');
-  const throttleMarks = [...document.querySelectorAll('.marks span')];
-  const status = document.getElementById('status');
-  const readout = document.getElementById('readout');
-  const whistleBtn = document.getElementById('whistleBtn');
-  const whistleAudio = document.getElementById('whistleAudio');
-  const fullBtn = document.getElementById('fullBtn');
+  // Dense rail-center trace. These points follow the visible center of the track,
+  // especially through the mountain S-curve and the upper-right bend.
+  const railPoints = [
+    [800,917],
+    [700,917],
+    [600,917],
+    [500,917],
+    [400,917],
+    [300,917],
+    [220,915],
+    [165,910],
+    [120,900],
+    [90,882],
+    [67,855],
+    [50,820],
+    [40,780],
+    [34,730],
+    [31,675],
+    [30,615],
+    [31,555],
+    [31,495],
+    [32,435],
+    [35,375],
+    [42,320],
+    [53,275],
+    [70,235],
+    [95,205],
+    [125,184],
+    [160,175],
+    [195,176],
+    [230,184],
+    [265,197],
+    [300,210],
+    [335,221],
+    [370,226],
+    [405,224],
+    [440,215],
+    [475,200],
+    [510,180],
+    [545,158],
+    [580,140],
+    [615,127],
+    [650,119],
+    [685,120],
+    [720,128],
+    [755,141],
+    [790,158],
+    [825,178],
+    [860,200],
+    [895,223],
+    [930,246],
+    [965,265],
+    [1000,280],
+    [1035,290],
+    [1070,294],
+    [1105,295],
+    [1140,297],
+    [1172,303],
+    [1200,316],
+    [1227,338],
+    [1248,365],
+    [1262,398],
+    [1269,438],
+    [1272,483],
+    [1273,532],
+    [1272,585],
+    [1270,640],
+    [1267,695],
+    [1262,748],
+    [1255,795],
+    [1245,835],
+    [1230,868],
+    [1210,890],
+    [1180,904],
+    [1145,912],
+    [1105,916],
+    [1040,918],
+    [960,918],
+    [880,918],
+    [800,917]
+  ];
 
-  const pathLen = path.getTotalLength();
-  const gaps = [0,64,119,181];
+  const railSegments = [];
+  let pathLen = 0;
+  for (let i = 0; i < railPoints.length - 1; i++) {
+    const a = railPoints[i];
+    const b = railPoints[i + 1];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    railSegments.push({a,b,start:pathLen,len});
+    pathLen += len;
+  }
+  const gaps = [0,62,116,177];
   const needleAngles = [-68,-34,0,34,68];
 
   let tempoIndex = 2;
@@ -565,22 +642,32 @@ h1{
 
   function pointAt(d){
     d = ((d % pathLen) + pathLen) % pathLen;
-    return path.getPointAtLength(d);
+
+    // Find the traced rail segment containing this distance.
+    // With ~80 points this remains very light-weight even at animation speed.
+    let seg = railSegments[railSegments.length - 1];
+    for (let i = 0; i < railSegments.length; i++) {
+      if (d <= railSegments[i].start + railSegments[i].len) {
+        seg = railSegments[i];
+        break;
+      }
+    }
+
+    const local = seg.len ? (d - seg.start) / seg.len : 0;
+    return {
+      x: seg.a[0] + (seg.b[0] - seg.a[0]) * local,
+      y: seg.a[1] + (seg.b[1] - seg.a[1]) * local
+    };
   }
 
   function placeCar(group,d){
     const p = pointAt(d);
-    const before = pointAt(d-3);
-    const after = pointAt(d+3);
+    const before = pointAt(d-4);
+    const after = pointAt(d+4);
     const angle = Math.atan2(after.y-before.y,after.x-before.x)*180/Math.PI;
 
-    // Exact coordinate conversion from the original 1448×1086 artwork
-    // into the physical 1346×988 flat crop.
-    const x = (p.x - 51) / 1346;
-    const y = (p.y - 49) / 988;
-
-    group.style.left = (x * 100) + '%';
-    group.style.top = (y * 100) + '%';
+    group.style.left = (p.x / 1346 * 100) + '%';
+    group.style.top = (p.y / 988 * 100) + '%';
     group.style.transform = `translate(-50%,-50%) rotate(${angle}deg)`;
   }
 
@@ -589,20 +676,24 @@ h1{
   }
 
   function mountainFactor(p){
-    if(p.y<320 && p.x>=190 && p.x<700){
-      let u=(p.x-190)/(700-190);
+    // Upper-left mountain climb: increasingly rallentando toward the apex.
+    if(p.y < 255 && p.x >= 120 && p.x < 660){
+      let u=(p.x-120)/(660-120);
       u=Math.max(0,Math.min(1,u));
       const smooth=u*u*(3-2*u);
       status.textContent='Rallentando';
       return 1-0.955*smooth;
     }
-    if(p.y<360 && p.x>=700 && p.x<=1140){
-      let u=(p.x-700)/(1140-700);
+
+    // Upper-right mountain descent: accelerando away from the apex.
+    if(p.y < 330 && p.x >= 660 && p.x <= 1140){
+      let u=(p.x-660)/(1140-660);
       u=Math.max(0,Math.min(1,u));
       const smooth=u*u*(3-2*u);
       status.textContent='Accelerando';
       return 0.045+0.955*smooth;
     }
+
     status.textContent=base().name;
     return 1;
   }
