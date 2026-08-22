@@ -21,25 +21,31 @@ header{text-align:center;margin-bottom:7px}
 h1{
   margin:0;
   text-align:center;
-  color:#0b4f8a;
-  font-size:clamp(28px,3.4vw,46px);
+  color:#07518f;
+  font-size:clamp(30px,3.6vw,48px);
   line-height:1;
   letter-spacing:.01em;
+  font-weight:800;
   text-shadow:
-    0 2px 0 #f0c65c,
-    0 3px 0 #7c4c1c;
+    -1px -1px 0 #e5b84f,
+     1px -1px 0 #e5b84f,
+    -1px  1px 0 #e5b84f,
+     1px  1px 0 #e5b84f,
+     0 3px 0 #70431b;
 }
 .subtitle{
   display:inline-block;
   margin:5px auto 0;
-  padding:5px 18px 6px;
-  color:#4f2f13;
-  background:linear-gradient(#f5d77f,#d7a63e);
-  border:2px solid #9b6a1f;
+  padding:5px 22px 6px;
+  color:#fff2c7;
+  background:linear-gradient(#a6271d,#6f1712);
+  border:3px solid #d7a746;
   border-radius:5px;
-  box-shadow:0 2px 0 #704817;
-  font:800 13px Georgia,"Times New Roman",serif;
-  letter-spacing:.07em;
+  box-shadow:
+    0 2px 0 #704817,
+    inset 0 0 0 1px rgba(255,255,255,.18);
+  font:800 14px Georgia,"Times New Roman",serif;
+  letter-spacing:.08em;
   text-transform:uppercase;
 }
 
@@ -111,10 +117,15 @@ h1{
 }
 
 .controller-wrap{
-  background:linear-gradient(#51311d,#2c1a10);
-  padding:9px;border-radius:12px;
-  box-shadow:0 7px 18px rgba(30,20,12,.26);
-  position:sticky;top:8px;
+  background:linear-gradient(#17324c,#0d2033);
+  padding:7px;
+  border:3px solid #b7832f;
+  border-radius:12px;
+  box-shadow:
+    0 7px 18px rgba(30,20,12,.26),
+    inset 0 0 0 2px #09213a;
+  position:sticky;
+  top:8px
 }
 .controller{
   background:linear-gradient(var(--panel2),var(--panel));
@@ -125,11 +136,19 @@ h1{
 .controller section{border-bottom:1px solid #4b4b46;padding-bottom:10px}
 .controller section:last-child{border-bottom:0;padding-bottom:0}
 .plate{
-  text-align:center;background:linear-gradient(#e7dfcf,#b9ad98);
-  color:#262019;border:2px solid #62584a;border-radius:3px;
-  box-shadow:inset 0 0 0 1px #f8f3e9;
-  padding:4px 6px;margin-bottom:7px;
-  font-weight:800;letter-spacing:.06em;font-size:13px;
+  text-align:center;
+  background:linear-gradient(#0f5489,#07365d);
+  color:#ffe7a5;
+  border:2px solid #c59032;
+  border-radius:5px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    0 1px 0 #4a2f10;
+  padding:4px 6px;
+  margin-bottom:6px;
+  font-weight:800;
+  letter-spacing:.07em;
+  font-size:13px
 }
 .gauge{
   position:relative;width:min(235px,100%);aspect-ratio:1.4/1;margin:auto;
@@ -141,17 +160,32 @@ h1{
 .gl1{left:3%;bottom:22%}.gl2{left:10%;top:25%}.gl3{left:50%;top:8%;transform:translateX(-50%)}
 .gl4{right:8%;top:25%}.gl5{right:1%;bottom:22%}
 .needle{
-  position:absolute;left:50%;bottom:22%;
-  width:5px;height:43%;background:#d23427;border-radius:5px;
+  position:absolute;
+  left:50%;
+  bottom:22%;
+  width:6px;
+  height:44%;
+  background:linear-gradient(#f04b3d,#c92f24);
+  border:2px solid #3b241d;
+  border-radius:5px 5px 2px 2px;
   transform-origin:50% 100%;
-  box-shadow:0 0 0 2px #3b2d25;
-  transition:transform .2s ease
+  box-shadow:0 1px 1px rgba(255,255,255,.25);
+  transition:transform .22s ease
 }
 .knob{
-  position:absolute;left:50%;bottom:13%;transform:translateX(-50%);
-  width:52px;height:52px;border-radius:50%;
-  background:radial-gradient(circle at 40% 35%,#5a5650,#171716 70%);
-  border:4px solid #090909;box-shadow:inset 0 0 0 3px #5b564f
+  position:absolute;
+  left:50%;
+  bottom:13%;
+  transform:translateX(-50%);
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  background:radial-gradient(circle at 38% 34%,#5f5b55,#181817 72%);
+  border:4px solid #090909;
+  box-shadow:
+    inset 0 0 0 3px #5b564f,
+    0 2px 3px rgba(0,0,0,.35);
+  z-index:3
 }
 .throttle-box{
   position:relative;
@@ -602,32 +636,35 @@ h1{
     [930,246],
     [965,265],
     [1000,280],
-    [1035,290],
-    [1070,294],
-    [1105,295],
-    [1140,297],
-    [1172,303],
-    [1200,316],
-    [1227,338],
-    [1248,365],
-    [1262,398],
-    [1269,438],
-    [1272,483],
-    [1273,532],
-    [1272,585],
-    [1270,640],
-    [1267,695],
-    [1262,748],
-    [1255,795],
-    [1245,835],
-    [1230,868],
-    [1210,890],
-    [1180,904],
-    [1145,912],
-    [1105,916],
-    [1040,918],
-    [960,918],
-    [880,918],
+    [1040,290],
+    [1080,296],
+    [1120,300],
+    [1160,306],
+    [1195,318],
+    [1225,338],
+    [1250,363],
+    [1270,392],
+    [1285,425],
+    [1296,462],
+    [1303,503],
+    [1308,548],
+    [1310,595],
+    [1310,642],
+    [1308,688],
+    [1304,732],
+    [1298,772],
+    [1289,808],
+    [1277,840],
+    [1262,866],
+    [1242,886],
+    [1218,900],
+    [1188,909],
+    [1152,914],
+    [1112,917],
+    [1068,919],
+    [1020,920],
+    [960,920],
+    [880,919],
     [800,917]
   ];
 
@@ -641,7 +678,7 @@ h1{
     pathLen += len;
   }
   const gaps = [0,62,116,177];
-  const needleAngles = [-68,-34,0,34,68];
+  const needleAngles = [-62,-31,0,31,62];
 
   let tempoIndex = 2;
   let headDist = 0;
