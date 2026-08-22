@@ -537,6 +537,18 @@ h1{
     {name:'Presto', speed:420}
   ];
 
+  const cars = [0,1,2,3].map(i => document.getElementById('car'+i));
+  const throttle = document.getElementById('throttle');
+  const needle = document.getElementById('needle');
+  const throttleHandle = document.getElementById('throttleHandle');
+  const throttleBox = document.querySelector('.throttle-box');
+  const throttleMarks = [...document.querySelectorAll('.marks span')];
+  const status = document.getElementById('status');
+  const readout = document.getElementById('readout');
+  const whistleBtn = document.getElementById('whistleBtn');
+  const whistleAudio = document.getElementById('whistleAudio');
+  const fullBtn = document.getElementById('fullBtn');
+
   // Dense rail-center trace. These points follow the visible center of the track,
   // especially through the mountain S-curve and the upper-right bend.
   const railPoints = [
