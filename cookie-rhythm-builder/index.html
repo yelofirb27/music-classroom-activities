@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cookie Rhythm Builder</title>
+<style>
+:root{
+  --cream:#fff8ea; --paper:#fffdf7; --ink:#3c2417; --brown:#6f3f24;
+  --gold:#d89b45; --red:#a94734; --line:#d8bb90; --shadow:0 10px 26px rgba(70,40,20,.15);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);background:
+radial-gradient(circle at 15% 10%,#fff 0 9%,transparent 30%),
+linear-gradient(135deg,#f7ead4,#fff8ea 45%,#f3dfc3);}
+body{min-height:100vh}
+.app{width:min(1500px,100%);min-height:100vh;margin:auto;padding:16px 18px 22px}
+header{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;margin-bottom:12px}
+h1{margin:0;font-size:clamp(28px,4vw,52px);letter-spacing:.5px;color:#5b301d}
+.subtitle{margin:4px 0 0;font-size:clamp(14px,1.5vw,21px);font-weight:700;color:#7b5942}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+button{font:inherit;font-weight:800;border:0;border-radius:13px;padding:11px 16px;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.08)}
+.btn-reset{background:#fff;color:var(--red);border:2px solid #d8b9ab}
+.btn-full{background:#5d341f;color:#fff}
+.builder{background:rgba(255,253,247,.9);border:2px solid #ead7b6;border-radius:24px;padding:15px;box-shadow:var(--shadow);margin-bottom:15px}
+.beats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.beat{min-height:190px;border:3px dashed #ca9e64;border-radius:20px;background:#fffdf8;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;transition:.16s}
+.beat.filled{border-style:solid;border-color:#b8793d;background:#fffaf1}
+.beat-num{position:absolute;left:10px;top:8px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#6b3a22;color:white;font-weight:900}
+.beat .placeholder{font-weight:800;color:#b19779;font-size:clamp(14px,1.3vw,19px)}
+.beat img{width:min(138px,62%);height:125px;object-fit:contain;filter:drop-shadow(0 5px 4px rgba(60,35,20,.18))}
+.beat .name{font-weight:900;font-size:clamp(16px,1.6vw,23px);text-align:center;margin-top:4px;line-height:1.05}
+.hint{text-align:center;margin-top:9px;font-size:14px;font-weight:750;color:#80644e}
+.picker-wrap{background:rgba(255,255,255,.72);border:1px solid #ead7b6;border-radius:24px;padding:14px 14px 17px;box-shadow:var(--shadow)}
+.picker-title{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:0 4px 10px}
+.picker-title h2{margin:0;font-size:clamp(20px,2vw,30px);color:#5b301d}
+.picker-title span{font-weight:750;color:#8b6a4d;font-size:14px}
+.picker{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
+.cookie{background:#fff;border:2px solid #ead8bd;border-radius:16px;padding:8px 6px 9px;min-height:158px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:.14s;user-select:none}
+.cookie:hover,.cookie:focus-visible{transform:translateY(-2px);border-color:#bd7a3d;box-shadow:0 8px 18px rgba(80,43,20,.14);outline:none}
+.cookie:active{transform:scale(.98)}
+.cookie.used{opacity:.35;filter:grayscale(.25);cursor:not-allowed;transform:none;box-shadow:none}
+.cookie.used::after{content:"USED";font-size:11px;font-weight:1000;letter-spacing:.7px;color:#8e4e36;margin-top:3px}
+.cookie img{width:108px;height:98px;object-fit:contain;filter:drop-shadow(0 4px 3px rgba(60,35,20,.15))}
+.cookie .label{font-weight:900;font-size:14px;line-height:1.05;text-align:center;margin-top:5px;color:#4c2b1c}
+.flash{animation:pop .28s ease}
+@keyframes pop{0%{transform:scale(.96)}55%{transform:scale(1.03)}100%{transform:scale(1)}}
+@media (max-width:1100px){.picker{grid-template-columns:repeat(4,1fr)}.cookie{min-height:138px}}
+@media (max-width:760px){
+  .app{padding:10px} header{grid-template-columns:1fr} .controls{justify-content:flex-start}
+  .beats{grid-template-columns:repeat(2,1fr)} .beat{min-height:160px}
+  .picker{grid-template-columns:repeat(4,1fr)} .cookie{min-height:120px;padding:5px}
+  .cookie img{width:80px;height:74px} .cookie .label{font-size:12px}
+}
+@media (max-width:480px){.picker{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div>
+    <h1>Cookie Rhythm Builder</h1>
+    <div class="subtitle">Choose four different cookies. Say each cookie name in rhythm.</div>
+  </div>
+  <div class="controls">
+    <button class="btn-reset" id="resetBtn">RESET</button>
+    <button class="btn-full" id="fullBtn">FULLSCREEN</button>
+  </div>
+</header>
+
+<section class="builder">
+  <div class="beats" id="beats"></div>
+  <div class="hint">Click a cookie to place it in the next open box. Each cookie can be used only once. Click a filled box to remove it.</div>
+</section>
+
+<section class="picker-wrap">
+  <div class="picker-title"><h2>Cookie Choices</h2><span>16 choices</span></div>
+  <div class="picker" id="picker"></div>
+</section>
+</div>
+
+<script>
+const cookies = [
+  {name:'Chocolate Chip', img:"assets/chocolate-chip.png"},
+  {name:'White Chocolate', img:"assets/white-chocolate.png"},
+  {name:'Oatmeal', img:"assets/oatmeal.png"},
+  {name:'Raisin', img:"assets/raisin.png"},
+  {name:'Peanut Butter', img:"assets/peanut-butter.png"},
+  {name:'Snickerdoodle', img:"assets/snickerdoodle.png"},
+  {name:'Double Chocolate', img:"assets/double-chocolate.png"},
+  {name:'M&M', img:"assets/mandm.png"},
+  {name:'Gingerbread', img:"assets/gingerbread.png"},
+  {name:'Shortbread', img:"assets/shortbread.png"},
+  {name:'Sprinkle', img:"assets/sprinkle.png"},
+  {name:'Lemon', img:"assets/lemon.png"},
+  {name:'Black & White', img:"assets/black-and-white.png"},
+  {name:'Almond', img:"assets/almond.png"},
+  {name:'Pecan Sandie', img:"assets/pecan-sandie.png"},
+  {name:'Fortune', img:"assets/fortune.png"}
+];
+
+const beatsEl = document.getElementById('beats');
+const pickerEl = document.getElementById('picker');
+let slots = [null,null,null,null];
+
+function isUsed(name) {
+  return slots.some(x => x && x.name === name);
+}
+
+function renderBeats(){
+  beatsEl.innerHTML = '';
+  slots.forEach((item,i)=>{
+    const b = document.createElement('div');
+    b.className = 'beat' + (item ? ' filled' : '');
+    b.tabIndex = 0;
+    b.innerHTML = `<div class="beat-num">${i+1}</div>` + (item
+      ? `<img src="${item.img}" alt=""><div class="name">${item.name}</div>`
+      : `<div class="placeholder">Choose a cookie</div>`);
+    const remove = ()=>{ if(slots[i]){ slots[i]=null; renderAll(); } };
+    b.addEventListener('click', remove);
+    b.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();remove();} });
+    beatsEl.appendChild(b);
+  });
+}
+
+function renderPicker(){
+  pickerEl.innerHTML='';
+  cookies.forEach(c=>{
+    const used = isUsed(c.name);
+    const card=document.createElement('div');
+    card.className='cookie' + (used ? ' used' : '');
+    card.tabIndex=used ? -1 : 0;
+    card.setAttribute('aria-disabled', used ? 'true' : 'false');
+    card.innerHTML=`<img src="${c.img}" alt="${c.name} cookie"><div class="label">${c.name}</div>`;
+    if(!used){
+      card.addEventListener('click',()=>addCookie(c));
+      card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();addCookie(c);}});
+    }
+    pickerEl.appendChild(card);
+  });
+}
+
+function renderAll(){
+  renderBeats();
+  renderPicker();
+}
+
+function addCookie(cookie){
+  if(isUsed(cookie.name)) return;
+  const open = slots.findIndex(x=>x===null);
+  if(open < 0) return; // all four boxes filled; don't replace anything automatically
+  slots[open] = cookie;
+  renderAll();
+  const target = beatsEl.children[open];
+  if(target){ target.classList.add('flash'); setTimeout(()=>target.classList.remove('flash'),300); }
+}
+
+document.getElementById('resetBtn').addEventListener('click',()=>{slots=[null,null,null,null];renderAll();});
+document.getElementById('fullBtn').addEventListener('click',async()=>{
+  try{
+    if(!document.fullscreenElement) await document.documentElement.requestFullscreen();
+    else await document.exitFullscreen();
+  }catch(e){}
+});
+renderAll();
+</script>
+</body>
+</html>
