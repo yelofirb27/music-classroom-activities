@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Hungry Caterpillar Fruit Counting</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f8f1d8;font-family:'Trebuchet MS','Arial Rounded MT Bold',Arial,sans-serif;user-select:none;-webkit-user-select:none;touch-action:none}
+#app{position:relative;width:100vw;height:100vh;overflow:hidden;background-color:#fbf4da;background-image:radial-gradient(circle at 12% 18%,rgba(231,64,48,.12) 0 2px,transparent 3px),radial-gradient(circle at 82% 20%,rgba(57,139,67,.13) 0 2px,transparent 3px),radial-gradient(circle at 34% 76%,rgba(241,146,37,.12) 0 2px,transparent 3px),linear-gradient(105deg,rgba(255,255,255,.58),rgba(250,235,189,.28));background-size:31px 31px,37px 37px,43px 43px,100% 100%}
+h1{position:absolute;top:1.2%;left:50%;transform:translateX(-50%);margin:0;width:96%;white-space:nowrap;text-align:center;font-size:clamp(21px,2.25vw,40px);font-weight:900;letter-spacing:.2px;color:#2d5d35;text-shadow:2px 2px 0 rgba(255,255,255,.9)} h1 .red{color:#d83d31} h1 .orange{color:#e97825} h1 .blue{color:#435da8}
+#numbers{position:absolute;left:3%;top:10%;bottom:10%;width:15%;display:flex;flex-direction:column;justify-content:space-around;align-items:center;z-index:4}
+.num{width:clamp(74px,8.3vw,145px);aspect-ratio:1;border:4px solid currentColor;border-radius:50%;display:grid;place-items:center;background:rgba(255,252,239,.92);font-size:clamp(42px,5vw,82px);font-weight:800;cursor:grab;touch-action:none}.num.done{opacity:.35;cursor:default}.num:focus-visible{outline:5px solid #222;outline-offset:4px}
+.num[data-n="1"]{color:#7aa84f}.num[data-n="2"]{color:#ef4444}.num[data-n="3"]{color:#f97316}.num[data-n="4"]{color:#e63946}.num[data-n="5"]{color:#4d5db6}
+#fruitArea{position:absolute;left:28%;right:4%;top:9%;bottom:11%;display:grid;grid-template-rows:repeat(5,1fr);gap:1.2%;z-index:2}
+.group{position:relative;display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.7vw,30px);min-height:0;border-radius:20px}
+.fruit{position:relative;height:min(12.5vh,125px);width:min(10vw,130px);display:grid;place-items:center;flex:0 0 auto}.fruit img{max-width:100%;max-height:100%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 1px rgba(0,0,0,.15))}
+/* Clean white tunnel openings: no outline, scallops, box, or ring. */
+.hole{display:none;position:absolute;transform:translate(-50%,-50%);width:26.35%;aspect-ratio:1;border-radius:50%;background:#fff;z-index:3}.fruit.eaten .hole{display:block}
+#draw{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}.trail{fill:none;stroke:#70aa43;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+#caterpillar{position:absolute;z-index:8;width:clamp(78px,8.5vw,145px);height:clamp(48px,5.2vw,88px);pointer-events:none;display:none;transform:translate(-50%,-50%)}
+.seg{position:absolute;border-radius:50%;width:32%;height:57%;top:25%;background:#5ca94d;border:2px solid rgba(25,80,38,.35)}.seg:nth-child(1){left:0}.seg:nth-child(2){left:20%;top:18%;background:#7bbf50}.seg:nth-child(3){left:40%;top:27%;background:#439e50}.seg:nth-child(4){left:59%;top:18%;background:#78b94d}.head{position:absolute;right:0;top:7%;width:37%;height:72%;border-radius:50%;background:#e64232;border:2px solid rgba(105,27,20,.35)}.eye{position:absolute;top:19%;width:20%;height:31%;background:#f3dc35;border-radius:50%}.eye:after{content:"";position:absolute;width:43%;height:62%;left:30%;top:20%;background:#296fae;border-radius:50%}.eye.a{left:16%}.eye.b{right:14%}.ant{position:absolute;width:3px;height:31%;background:#513727;top:-24%;transform-origin:bottom}.ant.a{left:28%;transform:rotate(-20deg)}.ant.b{right:25%;transform:rotate(18deg)}
+#message{position:absolute;left:50%;bottom:2.2%;transform:translateX(-50%);font-size:clamp(18px,2.2vw,36px);font-weight:900;color:#444;z-index:10;min-width:220px;text-align:center}
+.controls{position:absolute;right:2%;bottom:2%;display:flex;gap:12px;z-index:12}.controls button{min-height:48px;border:2px solid #333;border-radius:12px;background:#fff;padding:9px 16px;font-size:clamp(16px,1.3vw,22px);font-weight:800;cursor:pointer}.controls button:active{transform:translateY(1px)}
+@media(max-width:650px){h1{width:92%;white-space:normal;font-size:18px}.fruit{height:min(11vh,72px);width:min(11vw,76px)}#fruitArea{left:25%;right:2%}.num{width:60px;font-size:34px}.controls button{padding:7px 10px}.doneLabel{right:-1%}}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1><span class="red">Drag the hungry caterpillar</span> from the <span class="orange">number</span> to the correct amount of <span class="blue">fruit.</span></h1>
+  <div id="numbers" aria-label="Numbers 1 through 5"></div>
+  <div id="fruitArea"></div>
+  <svg id="draw" aria-hidden="true"><path id="trail" class="trail" d=""></path></svg>
+  <div id="caterpillar" aria-hidden="true"><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="head"><i class="ant a"></i><i class="ant b"></i><i class="eye a"></i><i class="eye b"></i></span></div>
+  <div id="message" aria-live="polite"></div>
+  <div class="controls"><button id="reset">↻ Reset</button><button id="full">⛶ Full Screen</button></div>
+</div>
+<script>
+(()=>{
+const app=document.getElementById('app'), nums=document.getElementById('numbers'), fruitArea=document.getElementById('fruitArea'), cat=document.getElementById('caterpillar'), trail=document.getElementById('trail'), msg=document.getElementById('message');
+const items=[
+ {n:1,name:'apple',src:'assets/apple.png',hole:[50,68]},
+ {n:2,name:'pear',src:'assets/pear.png',hole:[50,72]},
+ {n:3,name:'plum',src:'assets/plum.png',hole:[50,70]},
+ {n:4,name:'strawberry',src:'assets/strawberry.png',hole:[50,73]},
+ {n:5,name:'orange',src:'assets/orange.png',hole:[50,68]}
+];
+let active=null, points=[], locked=false;
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function build(){nums.innerHTML='';fruitArea.innerHTML='';msg.textContent='';trail.setAttribute('d','');cat.style.display='none';active=null;points=[];locked=false;
+ items.forEach(o=>{const b=document.createElement('button');b.className='num';b.dataset.n=o.n;b.textContent=o.n;b.setAttribute('aria-label','Number '+o.n);b.addEventListener('pointerdown',start);nums.appendChild(b)});
+ shuffle(items).forEach(o=>{const g=document.createElement('div');g.className='group';g.dataset.n=o.n;g.setAttribute('aria-label',`${o.n} ${o.name}${o.n>1?'s':''}`);for(let i=0;i<o.n;i++){const f=document.createElement('div');f.className='fruit';const im=document.createElement('img');im.src=o.src;im.alt=o.name;const h=document.createElement('span');h.className='hole';h.style.left=o.hole[0]+'%';h.style.top=o.hole[1]+'%';f.append(im,h);g.appendChild(f)}fruitArea.appendChild(g)});
+}
+function xy(e){const r=app.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+function place(p){cat.style.left=p.x+'px';cat.style.top=p.y+'px'}
+function path(){if(!points.length)return '';let d=`M ${points[0].x} ${points[0].y}`;for(let i=1;i<points.length;i++)d+=` L ${points[i].x} ${points[i].y}`;return d}
+function start(e){if(locked||e.currentTarget.classList.contains('done'))return;e.preventDefault();active=e.currentTarget;active.setPointerCapture?.(e.pointerId);const r=active.getBoundingClientRect(),ar=app.getBoundingClientRect();const p={x:r.right-ar.left+15,y:r.top-ar.top+r.height/2};points=[p];place(p);cat.style.display='block';trail.setAttribute('d',path());app.addEventListener('pointermove',move);app.addEventListener('pointerup',end,{once:true});app.addEventListener('pointercancel',end,{once:true})}
+function move(e){if(!active||locked)return;const p=xy(e);place(p);const last=points[points.length-1];if(!last||Math.hypot(p.x-last.x,p.y-last.y)>8){points.push(p);trail.setAttribute('d',path())}}
+function targetAt(x,y){return [...fruitArea.querySelectorAll('.group:not(.done)')].find(g=>{const r=g.getBoundingClientRect();return x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom})}
+function end(e){app.removeEventListener('pointermove',move);if(!active||locked)return;const t=targetAt(e.clientX,e.clientY);const correct=t&&Number(t.dataset.n)===Number(active.dataset.n);correct?success(t):fail()}
+function success(g){locked=true;msg.textContent='';const fruits=[...g.querySelectorAll('.fruit')];let i=0;function eat(){if(i>=fruits.length){g.classList.add('done');active.classList.add('done');setTimeout(()=>{trail.setAttribute('d','');cat.style.display='none';active=null;locked=false;msg.textContent=''},500);return}const r=fruits[i].getBoundingClientRect(),ar=app.getBoundingClientRect();const dest={x:r.left-ar.left+r.width/2,y:r.top-ar.top+r.height/2};animateTo(dest,()=>{fruits[i].classList.add('eaten');setTimeout(()=>{i++;eat()},130)})}eat()}
+function animateTo(dest,done){const cr=cat.getBoundingClientRect(),ar=app.getBoundingClientRect();const from={x:cr.left-ar.left+cr.width/2,y:cr.top-ar.top+cr.height/2};const start=performance.now(),dur=240;function f(now){const q=Math.min(1,(now-start)/dur),ease=1-Math.pow(1-q,3);const p={x:from.x+(dest.x-from.x)*ease,y:from.y+(dest.y-from.y)*ease};place(p);if(q<1)requestAnimationFrame(f);else done()}requestAnimationFrame(f)}
+function fail(){locked=true;msg.textContent='Try again!';const start=points[0];animateTo(start,()=>{trail.style.transition='opacity .25s';trail.style.opacity='0';setTimeout(()=>{trail.setAttribute('d','');trail.style.opacity='';trail.style.transition='';cat.style.display='none';msg.textContent='';active=null;points=[];locked=false},260)})}
+document.getElementById('reset').addEventListener('click',build);
+document.getElementById('full').addEventListener('click',async()=>{try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch(e){}});
+build();
+})();
+</script>
+</body></html>
